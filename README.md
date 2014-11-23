@@ -1,5 +1,5 @@
 ## Transduct
-[![Build Status](https://secure.travis-ci.org/transduce/duce.svg)](http://travis-ci.org/transduce/duce)
+[![Build Status](https://secure.travis-ci.org/transduce/transduct.svg)](http://travis-ci.org/transduce/transduct)
 
 Transducers for JavaScript using the [transduce][1] libraries.
 
