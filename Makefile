@@ -1,4 +1,4 @@
-PROJECT:=duce
+PROJECT:=transduct
 
 JS_TARGET ?= build/$(PROJECT).js
 

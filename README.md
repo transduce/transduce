@@ -1,4 +1,4 @@
-## Duce
+## Transduct
 [![Build Status](https://secure.travis-ci.org/transduce/duce.svg)](http://travis-ci.org/transduce/duce)
 
 Transducers for JavaScript using the [transduce][1] libraries.

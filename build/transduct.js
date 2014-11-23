@@ -1,38 +1,5 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
-var protocol = require('transduce-protocol'),
-    transduceToArray = protocol.transduceToArray,
-    /*
-    implFns = [
-      'remove', 'into', 'take', 'takeWhile',
-      'drop', 'dropWhile', 'cat', 'mapcat', 'partitionAll', 'partitionBy'],*/
-    protocolFns = [
-      'protocols', 'compose',
-      'isIterable', 'isIterator', 'iterable', 'iterator',
-      'isTransformer', 'transformer',
-      'isReduced', 'reduced', 'unreduced', 'deref',
-      'isFunction', 'isArray', 'arrayPush', 'identity'];
-
-var exports = module.exports = {
-  reduce: require('./lib/reduce'),
-  transduce: require('./lib/transduce'),
-  map: require('./lib/map'),
-  filter: require('./lib/filter')
-};
-exports.toArray = transduceToArray(exports);
-exportProtocol(exports);
-
-function exportProtocol(exports){
-  var i = 0, len = protocolFns.length, fn;
-  for(; i < len; i++){
-    fn = protocolFns[i];
-    exports[fn] = protocol[fn];
-  }
-}
-
-
-},{"./lib/filter":2,"./lib/map":3,"./lib/reduce":4,"./lib/transduce":5,"transduce-protocol":8}],2:[function(require,module,exports){
-"use strict";
 module.exports = filter;
 
 function filter(predicate) {
@@ -57,7 +24,7 @@ Filter.prototype.step = function(result, input) {
   return result;
 };
 
-},{}],3:[function(require,module,exports){
+},{}],2:[function(require,module,exports){
 "use strict";
 module.exports = map;
 function map(callback) {
@@ -79,7 +46,7 @@ Map.prototype.step = function(result, input) {
   return this.xf.step(result, this.f(input));
 };
 
-},{}],4:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 "use strict";
 var tp = require('transduce-protocol'),
     isReduced = tp.isReduced,
@@ -130,7 +97,7 @@ function iteratorReduce(xf, init, iter){
   return xf.result(value);
 }
 
-},{"transduce-protocol":8}],5:[function(require,module,exports){
+},{"transduce-protocol":7}],4:[function(require,module,exports){
 "use strict";
 var tp = require('transduce-protocol'),
     reduce = require('./reduce'),
@@ -142,7 +109,7 @@ function transduce(xf, f, init, coll){
   return reduce(xf(f), init, coll);
 }
 
-},{"./reduce":4,"transduce-protocol":8}],6:[function(require,module,exports){
+},{"./reduce":3,"transduce-protocol":7}],5:[function(require,module,exports){
 "use strict";
 /* global Symbol */
 var util = require('transduce-util'),
@@ -236,7 +203,7 @@ FunctionIterable.prototype[symbol] = function(){
   };
 };
 
-},{"transduce-util":7}],7:[function(require,module,exports){
+},{"transduce-util":6}],6:[function(require,module,exports){
 "use strict";
 var undef,
     Arr = Array,
@@ -327,7 +294,7 @@ function push(result, input){
   return result;
 }
 
-},{}],8:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 "use strict";
 /* global Symbol */
 var undef,
@@ -419,4 +386,37 @@ FunctionTransformer.prototype.step = function(result, input){
 };
 FunctionTransformer.prototype.result = identity;
 
-},{"iterator-protocol":6,"transduce-util":7}]},{},[1]);
+},{"iterator-protocol":5,"transduce-util":6}],8:[function(require,module,exports){
+"use strict";
+var protocol = require('transduce-protocol'),
+    transduceToArray = protocol.transduceToArray,
+    /*
+    implFns = [
+      'remove', 'into', 'take', 'takeWhile',
+      'drop', 'dropWhile', 'cat', 'mapcat', 'partitionAll', 'partitionBy'],*/
+    protocolFns = [
+      'protocols', 'compose',
+      'isIterable', 'isIterator', 'iterable', 'iterator',
+      'isTransformer', 'transformer',
+      'isReduced', 'reduced', 'unreduced', 'deref',
+      'isFunction', 'isArray', 'arrayPush', 'identity'];
+
+var exports = module.exports = {
+  reduce: require('./lib/reduce'),
+  transduce: require('./lib/transduce'),
+  map: require('./lib/map'),
+  filter: require('./lib/filter')
+};
+exports.toArray = transduceToArray(exports);
+exportProtocol(exports);
+
+function exportProtocol(exports){
+  var i = 0, len = protocolFns.length, fn;
+  for(; i < len; i++){
+    fn = protocolFns[i];
+    exports[fn] = protocol[fn];
+  }
+}
+
+
+},{"./lib/filter":1,"./lib/map":2,"./lib/reduce":3,"./lib/transduce":4,"transduce-protocol":7}]},{},[8]);

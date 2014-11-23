@@ -1,8 +1,8 @@
 {
-  "name": "duce",
-  "main": "build/duce.min.js",
+  "name": "transduct",
+  "main": "build/transduct.min.js",
   "version": "0.0.1",
-  "homepage": "https://github.com/transduce/duce",
+  "homepage": "https://github.com/transduce/transduct",
   "authors": [
     "Kevin Beaty <kevin@simplectic.com>"
   ],
