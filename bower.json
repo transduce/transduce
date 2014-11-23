@@ -1,0 +1,27 @@
+{
+  "name": "duce",
+  "main": "build/duce.min.js",
+  "version": "0.0.1",
+  "homepage": "https://github.com/transduce/duce",
+  "authors": [
+    "Kevin Beaty <kevin@simplectic.com>"
+  ],
+  "description": "JavaScript transducers using transduce libraries",
+  "moduleType": [
+    "amd",
+    "globals"
+  ],
+  "keywords": [
+    "transducer",
+    "transduce"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests",
+    "*-old"
+  ]
+}

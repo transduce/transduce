@@ -1,0 +1,31 @@
+{
+  "name": "duce",
+  "version": "0.0.1",
+  "description": "JavaScript transducers using transduce libraries",
+  "main": "duce.js",
+  "scripts": {
+    "test": "make test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/transduce/duce"
+  },
+  "keywords": [
+    "transducer",
+    "transduce"
+  ],
+  "author": "Kevin Beaty",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/transduce/duce/issues"
+  },
+  "homepage": "http://github.com/transduce/duce",
+  "dependencies": {
+    "transduce-protocol": "0.0.7"
+  },
+  "devDependencies": {
+    "tape": "~3.0.0",
+    "browserify": "~6.3.2",
+    "uglify-js": "~2.4.15"
+  }
+}
