@@ -14,5 +14,5 @@ toArray: function(xf, coll):
 ```
 Also mixes in all methods in [transduce-protocol][2].
 
-[1]: https://github.com/transduce/transduce
+[1]: https://github.com/transduce
 [2]: https://github.com/transduce/transduce-protocol

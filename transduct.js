@@ -13,10 +13,10 @@ var protocol = require('transduce-protocol'),
       'isFunction', 'isArray', 'arrayPush', 'identity'];
 
 var exports = module.exports = {
-  reduce: require('./lib/reduce'),
-  transduce: require('./lib/transduce'),
-  map: require('./lib/map'),
-  filter: require('./lib/filter')
+  reduce: require('transduct-reduce'),
+  transduce: require('transduct-transduce'),
+  map: require('transduce-map'),
+  filter: require('transduce-filter')
 };
 exports.toArray = transduceToArray(exports);
 exportProtocol(exports);
