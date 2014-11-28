@@ -25,7 +25,10 @@
     "transduct-reduce": "0.0.1",
     "transduct-transduce": "0.0.1",
     "transduce-filter": "0.0.1",
-    "transduce-map": "0.0.1"
+    "transduce-map": "0.0.1",
+    "transduce-remove": "0.0.1",
+    "transduce-drop": "0.0.1",
+    "transduce-take": "0.0.1"
   },
   "devDependencies": {
     "tape": "~3.0.0",

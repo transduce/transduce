@@ -44,24 +44,24 @@ test('filter', function(t) {
   t.deepEqual(tr.toArray(tr.filter(isEven), evenArray), [2, 4, 6]);
 });
 
-/*
 test('remove', function(t) {
   t.plan(1);
 
-  var odds = tr.into([], tr.remove(function(num){ return num % 2 === 0; }), [1, 2, 3, 4, 5, 6]);
+  var odds = tr.toArray(tr.remove(function(num){ return num % 2 === 0; }), [1, 2, 3, 4, 5, 6]);
   t.deepEqual(odds, [1, 3, 5], 'rejected each even number');
 });
 
 test('take', function(t) {
   t.plan(5);
 
-  t.deepEqual(tr.into([], tr.take(0), [1, 2, 3]), [], 'can pass an index to first');
+  t.deepEqual(tr.toArray(tr.take(0), [1, 2, 3]), [], 'can pass an index to first');
   t.deepEqual(tr.toArray(tr.take(1), [1, 2, 3]), [1], 'can pull out the first element of an array');
-  t.deepEqual(tr.into([], tr.take(2), [1, 2, 3]), [1, 2], 'can pass an index to first');
+  t.deepEqual(tr.toArray(tr.take(2), [1, 2, 3]), [1, 2], 'can pass an index to first');
   t.deepEqual(tr.toArray(tr.take(3), [1, 2, 3]), [1, 2, 3], 'can pass an index to first');
-  t.strictEqual(tr.into([], tr.take(-1), [1, 2, 3]).length, 0);
+  t.strictEqual(tr.toArray(tr.take(-1), [1, 2, 3]).length, 0);
 });
 
+/*
 test('takeWhile', function(t) {
   t.plan(4);
 
@@ -70,17 +70,18 @@ test('takeWhile', function(t) {
   t.deepEqual(tr.into([], tr.takeWhile(isEven), [2, 2, 3]), [2,2]);
   t.deepEqual(tr.into([], tr.takeWhile(isOdd), [1, 3, 3]), [1, 3, 3]);
 });
+*/
 
 test('drop', function(t) {
   t.plan(4);
 
   var numbers = [1, 2, 3, 4];
-  t.deepEqual(tr.into([], tr.drop(1), numbers), [2, 3, 4], 'working rest()');
-  t.deepEqual(tr.into([], tr.drop(0), numbers), [1, 2, 3, 4], 'working rest(0)');
-  t.deepEqual(tr.into([], tr.drop(-1), numbers), [1, 2, 3, 4], 'working rest(-1)');
-  t.deepEqual(tr.into([], tr.drop(2), numbers), [3, 4], 'rest can take an index');
+  t.deepEqual(tr.toArray(tr.drop(1), numbers), [2, 3, 4], 'working rest()');
+  t.deepEqual(tr.toArray(tr.drop(0), numbers), [1, 2, 3, 4], 'working rest(0)');
+  t.deepEqual(tr.toArray(tr.drop(-1), numbers), [1, 2, 3, 4], 'working rest(-1)');
+  t.deepEqual(tr.toArray(tr.drop(2), numbers), [3, 4], 'rest can take an index');
 });
-
+/*
 test('dropWhile', function(t) {
   t.plan(4);
 

@@ -3,8 +3,8 @@ var protocol = require('transduce-protocol'),
     transduceToArray = protocol.transduceToArray,
     /*
     implFns = [
-      'remove', 'into', 'take', 'takeWhile',
-      'drop', 'dropWhile', 'cat', 'mapcat', 'partitionAll', 'partitionBy'],*/
+      'into', 'takeWhile',
+      'dropWhile', 'cat', 'mapcat', 'partitionAll', 'partitionBy'],*/
     protocolFns = [
       'protocols', 'compose',
       'isIterable', 'isIterator', 'iterable', 'iterator',
@@ -16,7 +16,10 @@ var exports = module.exports = {
   reduce: require('transduct-reduce'),
   transduce: require('transduct-transduce'),
   map: require('transduce-map'),
-  filter: require('transduce-filter')
+  filter: require('transduce-filter'),
+  remove: require('transduce-remove'),
+  drop: require('transduce-drop'),
+  take: require('transduce-take')
 };
 exports.toArray = transduceToArray(exports);
 exportProtocol(exports);
