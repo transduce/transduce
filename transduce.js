@@ -1,5 +1,6 @@
 "use strict";
 var util = require('transduce-util'),
+    compose = require('transduce-compose'),
     reduced = require('transduce-reduced'),
     iter = require('iterator-protocol'),
     transformer = require('transformer-protocol');
@@ -20,6 +21,7 @@ module.exports = {
   mapcat: require('transduce-mapcat'),
   partitionAll: require('transduce-partitionall'),
   partitionBy: require('transduce-partitionby'),
+  compose: compose,
   isIterable: iter.isIterable,
   isIterator: iter.isIterator,
   iterable: iter.iterable,
@@ -31,7 +33,6 @@ module.exports = {
   unreduced: reduced.unreduced,
   deref: reduced.unreduced,
   protocols: util.protocols,
-  compose: util.compose,
   isFunction: util.isFunction,
   isArray: util.isArray,
   isString: util.isString,

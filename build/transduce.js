@@ -4,8 +4,6 @@
 var util = require('transduce-util'),
     symbol = util.protocols.iterator,
     isFunction = util.isFunction,
-    isArray = util.isArray,
-    isString = util.isString,
     keys = Object.keys || _keys,
     undef;
 
@@ -15,10 +13,7 @@ module.exports = {
   isIterator: isIterator,
   iterable: iterable,
   iterator: iterator,
-  toArray: toArray,
-  isFunction: isFunction,
-  isArray: isArray,
-  isString: isString
+  toArray: toArray
 };
 
 function toArray(iter){
@@ -45,7 +40,7 @@ function iterable(value){
   var it;
   if(isIterable(value)){
     it = value;
-  } else if(isArray(value) || isString(value)){
+  } else if(util.isArray(value) || util.isString(value)){
     it = new ArrayIterable(value);
   } else if(isFunction(value)){
     it = new FunctionIterable(value);
@@ -127,7 +122,7 @@ function _keys(obj){
   return keys;
 }
 
-},{"transduce-util":19}],2:[function(require,module,exports){
+},{"transduce-util":20}],2:[function(require,module,exports){
 "use strict";
 
 var tp = require('transduce-reduced'),
@@ -167,7 +162,21 @@ PreserveReduced.prototype.step = function(value, item){
   return value;
 };
 
-},{"transduce-reduce":11,"transduce-reduced":12}],3:[function(require,module,exports){
+},{"transduce-reduce":12,"transduce-reduced":13}],3:[function(require,module,exports){
+"use strict";
+module.exports = compose;
+function compose(){
+  var fns = arguments;
+  return function(xf){
+    var i = fns.length;
+    while(i--){
+      xf = fns[i](xf);
+    }
+    return xf;
+  };
+}
+
+},{}],4:[function(require,module,exports){
 "use strict";
 
 module.exports = drop;
@@ -193,7 +202,7 @@ Drop.prototype.step = function(value, item){
   return value;
 };
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 "use strict";
 var undef;
 
@@ -223,7 +232,7 @@ DropWhile.prototype.step = function(value, item){
   return this.xf.step(value, item);
 };
 
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 "use strict";
 module.exports = filter;
 
@@ -249,7 +258,7 @@ Filter.prototype.step = function(result, input) {
   return result;
 };
 
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 "use strict";
 var transduce = require('transduce-transduce');
 
@@ -258,7 +267,7 @@ function into(to, xf, from){
   return transduce(xf, to, to, from);
 }
 
-},{"transduce-transduce":18}],7:[function(require,module,exports){
+},{"transduce-transduce":19}],8:[function(require,module,exports){
 "use strict";
 module.exports = map;
 function map(callback) {
@@ -280,17 +289,17 @@ Map.prototype.step = function(result, input) {
   return this.xf.step(result, this.f(input));
 };
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 "use strict";
-var util = require('transduce-util'),
+var compose = require('transduce-compose'),
     map = require('transduce-map'),
     cat = require('transduce-cat');
 module.exports = mapcat;
 function mapcat(callback) {
-  return util.compose(map(callback), cat);
+  return compose(map(callback), cat);
 }
 
-},{"transduce-cat":2,"transduce-map":7,"transduce-util":19}],9:[function(require,module,exports){
+},{"transduce-cat":2,"transduce-compose":3,"transduce-map":8}],10:[function(require,module,exports){
 "use strict";
 module.exports = partitionAll;
 function partitionAll(n) {
@@ -325,7 +334,7 @@ PartitionAll.prototype.step = function(result, input) {
   return result;
 };
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 "use strict";
 var tp = require('transduce-reduced'),
     undef;
@@ -371,16 +380,17 @@ PartitionBy.prototype.step = function(result, input) {
   return result;
 };
 
-},{"transduce-reduced":12}],11:[function(require,module,exports){
+},{"transduce-reduced":13}],12:[function(require,module,exports){
 "use strict";
 var iter = require('iterator-protocol'),
     trans = require('transformer-protocol'),
     red = require('transduce-reduced'),
+    util = require('transduce-util'),
     isReduced = red.isReduced,
+    deref = red.deref,
     transformer = trans.transformer,
     iterator = iter.iterator,
-    isArray = iter.isArray,
-    deref = red.deref,
+    isArray = util.isArray,
     undef;
 module.exports = reduce;
 
@@ -425,7 +435,7 @@ function iteratorReduce(xf, init, iter){
   return xf.result(value);
 }
 
-},{"iterator-protocol":1,"transduce-reduced":12,"transformer-protocol":20}],12:[function(require,module,exports){
+},{"iterator-protocol":1,"transduce-reduced":13,"transduce-util":20,"transformer-protocol":21}],13:[function(require,module,exports){
 "use strict";
 
 module.exports = {
@@ -458,7 +468,7 @@ function Reduced(value){
   this.__transducers_reduced__ = true;
 }
 
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 "use strict";
 var filter = require('transduce-filter');
 
@@ -470,7 +480,7 @@ function remove(p){
 }
 
 
-},{"transduce-filter":5}],14:[function(require,module,exports){
+},{"transduce-filter":6}],15:[function(require,module,exports){
 "use strict";
 
 var tp = require('transduce-reduced');
@@ -501,7 +511,7 @@ Take.prototype.step = function(value, item){
   return value;
 };
 
-},{"transduce-reduced":12}],15:[function(require,module,exports){
+},{"transduce-reduced":13}],16:[function(require,module,exports){
 "use strict";
 var reduced = require('transduce-reduced').reduced;
 
@@ -530,7 +540,7 @@ TakeWhile.prototype.step = function(value, item){
   return value;
 };
 
-},{"transduce-reduced":12}],16:[function(require,module,exports){
+},{"transduce-reduced":13}],17:[function(require,module,exports){
 "use strict";
 var util = require('transduce-util'),
     push = util.arrayPush,
@@ -547,7 +557,7 @@ function transduceImplToArray(impl){
   };
 }
 
-},{"transduce-util":19}],17:[function(require,module,exports){
+},{"transduce-util":20}],18:[function(require,module,exports){
 "use strict";
 var implToArray = require('transduce-impl-toarray');
 module.exports = implToArray({
@@ -555,7 +565,7 @@ module.exports = implToArray({
   reduce: require('transduce-reduce')
 });
 
-},{"transduce-impl-toarray":16,"transduce-reduce":11,"transduce-transduce":18}],18:[function(require,module,exports){
+},{"transduce-impl-toarray":17,"transduce-reduce":12,"transduce-transduce":19}],19:[function(require,module,exports){
 "use strict";
 var tp = require('transformer-protocol'),
     reduce = require('transduce-reduce'),
@@ -567,7 +577,7 @@ function transduce(xf, f, init, coll){
   return reduce(xf(f), init, coll);
 }
 
-},{"transduce-reduce":11,"transformer-protocol":20}],19:[function(require,module,exports){
+},{"transduce-reduce":12,"transformer-protocol":21}],20:[function(require,module,exports){
 "use strict";
 var undef,
     Arr = Array,
@@ -591,7 +601,6 @@ module.exports = {
   isRegExp: predicateToString('RegExp'),
   isNumber: predicateToString('Number'),
   isUndefined: isUndefined,
-  compose: compose,
   identity: identity,
   arrayPush: push,
   objectMerge: merge,
@@ -617,17 +626,6 @@ function identity(result){
   return result;
 }
 
-function compose(){
-  var fns = arguments;
-  return function(xf){
-    var i = fns.length;
-    while(i--){
-      xf = fns[i](xf);
-    }
-    return xf;
-  };
-}
-
 function push(result, input){
   result.push(input);
   return result;
@@ -651,7 +649,7 @@ function append(result, input){
   return result + input;
 }
 
-},{}],20:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 "use strict";
 /* global Symbol */
 var undef,
@@ -659,24 +657,14 @@ var undef,
     slice = Array.prototype.slice,
     symTransformer = util.protocols.transformer,
     isFunction = util.isFunction,
-    isArray = util.isArray,
-    isString = util.isString,
     identity = util.identity,
-    push = util.arrayPush,
-    append = util.stringAppend,
     merge = util.objectMerge;
 
 
 module.exports = {
   symbol: symTransformer,
   isTransformer: isTransformer,
-  transformer: transformer,
-  isFunction: isFunction,
-  isArray: isArray,
-  isString: isString,
-  arrayPush: push,
-  objectMerge: merge,
-  stringAppend: append
+  transformer: transformer
 };
 
 function isTransformer(value){
@@ -693,9 +681,9 @@ function transformer(value){
     }
   } else if(isFunction(value)){
     xf = new FunctionTransformer(value);
-  } else if(isArray(value)){
+  } else if(util.isArray(value)){
     xf = new ArrayTransformer(value);
-  } else if(isString(value)){
+  } else if(util.isString(value)){
     xf = new StringTransformer(value);
   } else {
     xf = new ObjectTransformer(value);
@@ -713,7 +701,7 @@ function ArrayTransformer(arr){
 ArrayTransformer.prototype.init = function(){
   return slice.call(this.arrDefault);
 };
-ArrayTransformer.prototype.step = push;
+ArrayTransformer.prototype.step = util.arrayPush;
 ArrayTransformer.prototype.result = identity;
 
 // Turns a step function into a transfomer with init, step, result (init not supported and will error)
@@ -739,7 +727,7 @@ function StringTransformer(str){
 StringTransformer.prototype.init = function(){
   return this.strDefault;
 };
-StringTransformer.prototype.step = append;
+StringTransformer.prototype.step = util.stringAppend;
 StringTransformer.prototype.result = identity;
 
 // Merges value into object, using optional constructor arg as default, or {} if not provided
@@ -755,9 +743,10 @@ ObjectTransformer.prototype.init = function(){
 ObjectTransformer.prototype.step = merge;
 ObjectTransformer.prototype.result = identity;
 
-},{"transduce-util":19}],21:[function(require,module,exports){
+},{"transduce-util":20}],22:[function(require,module,exports){
 "use strict";
 var util = require('transduce-util'),
+    compose = require('transduce-compose'),
     reduced = require('transduce-reduced'),
     iter = require('iterator-protocol'),
     transformer = require('transformer-protocol');
@@ -778,6 +767,7 @@ module.exports = {
   mapcat: require('transduce-mapcat'),
   partitionAll: require('transduce-partitionall'),
   partitionBy: require('transduce-partitionby'),
+  compose: compose,
   isIterable: iter.isIterable,
   isIterator: iter.isIterator,
   iterable: iter.iterable,
@@ -789,7 +779,6 @@ module.exports = {
   unreduced: reduced.unreduced,
   deref: reduced.unreduced,
   protocols: util.protocols,
-  compose: util.compose,
   isFunction: util.isFunction,
   isArray: util.isArray,
   isString: util.isString,
@@ -802,5 +791,5 @@ module.exports = {
   identity: util.identity,
 };
 
-},{"iterator-protocol":1,"transduce-cat":2,"transduce-drop":3,"transduce-dropwhile":4,"transduce-filter":5,"transduce-into":6,"transduce-map":7,"transduce-mapcat":8,"transduce-partitionall":9,"transduce-partitionby":10,"transduce-reduce":11,"transduce-reduced":12,"transduce-remove":13,"transduce-take":14,"transduce-takewhile":15,"transduce-toarray":17,"transduce-transduce":18,"transduce-util":19,"transformer-protocol":20}]},{},[21])(21)
+},{"iterator-protocol":1,"transduce-cat":2,"transduce-compose":3,"transduce-drop":4,"transduce-dropwhile":5,"transduce-filter":6,"transduce-into":7,"transduce-map":8,"transduce-mapcat":9,"transduce-partitionall":10,"transduce-partitionby":11,"transduce-reduce":12,"transduce-reduced":13,"transduce-remove":14,"transduce-take":15,"transduce-takewhile":16,"transduce-toarray":18,"transduce-transduce":19,"transduce-util":20,"transformer-protocol":21}]},{},[22])(22)
 });

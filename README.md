@@ -16,6 +16,7 @@ reduce: function(f, init, coll);
 transduce: function(xf, f, init, coll);
 into: function(to, xf, from);
 toArray: function(xf?, coll);
+compose: function(/*fns*/){}
 
 // transducers
 map: function(mappingFunction);
@@ -55,7 +56,6 @@ isRegExp: function(value){}
 isNumber: function(value){}
 isUndefined: function(value){}
 identity: function(value){}
-compose: function(/*fns*/){}
 arrayPush: function(arr, item){}
 objectMerge: function(obj, item){}
 stringAppend: function(str, item){}
@@ -80,6 +80,11 @@ From [transduce-into](https://github.com/transduce/transduce-into)
 Transduce a collection into an array with an optional transformation.
 
 From [transduce-toarray](https://github.com/transduce/transduce-toarray)
+
+##### compose()
+Simple function composition of arguments. Useful for composing (combining) transducers.
+
+From [transduce-compose](https://github.com/transduce/transduce-compose)
 
 ### Transducers
 
@@ -190,9 +195,6 @@ Symbols (or strings that act as symbols) for `@@iterator` and [`@@transformer`][
 
 ##### identity(value)
 Always returns value
-
-##### compose()
-Simple function composition of arguments. Useful for composing (combining) transducers.
 
 ##### arrayPush(arr, item)
 Array.push as a reducing function.  Calls push and returns array;
