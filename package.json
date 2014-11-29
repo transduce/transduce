@@ -1,14 +1,14 @@
 {
-  "name": "transduct",
-  "version": "0.0.2",
+  "name": "transduce",
+  "version": "0.1.0",
   "description": "JavaScript transducers using transduce libraries",
-  "main": "transduct.js",
+  "main": "transduce.js",
   "scripts": {
     "test": "make test"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/transduce/transduct"
+    "url": "https://github.com/transduce/transduce"
   },
   "keywords": [
     "transducer",
@@ -17,18 +17,29 @@
   "author": "Kevin Beaty",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/transduce/transduct/issues"
+    "url": "https://github.com/transduce/transduce/issues"
   },
-  "homepage": "http://github.com/transduce/transduct",
+  "homepage": "http://github.com/transduce/transduce",
   "dependencies": {
-    "transduce-protocol": "0.0.7",
-    "transduct-reduce": "0.0.1",
-    "transduct-transduce": "0.0.1",
+    "transduce-reduce": "0.0.2",
+    "transduce-transduce": "0.0.2",
     "transduce-filter": "0.0.1",
     "transduce-map": "0.0.1",
     "transduce-remove": "0.0.1",
     "transduce-drop": "0.0.1",
-    "transduce-take": "0.0.1"
+    "transduce-take": "0.0.2",
+    "transduce-dropwhile": "0.0.1",
+    "transduce-takewhile": "0.0.2",
+    "transduce-cat": "0.0.2",
+    "transduce-mapcat": "0.0.2",
+    "transduce-partitionall": "0.0.1",
+    "transduce-partitionby": "0.0.1",
+    "transduce-into": "0.0.2",
+    "transduce-toarray": "0.0.2",
+    "transduce-util": "0.0.3",
+    "transduce-reduced": "0.0.2",
+    "iterator-protocol": "0.0.3",
+    "transformer-protocol": "0.0.1"
   },
   "devDependencies": {
     "tape": "~3.0.0",

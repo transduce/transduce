@@ -1,4 +1,4 @@
-PROJECT:=transduct
+PROJECT:=transduce
 
 JS_TARGET ?= build/$(PROJECT).js
 
@@ -23,7 +23,7 @@ node_modules:
 js: $(JS_TARGET) $(JS_TARGET:.js=.min.js)
 
 $(JS_TARGET): $(PROJECT).js | build
-	`npm bin`/browserify $< > $@
+	`npm bin`/browserify -s transduce $< > $@
 
 build:
 	mkdir -p build
