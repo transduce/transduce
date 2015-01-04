@@ -23,8 +23,7 @@
   "dependencies": {
     "transduce-util": "~0.2.0",
     "iterator-protocol": "~0.2.0",
-    "transformer-protocol": "~0.2.0",
-    "transduce-impl-toarray": "~0.1.0"
+    "transformer-protocol": "~0.2.0"
   },
   "devDependencies": {
     "uglify-js": "~2.4.16",

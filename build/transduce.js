@@ -38,7 +38,7 @@ PreserveReduced.prototype.step = function(value, item){
   return value;
 };
 
-},{"./reduce":18,"transduce-util":13}],2:[function(require,module,exports){
+},{"./reduce":14,"transduce-util":10}],2:[function(require,module,exports){
 "use strict";
 
 module.exports = drop;
@@ -166,7 +166,7 @@ module.exports = {
   identity: util.identity,
 };
 
-},{"./cat":1,"./drop":2,"./dropwhile":3,"./filter":4,"./into":6,"./map":7,"./mapcat":8,"./partitionall":16,"./partitionby":17,"./reduce":18,"./remove":19,"./take":20,"./takewhile":21,"./toarray":22,"./transduce":23,"iterator-protocol":9,"transduce-util":13,"transformer-protocol":15}],6:[function(require,module,exports){
+},{"./cat":1,"./drop":2,"./dropwhile":3,"./filter":4,"./into":6,"./map":7,"./mapcat":8,"./partitionall":12,"./partitionby":13,"./reduce":14,"./remove":15,"./take":16,"./takewhile":17,"./toarray":18,"./transduce":19,"iterator-protocol":9,"transduce-util":10,"transformer-protocol":11}],6:[function(require,module,exports){
 "use strict";
 var transduce = require('./transduce');
 
@@ -175,7 +175,7 @@ function into(to, xf, from){
   return transduce(xf, to, to, from);
 }
 
-},{"./transduce":23}],7:[function(require,module,exports){
+},{"./transduce":19}],7:[function(require,module,exports){
 "use strict";
 module.exports = map;
 function map(callback) {
@@ -207,7 +207,7 @@ function mapcat(callback) {
   return compose(map(callback), cat);
 }
 
-},{"./cat":1,"./map":7,"transduce-util":13}],9:[function(require,module,exports){
+},{"./cat":1,"./map":7,"transduce-util":10}],9:[function(require,module,exports){
 "use strict";
 /* global Symbol */
 var util = require('transduce-util'),
@@ -349,97 +349,6 @@ var undef,
 
 module.exports = {
   protocols: protocols,
-  isFunction: isFunction,
-  isArray: isArray,
-  isString: predicateToString('String'),
-  isRegExp: predicateToString('RegExp'),
-  isNumber: predicateToString('Number'),
-  isUndefined: isUndefined,
-  identity: identity,
-  arrayPush: push,
-  objectMerge: merge,
-  stringAppend: append
-};
-
-function isFunction(value){
-  return typeof value === 'function';
-}
-
-function isUndefined(value){
-  return value === undef;
-}
-
-function predicateToString(type){
-  var str = '[object '+type+']';
-  return function(value){
-    return toString.call(value) === str;
-  };
-}
-
-function identity(result){
-  return result;
-}
-
-function push(result, input){
-  result.push(input);
-  return result;
-}
-
-function merge(result, input){
-  if(isArray(input) && input.length === 2){
-    result[input[0]] = input[1];
-  } else {
-    var prop;
-    for(prop in input){
-      if(input.hasOwnProperty(prop)){
-        result[prop] = input[prop];
-      }
-    }
-  }
-  return result;
-}
-
-function append(result, input){
-  return result + input;
-}
-
-},{}],11:[function(require,module,exports){
-arguments[4][10][0].apply(exports,arguments)
-},{"dup":10}],12:[function(require,module,exports){
-"use strict";
-var util = require('transduce-util'),
-    push = util.arrayPush,
-    undef;
-
-module.exports = transduceImplToArray;
-function transduceImplToArray(impl){
-  return function(xf, coll){
-    var init = [];
-    if(coll === undef){
-      return impl.reduce(push, init, xf);
-    }
-    return impl.transduce(xf, push, init, coll);
-  };
-}
-
-},{"transduce-util":11}],13:[function(require,module,exports){
-"use strict";
-var undef,
-    Arr = Array,
-    toString = Object.prototype.toString,
-    isArray = (isFunction(Arr.isArray) ? Arr.isArray : predicateToString('Array')),
-    /* global Symbol */
-    symbolExists = typeof Symbol !== 'undefined',
-    symIterator = symbolExists ? Symbol.iterator : '@@iterator',
-    /* jshint newcap:false */
-    symTransformer = symbolExists ? Symbol('transformer') : '@@transformer',
-    protocols = {
-      iterator: symIterator,
-      transformer: symTransformer
-    };
-
-module.exports = {
-  protocols: protocols,
   compose: compose,
   isReduced: isReduced,
   reduced: reduced,
@@ -533,9 +442,7 @@ function append(result, input){
   return result + input;
 }
 
-},{}],14:[function(require,module,exports){
-arguments[4][10][0].apply(exports,arguments)
-},{"dup":10}],15:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 "use strict";
 /* global Symbol */
 var undef,
@@ -629,7 +536,7 @@ ObjectTransformer.prototype.init = function(){
 ObjectTransformer.prototype.step = merge;
 ObjectTransformer.prototype.result = identity;
 
-},{"transduce-util":14}],16:[function(require,module,exports){
+},{"transduce-util":10}],12:[function(require,module,exports){
 "use strict";
 module.exports = partitionAll;
 function partitionAll(n) {
@@ -664,7 +571,7 @@ PartitionAll.prototype.step = function(result, input) {
   return result;
 };
 
-},{}],17:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 "use strict";
 var tp = require('transduce-util'),
     undef;
@@ -710,7 +617,7 @@ PartitionBy.prototype.step = function(result, input) {
   return result;
 };
 
-},{"transduce-util":13}],18:[function(require,module,exports){
+},{"transduce-util":10}],14:[function(require,module,exports){
 "use strict";
 var iter = require('iterator-protocol'),
     trans = require('transformer-protocol'),
@@ -763,7 +670,7 @@ function iteratorReduce(xf, init, iter){
   return xf.result(value);
 }
 
-},{"iterator-protocol":9,"transduce-util":13,"transformer-protocol":15}],19:[function(require,module,exports){
+},{"iterator-protocol":9,"transduce-util":10,"transformer-protocol":11}],15:[function(require,module,exports){
 "use strict";
 var filter = require('./filter');
 
@@ -775,7 +682,7 @@ function remove(p){
 }
 
 
-},{"./filter":4}],20:[function(require,module,exports){
+},{"./filter":4}],16:[function(require,module,exports){
 "use strict";
 
 var tp = require('transduce-util');
@@ -806,7 +713,7 @@ Take.prototype.step = function(value, item){
   return value;
 };
 
-},{"transduce-util":13}],21:[function(require,module,exports){
+},{"transduce-util":10}],17:[function(require,module,exports){
 "use strict";
 var reduced = require('transduce-util').reduced;
 
@@ -835,15 +742,24 @@ TakeWhile.prototype.step = function(value, item){
   return value;
 };
 
-},{"transduce-util":13}],22:[function(require,module,exports){
+},{"transduce-util":10}],18:[function(require,module,exports){
 "use strict";
-var implToArray = require('transduce-impl-toarray');
-module.exports = implToArray({
-  transduce: require('./transduce'),
-  reduce: require('./reduce')
-});
+var transduce = require('./transduce'),
+    reduce = require('./reduce'),
+    util = require('transduce-util'),
+    push = util.arrayPush,
+    undef;
 
-},{"./reduce":18,"./transduce":23,"transduce-impl-toarray":12}],23:[function(require,module,exports){
+module.exports = toArray;
+function toArray(xf, coll){
+  var init = [];
+  if(coll === undef){
+    return reduce(push, init, xf);
+  }
+  return transduce(xf, push, init, coll);
+}
+
+},{"./reduce":14,"./transduce":19,"transduce-util":10}],19:[function(require,module,exports){
 "use strict";
 var tp = require('transformer-protocol'),
     reduce = require('./reduce'),
@@ -855,5 +771,5 @@ function transduce(xf, f, init, coll){
   return reduce(xf(f), init, coll);
 }
 
-},{"./reduce":18,"transformer-protocol":15}]},{},[5])(5)
+},{"./reduce":14,"transformer-protocol":11}]},{},[5])(5)
 });
