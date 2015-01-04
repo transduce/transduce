@@ -1,8 +1,8 @@
 {
   "name": "transduce",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "JavaScript transducers using transduce libraries",
-  "main": "transduce.js",
+  "main": "index.js",
   "scripts": {
     "test": "make test"
   },
@@ -26,21 +26,7 @@
     "transduce-reduced": "~0.1.0",
     "iterator-protocol": "~0.1.0",
     "transformer-protocol": "~0.1.0",
-    "transduce-reduce": "~0.1.0",
-    "transduce-transduce": "~0.1.0",
-    "transduce-into": "~0.1.0",
-    "transduce-toarray": "~0.1.0",
-    "transduce-map": "~0.1.0",
-    "transduce-filter": "~0.1.0",
-    "transduce-remove": "~0.1.0",
-    "transduce-take": "~0.1.0",
-    "transduce-takewhile": "~0.1.0",
-    "transduce-drop": "~0.1.0",
-    "transduce-dropwhile": "~0.1.0",
-    "transduce-cat": "~0.1.0",
-    "transduce-mapcat": "~0.1.0",
-    "transduce-partitionall": "~0.1.0",
-    "transduce-partitionby": "~0.1.0"
+    "transduce-impl-toarray": "~0.1.0"
   },
   "devDependencies": {
     "tape": "~3.0.0",

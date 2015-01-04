@@ -22,8 +22,8 @@ node_modules:
 
 js: $(JS_TARGET) $(JS_TARGET:.js=.min.js)
 
-$(JS_TARGET): $(PROJECT).js | build
-	`npm bin`/browserify -s transduce $< > $@
+$(JS_TARGET): *.js | build
+	`npm bin`/browserify -s transduce index.js > $@
 
 build:
 	mkdir -p build

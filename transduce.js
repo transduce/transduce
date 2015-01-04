@@ -1,46 +1,10 @@
 "use strict";
-var util = require('transduce-util'),
-    compose = require('transduce-compose'),
-    reduced = require('transduce-reduced'),
-    iter = require('iterator-protocol'),
-    transformer = require('transformer-protocol');
+var tp = require('transformer-protocol'),
+    reduce = require('./reduce'),
+    transformer = tp.transformer;
 
-module.exports = {
-  reduce: require('transduce-reduce'),
-  transduce: require('transduce-transduce'),
-  into: require('transduce-into'),
-  toArray: require('transduce-toarray'),
-  map: require('transduce-map'),
-  filter: require('transduce-filter'),
-  remove: require('transduce-remove'),
-  take: require('transduce-take'),
-  takeWhile: require('transduce-takewhile'),
-  drop: require('transduce-drop'),
-  dropWhile: require('transduce-dropwhile'),
-  cat: require('transduce-cat'),
-  mapcat: require('transduce-mapcat'),
-  partitionAll: require('transduce-partitionall'),
-  partitionBy: require('transduce-partitionby'),
-  compose: compose,
-  isIterable: iter.isIterable,
-  isIterator: iter.isIterator,
-  iterable: iter.iterable,
-  iterator: iter.iterator,
-  isTransformer: transformer.isTransformer,
-  transformer: transformer.transformer,
-  isReduced: reduced.isReduced,
-  reduced: reduced.reduced,
-  unreduced: reduced.unreduced,
-  deref: reduced.unreduced,
-  protocols: util.protocols,
-  isFunction: util.isFunction,
-  isArray: util.isArray,
-  isString: util.isString,
-  isRegExp: util.isRegExp,
-  isNumber: util.isNumber,
-  isUndefined: util.isUndefined,
-  arrayPush: util.arrayPush,
-  objectMerge: util.objectMerge,
-  stringAppend: util.stringAppend,
-  identity: util.identity,
-};
+module.exports = transduce;
+function transduce(xf, f, init, coll){
+  f = transformer(f);
+  return reduce(xf(f), init, coll);
+}
