@@ -1,5 +1,5 @@
 "use strict";
-var reduced = require('transduce-reduced').reduced;
+var reduced = require('transduce-util').reduced;
 
 module.exports = takeWhile;
 function takeWhile(p){

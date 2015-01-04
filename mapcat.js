@@ -1,5 +1,5 @@
 "use strict";
-var compose = require('transduce-compose'),
+var compose = require('transduce-util').compose,
     map = require('./map'),
     cat = require('./cat');
 module.exports = mapcat;

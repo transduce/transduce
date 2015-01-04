@@ -1,6 +1,6 @@
 "use strict";
 
-var tp = require('transduce-reduced');
+var tp = require('transduce-util');
 
 module.exports = take;
 function take(n){

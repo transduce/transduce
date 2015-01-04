@@ -16,7 +16,6 @@ reduce: function(f, init, coll);
 transduce: function(xf, f, init, coll);
 into: function(to, xf, from);
 toArray: function(xf?, coll);
-compose: function(/*fns*/){}
 
 // transducers
 map: function(mappingFunction);
@@ -41,13 +40,12 @@ iterator: function(value);
 isTransformer: function(value){},
 transformer: function(value){},
 
-// transduce-reduced
+// transduce-util
+compose: function(/*fns*/){}
 isReduced: function(value){}
 reduced: function(value, force?){}
 unreduced: function(value){}
 deref: unreduced
-
-// transduce-util
 protocols: {iterator, transformer}
 isFunction: function(value){}
 isArray: function(value){}
@@ -72,11 +70,6 @@ Returns a new collection appending all items into the empty collection `to` by p
 
 ##### toArray(xf?, coll)
 Transduce a collection into an array with an optional transformation.
-
-##### compose()
-Simple function composition of arguments. Useful for composing (combining) transducers.
-
-From [transduce-compose](https://github.com/transduce/transduce-compose)
 
 ### Transducers
 
@@ -145,8 +138,12 @@ Does the parameter have a [transformer protocol][10] or have `init`, `step`, `re
 ##### transformer(value)
 Attempts to convert the parameter into a transformer.  If cannot be converted, returns `undefined`.  If defined, the return value will have `init`, `step`, `result` methods that can be used for transformation.  Converts arrays (`arrayPush`), strings (`stringAppend`), objects (`objectMerge`), functions (wrap as reducing function) or anything that `isTransformer` into a transformer.
 
-### Reduced
-Mixes in all methods from [transduce-reduced][13].
+### Util
+
+Mixes in all methods from [transduce-util][12].
+
+##### compose()
+Simple function composition of arguments. Useful for composing (combining) transducers.
 
 ##### isReduced(value)
 Is the value reduced? (signal for early termination)
@@ -156,10 +153,6 @@ Ensures the value is reduced (useful for early termination). If `force` is not p
 
 ##### unreduced/deref(value)
 Ensure the value is not reduced (unwraps reduced values if necessary)
-
-### Util 
-
-Mixes in all methods from [transduce-util][12].
 
 ##### protocols
 Symbols (or strings that act as symbols) for `@@iterator` and [`@@transformer`][10] that you can use to configure your custom objects.
@@ -183,5 +176,4 @@ Appends item onto result using `+`.
 [10]: https://github.com/jlongster/transducers.js#the-transformer-protocol
 [11]: https://github.com/transduce/iterator-protocol
 [12]: https://github.com/transduce/transduce-util
-[13]: https://github.com/transduce/transduce-reduced
 [14]: https://github.com/transduce/transformer-protocol

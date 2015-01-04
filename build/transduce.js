@@ -1,7 +1,7 @@
 !function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.transduce=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
 
-var tp = require('transduce-reduced'),
+var tp = require('transduce-util'),
     reduce = require('./reduce');
 
 module.exports = cat;
@@ -38,7 +38,7 @@ PreserveReduced.prototype.step = function(value, item){
   return value;
 };
 
-},{"./reduce":17,"transduce-reduced":12}],2:[function(require,module,exports){
+},{"./reduce":18,"transduce-util":13}],2:[function(require,module,exports){
 "use strict";
 
 module.exports = drop;
@@ -123,8 +123,6 @@ Filter.prototype.step = function(result, input) {
 },{}],5:[function(require,module,exports){
 "use strict";
 var util = require('transduce-util'),
-    compose = require('transduce-compose'),
-    reduced = require('transduce-reduced'),
     iter = require('iterator-protocol'),
     transformer = require('transformer-protocol');
 
@@ -144,17 +142,17 @@ module.exports = {
   mapcat: require('./mapcat'),
   partitionAll: require('./partitionall'),
   partitionBy: require('./partitionby'),
-  compose: compose,
   isIterable: iter.isIterable,
   isIterator: iter.isIterator,
   iterable: iter.iterable,
   iterator: iter.iterator,
   isTransformer: transformer.isTransformer,
   transformer: transformer.transformer,
-  isReduced: reduced.isReduced,
-  reduced: reduced.reduced,
-  unreduced: reduced.unreduced,
-  deref: reduced.unreduced,
+  compose: util.compose,
+  isReduced: util.isReduced,
+  reduced: util.reduced,
+  unreduced: util.unreduced,
+  deref: util.unreduced,
   protocols: util.protocols,
   isFunction: util.isFunction,
   isArray: util.isArray,
@@ -168,7 +166,7 @@ module.exports = {
   identity: util.identity,
 };
 
-},{"./cat":1,"./drop":2,"./dropwhile":3,"./filter":4,"./into":6,"./map":7,"./mapcat":8,"./partitionall":15,"./partitionby":16,"./reduce":17,"./remove":18,"./take":19,"./takewhile":20,"./toarray":21,"./transduce":22,"iterator-protocol":9,"transduce-compose":10,"transduce-reduced":12,"transduce-util":13,"transformer-protocol":14}],6:[function(require,module,exports){
+},{"./cat":1,"./drop":2,"./dropwhile":3,"./filter":4,"./into":6,"./map":7,"./mapcat":8,"./partitionall":16,"./partitionby":17,"./reduce":18,"./remove":19,"./take":20,"./takewhile":21,"./toarray":22,"./transduce":23,"iterator-protocol":9,"transduce-util":13,"transformer-protocol":15}],6:[function(require,module,exports){
 "use strict";
 var transduce = require('./transduce');
 
@@ -177,7 +175,7 @@ function into(to, xf, from){
   return transduce(xf, to, to, from);
 }
 
-},{"./transduce":22}],7:[function(require,module,exports){
+},{"./transduce":23}],7:[function(require,module,exports){
 "use strict";
 module.exports = map;
 function map(callback) {
@@ -201,7 +199,7 @@ Map.prototype.step = function(result, input) {
 
 },{}],8:[function(require,module,exports){
 "use strict";
-var compose = require('transduce-compose'),
+var compose = require('transduce-util').compose,
     map = require('./map'),
     cat = require('./cat');
 module.exports = mapcat;
@@ -209,7 +207,7 @@ function mapcat(callback) {
   return compose(map(callback), cat);
 }
 
-},{"./cat":1,"./map":7,"transduce-compose":10}],9:[function(require,module,exports){
+},{"./cat":1,"./map":7,"transduce-util":13}],9:[function(require,module,exports){
 "use strict";
 /* global Symbol */
 var util = require('transduce-util'),
@@ -333,71 +331,7 @@ function _keys(obj){
   return keys;
 }
 
-},{"transduce-util":13}],10:[function(require,module,exports){
-"use strict";
-module.exports = compose;
-function compose(){
-  var fns = arguments;
-  return function(xf){
-    var i = fns.length;
-    while(i--){
-      xf = fns[i](xf);
-    }
-    return xf;
-  };
-}
-
-},{}],11:[function(require,module,exports){
-"use strict";
-var util = require('transduce-util'),
-    push = util.arrayPush,
-    undef;
-
-module.exports = transduceImplToArray;
-function transduceImplToArray(impl){
-  return function(xf, coll){
-    var init = [];
-    if(coll === undef){
-      return impl.reduce(push, init, xf);
-    }
-    return impl.transduce(xf, push, init, coll);
-  };
-}
-
-},{"transduce-util":13}],12:[function(require,module,exports){
-"use strict";
-
-module.exports = {
-  isReduced: isReduced,
-  reduced: reduced,
-  unreduced: unreduced,
-  deref: unreduced,
-};
-
-function isReduced(value){
-  return !!(value instanceof Reduced || value && value.__transducers_reduced__);
-}
-
-function reduced(value, force){
-  if(force || !isReduced(value)){
-    value = new Reduced(value);
-  }
-  return value;
-}
-
-function unreduced(value){
-  if(isReduced(value)){
-    value = value.value;
-  }
-  return value;
-}
-
-function Reduced(value){
-  this.value = value;
-  this.__transducers_reduced__ = true;
-}
-
-},{}],13:[function(require,module,exports){
+},{"transduce-util":10}],10:[function(require,module,exports){
 "use strict";
 var undef,
     Arr = Array,
@@ -469,7 +403,139 @@ function append(result, input){
   return result + input;
 }
 
+},{}],11:[function(require,module,exports){
+arguments[4][10][0].apply(exports,arguments)
+},{"dup":10}],12:[function(require,module,exports){
+"use strict";
+var util = require('transduce-util'),
+    push = util.arrayPush,
+    undef;
+
+module.exports = transduceImplToArray;
+function transduceImplToArray(impl){
+  return function(xf, coll){
+    var init = [];
+    if(coll === undef){
+      return impl.reduce(push, init, xf);
+    }
+    return impl.transduce(xf, push, init, coll);
+  };
+}
+
+},{"transduce-util":11}],13:[function(require,module,exports){
+"use strict";
+var undef,
+    Arr = Array,
+    toString = Object.prototype.toString,
+    isArray = (isFunction(Arr.isArray) ? Arr.isArray : predicateToString('Array')),
+    /* global Symbol */
+    symbolExists = typeof Symbol !== 'undefined',
+    symIterator = symbolExists ? Symbol.iterator : '@@iterator',
+    /* jshint newcap:false */
+    symTransformer = symbolExists ? Symbol('transformer') : '@@transformer',
+    protocols = {
+      iterator: symIterator,
+      transformer: symTransformer
+    };
+
+module.exports = {
+  protocols: protocols,
+  compose: compose,
+  isReduced: isReduced,
+  reduced: reduced,
+  unreduced: unreduced,
+  deref: unreduced,
+  isFunction: isFunction,
+  isArray: isArray,
+  isString: predicateToString('String'),
+  isRegExp: predicateToString('RegExp'),
+  isNumber: predicateToString('Number'),
+  isUndefined: isUndefined,
+  identity: identity,
+  arrayPush: push,
+  objectMerge: merge,
+  stringAppend: append
+};
+
+function isFunction(value){
+  return typeof value === 'function';
+}
+
+function isUndefined(value){
+  return value === undef;
+}
+
+function predicateToString(type){
+  var str = '[object '+type+']';
+  return function(value){
+    return toString.call(value) === str;
+  };
+}
+
+function compose(){
+  var fns = arguments;
+  return function(xf){
+    var i = fns.length;
+    while(i--){
+      xf = fns[i](xf);
+    }
+    return xf;
+  };
+}
+
+function isReduced(value){
+  return !!(value instanceof Reduced || value && value.__transducers_reduced__);
+}
+
+function reduced(value, force){
+  if(force || !isReduced(value)){
+    value = new Reduced(value);
+  }
+  return value;
+}
+
+function unreduced(value){
+  if(isReduced(value)){
+    value = value.value;
+  }
+  return value;
+}
+
+function Reduced(value){
+  this.value = value;
+  this.__transducers_reduced__ = true;
+}
+
+function identity(result){
+  return result;
+}
+
+function push(result, input){
+  result.push(input);
+  return result;
+}
+
+function merge(result, input){
+  if(isArray(input) && input.length === 2){
+    result[input[0]] = input[1];
+  } else {
+    var prop;
+    for(prop in input){
+      if(input.hasOwnProperty(prop)){
+        result[prop] = input[prop];
+      }
+    }
+  }
+  return result;
+}
+
+function append(result, input){
+  return result + input;
+}
+
 },{}],14:[function(require,module,exports){
+arguments[4][10][0].apply(exports,arguments)
+},{"dup":10}],15:[function(require,module,exports){
 "use strict";
 /* global Symbol */
 var undef,
@@ -563,7 +629,7 @@ ObjectTransformer.prototype.init = function(){
 ObjectTransformer.prototype.step = merge;
 ObjectTransformer.prototype.result = identity;
 
-},{"transduce-util":13}],15:[function(require,module,exports){
+},{"transduce-util":14}],16:[function(require,module,exports){
 "use strict";
 module.exports = partitionAll;
 function partitionAll(n) {
@@ -598,9 +664,9 @@ PartitionAll.prototype.step = function(result, input) {
   return result;
 };
 
-},{}],16:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 "use strict";
-var tp = require('transduce-reduced'),
+var tp = require('transduce-util'),
     undef;
 
 module.exports = partitionBy;
@@ -644,14 +710,13 @@ PartitionBy.prototype.step = function(result, input) {
   return result;
 };
 
-},{"transduce-reduced":12}],17:[function(require,module,exports){
+},{"transduce-util":13}],18:[function(require,module,exports){
 "use strict";
 var iter = require('iterator-protocol'),
     trans = require('transformer-protocol'),
-    red = require('transduce-reduced'),
     util = require('transduce-util'),
-    isReduced = red.isReduced,
-    deref = red.deref,
+    isReduced = util.isReduced,
+    deref = util.deref,
     transformer = trans.transformer,
     iterator = iter.iterator,
     isArray = util.isArray,
@@ -698,7 +763,7 @@ function iteratorReduce(xf, init, iter){
   return xf.result(value);
 }
 
-},{"iterator-protocol":9,"transduce-reduced":12,"transduce-util":13,"transformer-protocol":14}],18:[function(require,module,exports){
+},{"iterator-protocol":9,"transduce-util":13,"transformer-protocol":15}],19:[function(require,module,exports){
 "use strict";
 var filter = require('./filter');
 
@@ -710,10 +775,10 @@ function remove(p){
 }
 
 
-},{"./filter":4}],19:[function(require,module,exports){
+},{"./filter":4}],20:[function(require,module,exports){
 "use strict";
 
-var tp = require('transduce-reduced');
+var tp = require('transduce-util');
 
 module.exports = take;
 function take(n){
@@ -741,9 +806,9 @@ Take.prototype.step = function(value, item){
   return value;
 };
 
-},{"transduce-reduced":12}],20:[function(require,module,exports){
+},{"transduce-util":13}],21:[function(require,module,exports){
 "use strict";
-var reduced = require('transduce-reduced').reduced;
+var reduced = require('transduce-util').reduced;
 
 module.exports = takeWhile;
 function takeWhile(p){
@@ -770,7 +835,7 @@ TakeWhile.prototype.step = function(value, item){
   return value;
 };
 
-},{"transduce-reduced":12}],21:[function(require,module,exports){
+},{"transduce-util":13}],22:[function(require,module,exports){
 "use strict";
 var implToArray = require('transduce-impl-toarray');
 module.exports = implToArray({
@@ -778,7 +843,7 @@ module.exports = implToArray({
   reduce: require('./reduce')
 });
 
-},{"./reduce":17,"./transduce":22,"transduce-impl-toarray":11}],22:[function(require,module,exports){
+},{"./reduce":18,"./transduce":23,"transduce-impl-toarray":12}],23:[function(require,module,exports){
 "use strict";
 var tp = require('transformer-protocol'),
     reduce = require('./reduce'),
@@ -790,5 +855,5 @@ function transduce(xf, f, init, coll){
   return reduce(xf(f), init, coll);
 }
 
-},{"./reduce":17,"transformer-protocol":14}]},{},[5])(5)
+},{"./reduce":18,"transformer-protocol":15}]},{},[5])(5)
 });

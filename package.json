@@ -1,6 +1,6 @@
 {
   "name": "transduce",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "JavaScript transducers using transduce libraries",
   "main": "index.js",
   "scripts": {
@@ -21,9 +21,7 @@
   },
   "homepage": "http://github.com/transduce/transduce",
   "dependencies": {
-    "transduce-util": "~0.1.0",
-    "transduce-compose": "~0.1.0",
-    "transduce-reduced": "~0.1.0",
+    "transduce-util": "~0.2.0",
     "iterator-protocol": "~0.1.0",
     "transformer-protocol": "~0.1.0",
     "transduce-impl-toarray": "~0.1.0"

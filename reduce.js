@@ -1,10 +1,9 @@
 "use strict";
 var iter = require('iterator-protocol'),
     trans = require('transformer-protocol'),
-    red = require('transduce-reduced'),
     util = require('transduce-util'),
-    isReduced = red.isReduced,
-    deref = red.deref,
+    isReduced = util.isReduced,
+    deref = util.deref,
     transformer = trans.transformer,
     iterator = iter.iterator,
     isArray = util.isArray,
