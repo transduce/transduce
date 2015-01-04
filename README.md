@@ -1,7 +1,7 @@
 ## Transduce
 [![Build Status](https://secure.travis-ci.org/transduce/transduce.svg)](http://travis-ci.org/transduce/transduce)
 
-Transducers for JavaScript using the [transduce][1] libraries. Collected as a convenience for an aggregated API. Any library below can be installed standalone and bundled seperately in browserify builds. 
+Transducers for JavaScript using the [transduce][1] libraries. Collected as a convenience for an aggregated API. Any library or transducer below can be installed standalone and bundled seperately in browserify builds.
 
 Compatible with and inspired by both [transducers-js][4] and [transducers.js][5].
 
@@ -64,22 +64,14 @@ stringAppend: function(str, item){}
 ##### reduce(f, init, coll)
 Reduces over a transformation, `f` is converted to a `transformer` and coll is converted to an `iterator` using [transduce-protocol][1]. Arrays are special cased to reduce using for loop.
 
-From [transduce-reduce](https://github.com/transduce/transduce-reduce)
-
 ##### transduce(xf, f, init, coll)
 Transduces over a transformation, `f` is converted to a `transformer` using [transduce-protocol][1] and the initialized transformer is passed to [transduce-reduce][4].
-
-From [transduce-transduce](https://github.com/transduce/transduce-transduce)
 
 ##### into(to, xf, from)
 Returns a new collection appending all items into the empty collection `to` by passing all items from source collection `from` through the transformation `xf`.  Chooses appropriate step function from type of `to`.  Can be array, object, string or have `@@transformer`.
 
-From [transduce-into](https://github.com/transduce/transduce-into)
-
 ##### toArray(xf?, coll)
 Transduce a collection into an array with an optional transformation.
-
-From [transduce-toarray](https://github.com/transduce/transduce-toarray)
 
 ##### compose()
 Simple function composition of arguments. Useful for composing (combining) transducers.
@@ -91,56 +83,35 @@ From [transduce-compose](https://github.com/transduce/transduce-compose)
 ##### map(mappingFunction)
 Transducer that steps all items after applying a `mappingFunction` to each item.
 
-From [transduce-map](https://github.com/transduce/transduce-map)
-
 ##### filter(predicate)
 Transducer that steps items which pass predicate test.
-
-From [transduce-filter](https://github.com/transduce/transduce-filter)
 
 ##### remove(predicate)
 Transducer that removes all items that pass predicate.
 
-From [transduce-remove](https://github.com/transduce/transduce-remove)
-
 ##### take(n)
 Transducer that steps first `n` items and then terminates with `reduced`.
-
-From [transduce-take](https://github.com/transduce/transduce-take)
 
 ##### takeWhile(predicate)
 Transducer that take items until predicate returns true. Terminates with reduce when predicate returns true.
 
-From [transduce-takewhile](https://github.com/transduce/transduce-takewhile)
-
 ##### drop(n)
 Transducer that drops first `n` items and steps remaining untouched.
-From [transduce-drop](https://github.com/transduce/transduce-drop)
 
 ##### dropWhile(predicate)
 Transducer that drops items until predicate returns true and steps remaining untouched.
 
-From [transduce-dropwhile](https://github.com/transduce/transduce-dropwhile)
-
 ##### cat
 Concatenating transducer.  Reducing over every item in the transformation using provided transformer.
-
-From [transduce-cat](https://github.com/transduce/transduce-cat)
 
 ##### mapcat(mappingFunction)
 Transducer that applies a `mappingFunction` to each item, then concatenates the result of the mapping function.  Same is `compose(map(mappingFunction), cat)`
 
-From [transduce-mapcat](https://github.com/transduce/transduce-mapcat)
-
 ##### partitionAll(n)
 Partitions the source into arrays of size `n`. When transformer completes, the transformer will be stepped with any remaining items.
 
-From [transduce-partitionall](https://github.com/transduce/transduce-partitionall)
-
 ##### partitionBy(f)
 Partitions the source into sub arrays when the value of the function `f` changes equality.  When transformer completes, the transformer will be stepped with any remaining items.
-
-From [transduce-partitionby](https://github.com/transduce/transduce-partitionby)
 
 ### Iterator Protocol
 Mixes in all methods and [iterator-protocol][11].

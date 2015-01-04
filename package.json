@@ -29,8 +29,8 @@
     "transduce-impl-toarray": "~0.1.0"
   },
   "devDependencies": {
-    "tape": "~3.0.0",
-    "browserify": "~6.3.2",
-    "uglify-js": "~2.4.15"
+    "uglify-js": "~2.4.16",
+    "tape": "~3.0.3",
+    "browserify": "~8.0.3"
   }
 }

@@ -1,5 +1,216 @@
 !function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.transduce=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
+
+var tp = require('transduce-reduced'),
+    reduce = require('./reduce');
+
+module.exports = cat;
+function cat(xf){
+  return new Cat(xf);
+}
+function Cat(xf){
+  this.xf = new PreserveReduced(xf);
+}
+Cat.prototype.init = function(){
+  return this.xf.init();
+};
+Cat.prototype.result = function(value){
+  return this.xf.result(value);
+};
+Cat.prototype.step = function(value, item){
+  return reduce(this.xf, value, item);
+};
+
+function PreserveReduced(xf){
+  this.xf = xf;
+}
+PreserveReduced.prototype.init = function(){
+  return this.xf.init();
+};
+PreserveReduced.prototype.result = function(value){
+  return this.xf.result(value);
+};
+PreserveReduced.prototype.step = function(value, item){
+  value = this.xf.step(value, item);
+  if(tp.isReduced(value)){
+    value = tp.reduced(value, true);
+  }
+  return value;
+};
+
+},{"./reduce":17,"transduce-reduced":12}],2:[function(require,module,exports){
+"use strict";
+
+module.exports = drop;
+function drop(n){
+  return function(xf){
+    return new Drop(n, xf);
+  };
+}
+function Drop(n, xf){
+  this.xf = xf;
+  this.n = n;
+}
+Drop.prototype.init = function(){
+  return this.xf.init();
+};
+Drop.prototype.result = function(value){
+  return this.xf.result(value);
+};
+Drop.prototype.step = function(value, item){
+  if(--this.n < 0){
+    value = this.xf.step(value, item);
+  }
+  return value;
+};
+
+},{}],3:[function(require,module,exports){
+"use strict";
+var undef;
+
+module.exports = dropWhile;
+function dropWhile(p){
+  return function(xf){
+    return new DropWhile(p, xf);
+  };
+}
+function DropWhile(p, xf){
+  this.xf = xf;
+  this.p = p;
+}
+DropWhile.prototype.init = function(){
+  return this.xf.init();
+};
+DropWhile.prototype.result = function(value){
+  return this.xf.result(value);
+};
+DropWhile.prototype.step = function(value, item){
+  if(this.p){
+    if(this.p(item)){
+      return value;
+    }
+    this.p = undef;
+  }
+  return this.xf.step(value, item);
+};
+
+},{}],4:[function(require,module,exports){
+"use strict";
+module.exports = filter;
+
+function filter(predicate) {
+  return function(xf){
+    return new Filter(predicate, xf);
+  };
+}
+function Filter(f, xf) {
+  this.xf = xf;
+  this.f = f;
+}
+Filter.prototype.init = function(){
+  return this.xf.init();
+};
+Filter.prototype.result = function(result){
+  return this.xf.result(result);
+};
+Filter.prototype.step = function(result, input) {
+  if(this.f(input)){
+    result = this.xf.step(result, input);
+  }
+  return result;
+};
+
+},{}],5:[function(require,module,exports){
+"use strict";
+var util = require('transduce-util'),
+    compose = require('transduce-compose'),
+    reduced = require('transduce-reduced'),
+    iter = require('iterator-protocol'),
+    transformer = require('transformer-protocol');
+
+module.exports = {
+  reduce: require('./reduce'),
+  transduce: require('./transduce'),
+  into: require('./into'),
+  toArray: require('./toarray'),
+  map: require('./map'),
+  filter: require('./filter'),
+  remove: require('./remove'),
+  take: require('./take'),
+  takeWhile: require('./takewhile'),
+  drop: require('./drop'),
+  dropWhile: require('./dropwhile'),
+  cat: require('./cat'),
+  mapcat: require('./mapcat'),
+  partitionAll: require('./partitionall'),
+  partitionBy: require('./partitionby'),
+  compose: compose,
+  isIterable: iter.isIterable,
+  isIterator: iter.isIterator,
+  iterable: iter.iterable,
+  iterator: iter.iterator,
+  isTransformer: transformer.isTransformer,
+  transformer: transformer.transformer,
+  isReduced: reduced.isReduced,
+  reduced: reduced.reduced,
+  unreduced: reduced.unreduced,
+  deref: reduced.unreduced,
+  protocols: util.protocols,
+  isFunction: util.isFunction,
+  isArray: util.isArray,
+  isString: util.isString,
+  isRegExp: util.isRegExp,
+  isNumber: util.isNumber,
+  isUndefined: util.isUndefined,
+  arrayPush: util.arrayPush,
+  objectMerge: util.objectMerge,
+  stringAppend: util.stringAppend,
+  identity: util.identity,
+};
+
+},{"./cat":1,"./drop":2,"./dropwhile":3,"./filter":4,"./into":6,"./map":7,"./mapcat":8,"./partitionall":15,"./partitionby":16,"./reduce":17,"./remove":18,"./take":19,"./takewhile":20,"./toarray":21,"./transduce":22,"iterator-protocol":9,"transduce-compose":10,"transduce-reduced":12,"transduce-util":13,"transformer-protocol":14}],6:[function(require,module,exports){
+"use strict";
+var transduce = require('./transduce');
+
+module.exports = into;
+function into(to, xf, from){
+  return transduce(xf, to, to, from);
+}
+
+},{"./transduce":22}],7:[function(require,module,exports){
+"use strict";
+module.exports = map;
+function map(callback) {
+  return function(xf){
+    return new Map(callback, xf);
+  };
+}
+function Map(f, xf) {
+  this.xf = xf;
+  this.f = f;
+}
+Map.prototype.init = function(){
+  return this.xf.init();
+};
+Map.prototype.result = function(result){
+  return this.xf.result(result);
+};
+Map.prototype.step = function(result, input) {
+  return this.xf.step(result, this.f(input));
+};
+
+},{}],8:[function(require,module,exports){
+"use strict";
+var compose = require('transduce-compose'),
+    map = require('./map'),
+    cat = require('./cat');
+module.exports = mapcat;
+function mapcat(callback) {
+  return compose(map(callback), cat);
+}
+
+},{"./cat":1,"./map":7,"transduce-compose":10}],9:[function(require,module,exports){
+"use strict";
 /* global Symbol */
 var util = require('transduce-util'),
     symbol = util.protocols.iterator,
@@ -122,47 +333,7 @@ function _keys(obj){
   return keys;
 }
 
-},{"transduce-util":20}],2:[function(require,module,exports){
-"use strict";
-
-var tp = require('transduce-reduced'),
-    reduce = require('transduce-reduce');
-
-module.exports = cat;
-function cat(xf){
-  return new Cat(xf);
-}
-function Cat(xf){
-  this.xf = new PreserveReduced(xf);
-}
-Cat.prototype.init = function(){
-  return this.xf.init();
-};
-Cat.prototype.result = function(value){
-  return this.xf.result(value);
-};
-Cat.prototype.step = function(value, item){
-  return reduce(this.xf, value, item);
-};
-
-function PreserveReduced(xf){
-  this.xf = xf;
-}
-PreserveReduced.prototype.init = function(){
-  return this.xf.init();
-};
-PreserveReduced.prototype.result = function(value){
-  return this.xf.result(value);
-};
-PreserveReduced.prototype.step = function(value, item){
-  value = this.xf.step(value, item);
-  if(tp.isReduced(value)){
-    value = tp.reduced(value, true);
-  }
-  return value;
-};
-
-},{"transduce-reduce":12,"transduce-reduced":13}],3:[function(require,module,exports){
+},{"transduce-util":13}],10:[function(require,module,exports){
 "use strict";
 module.exports = compose;
 function compose(){
@@ -176,266 +347,24 @@ function compose(){
   };
 }
 
-},{}],4:[function(require,module,exports){
-"use strict";
-
-module.exports = drop;
-function drop(n){
-  return function(xf){
-    return new Drop(n, xf);
-  };
-}
-function Drop(n, xf){
-  this.xf = xf;
-  this.n = n;
-}
-Drop.prototype.init = function(){
-  return this.xf.init();
-};
-Drop.prototype.result = function(value){
-  return this.xf.result(value);
-};
-Drop.prototype.step = function(value, item){
-  if(--this.n < 0){
-    value = this.xf.step(value, item);
-  }
-  return value;
-};
-
-},{}],5:[function(require,module,exports){
-"use strict";
-var undef;
-
-module.exports = dropWhile;
-function dropWhile(p){
-  return function(xf){
-    return new DropWhile(p, xf);
-  };
-}
-function DropWhile(p, xf){
-  this.xf = xf;
-  this.p = p;
-}
-DropWhile.prototype.init = function(){
-  return this.xf.init();
-};
-DropWhile.prototype.result = function(value){
-  return this.xf.result(value);
-};
-DropWhile.prototype.step = function(value, item){
-  if(this.p){
-    if(this.p(item)){
-      return value;
-    }
-    this.p = undef;
-  }
-  return this.xf.step(value, item);
-};
-
-},{}],6:[function(require,module,exports){
-"use strict";
-module.exports = filter;
-
-function filter(predicate) {
-  return function(xf){
-    return new Filter(predicate, xf);
-  };
-}
-function Filter(f, xf) {
-  this.xf = xf;
-  this.f = f;
-}
-Filter.prototype.init = function(){
-  return this.xf.init();
-};
-Filter.prototype.result = function(result){
-  return this.xf.result(result);
-};
-Filter.prototype.step = function(result, input) {
-  if(this.f(input)){
-    result = this.xf.step(result, input);
-  }
-  return result;
-};
-
-},{}],7:[function(require,module,exports){
-"use strict";
-var transduce = require('transduce-transduce');
-
-module.exports = into;
-function into(to, xf, from){
-  return transduce(xf, to, to, from);
-}
-
-},{"transduce-transduce":19}],8:[function(require,module,exports){
-"use strict";
-module.exports = map;
-function map(callback) {
-  return function(xf){
-    return new Map(callback, xf);
-  };
-}
-function Map(f, xf) {
-  this.xf = xf;
-  this.f = f;
-}
-Map.prototype.init = function(){
-  return this.xf.init();
-};
-Map.prototype.result = function(result){
-  return this.xf.result(result);
-};
-Map.prototype.step = function(result, input) {
-  return this.xf.step(result, this.f(input));
-};
-
-},{}],9:[function(require,module,exports){
-"use strict";
-var compose = require('transduce-compose'),
-    map = require('transduce-map'),
-    cat = require('transduce-cat');
-module.exports = mapcat;
-function mapcat(callback) {
-  return compose(map(callback), cat);
-}
-
-},{"transduce-cat":2,"transduce-compose":3,"transduce-map":8}],10:[function(require,module,exports){
-"use strict";
-module.exports = partitionAll;
-function partitionAll(n) {
-  return function(xf){
-    return new PartitionAll(n, xf);
-  };
-}
-function PartitionAll(n, xf) {
-  this.xf = xf;
-  this.n = n;
-  this.inputs = [];
-}
-PartitionAll.prototype.init = function(){
-  return this.xf.init();
-};
-PartitionAll.prototype.result = function(result){
-  var ins = this.inputs;
-  if(ins.length){
-    this.inputs = [];
-    result = this.xf.step(result, ins);
-  }
-  return this.xf.result(result);
-};
-PartitionAll.prototype.step = function(result, input) {
-  var ins = this.inputs,
-      n = this.n;
-  ins.push(input);
-  if(n === ins.length){
-    this.inputs = [];
-    result = this.xf.step(result, ins);
-  }
-  return result;
-};
-
 },{}],11:[function(require,module,exports){
 "use strict";
-var tp = require('transduce-reduced'),
+var util = require('transduce-util'),
+    push = util.arrayPush,
     undef;
 
-module.exports = partitionBy;
-function partitionBy(f) {
-  return function(xf){
-    return new PartitionBy(f, xf);
+module.exports = transduceImplToArray;
+function transduceImplToArray(impl){
+  return function(xf, coll){
+    var init = [];
+    if(coll === undef){
+      return impl.reduce(push, init, xf);
+    }
+    return impl.transduce(xf, push, init, coll);
   };
 }
-function PartitionBy(f, xf) {
-  this.xf = xf;
-  this.f = f;
-}
-PartitionBy.prototype.init = function(){
-  return this.xf.init();
-};
-PartitionBy.prototype.result = function(result){
-  var ins = this.inputs;
-  if(ins.length){
-    this.inputs = [];
-    result = this.xf.step(result, ins);
-  }
-  return this.xf.result(result);
-};
-PartitionBy.prototype.step = function(result, input) {
-  var ins = this.inputs,
-      curr = this.f(input),
-      prev = this.prev;
-  this.prev = curr;
 
-  if(ins === undef){
-    this.inputs = [input];
-  } else if(prev === curr){
-    ins.push(input);
-  } else {
-    this.inputs = [];
-    result = this.xf.step(result, ins);
-    if(!tp.isReduced(result)){
-      this.inputs.push(input);
-    }
-  }
-  return result;
-};
-
-},{"transduce-reduced":13}],12:[function(require,module,exports){
-"use strict";
-var iter = require('iterator-protocol'),
-    trans = require('transformer-protocol'),
-    red = require('transduce-reduced'),
-    util = require('transduce-util'),
-    isReduced = red.isReduced,
-    deref = red.deref,
-    transformer = trans.transformer,
-    iterator = iter.iterator,
-    isArray = util.isArray,
-    undef;
-module.exports = reduce;
-
-function reduce(xf, init, coll){
-  var iter = iterator(coll);
-  xf = transformer(xf);
-  if(isArray(coll)){
-    return arrayReduce(xf, init, coll);
-  }
-  return iteratorReduce(xf, init, coll);
-}
-
-function arrayReduce(xf, init, arr){
-  var value = init,
-      i = 0,
-      len = arr.length;
-  for(; i < len; i++){
-    value = xf.step(value, arr[i]);
-    if(isReduced(value)){
-      value = deref(value);
-      break;
-    }
-  }
-  return xf.result(value);
-}
-
-function iteratorReduce(xf, init, iter){
-  var value = init, next;
-  iter = iterator(iter);
-  while(true){
-    next = iter.next();
-    if(next.done){
-      break;
-    }
-
-    value = xf.step(value, next.value);
-    if(isReduced(value)){
-      value = deref(value);
-      break;
-    }
-  }
-  return xf.result(value);
-}
-
-},{"iterator-protocol":1,"transduce-reduced":13,"transduce-util":20,"transformer-protocol":21}],13:[function(require,module,exports){
+},{"transduce-util":13}],12:[function(require,module,exports){
 "use strict";
 
 module.exports = {
@@ -468,116 +397,7 @@ function Reduced(value){
   this.__transducers_reduced__ = true;
 }
 
-},{}],14:[function(require,module,exports){
-"use strict";
-var filter = require('transduce-filter');
-
-module.exports = remove;
-function remove(p){
-  return filter(function(x){
-    return !p(x);
-  });
-}
-
-
-},{"transduce-filter":6}],15:[function(require,module,exports){
-"use strict";
-
-var tp = require('transduce-reduced');
-
-module.exports = take;
-function take(n){
-  return function(xf){
-    return new Take(n, xf);
-  };
-}
-function Take(n, xf){
-  this.xf = xf;
-  this.n = n;
-}
-Take.prototype.init = function(){
-  return this.xf.init();
-};
-Take.prototype.result = function(value){
-  return this.xf.result(value);
-};
-Take.prototype.step = function(value, item){
-  if(this.n-- > 0){
-    value = this.xf.step(value, item);
-  }
-  if(this.n <= 0){
-    value = tp.reduced(value);
-  }
-  return value;
-};
-
-},{"transduce-reduced":13}],16:[function(require,module,exports){
-"use strict";
-var reduced = require('transduce-reduced').reduced;
-
-module.exports = takeWhile;
-function takeWhile(p){
-  return function(xf){
-    return new TakeWhile(p, xf);
-  };
-}
-function TakeWhile(p, xf){
-  this.xf = xf;
-  this.p = p;
-}
-TakeWhile.prototype.init = function(){
-  return this.xf.init();
-};
-TakeWhile.prototype.result = function(value){
-  return this.xf.result(value);
-};
-TakeWhile.prototype.step = function(value, item){
-  if(this.p(item)){
-    value = this.xf.step(value, item);
-  } else {
-    value = reduced(value);
-  }
-  return value;
-};
-
-},{"transduce-reduced":13}],17:[function(require,module,exports){
-"use strict";
-var util = require('transduce-util'),
-    push = util.arrayPush,
-    undef;
-
-module.exports = transduceImplToArray;
-function transduceImplToArray(impl){
-  return function(xf, coll){
-    var init = [];
-    if(coll === undef){
-      return impl.reduce(push, init, xf);
-    }
-    return impl.transduce(xf, push, init, coll);
-  };
-}
-
-},{"transduce-util":20}],18:[function(require,module,exports){
-"use strict";
-var implToArray = require('transduce-impl-toarray');
-module.exports = implToArray({
-  transduce: require('transduce-transduce'),
-  reduce: require('transduce-reduce')
-});
-
-},{"transduce-impl-toarray":17,"transduce-reduce":12,"transduce-transduce":19}],19:[function(require,module,exports){
-"use strict";
-var tp = require('transformer-protocol'),
-    reduce = require('transduce-reduce'),
-    transformer = tp.transformer;
-
-module.exports = transduce;
-function transduce(xf, f, init, coll){
-  f = transformer(f);
-  return reduce(xf(f), init, coll);
-}
-
-},{"transduce-reduce":12,"transformer-protocol":21}],20:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 "use strict";
 var undef,
     Arr = Array,
@@ -649,7 +469,7 @@ function append(result, input){
   return result + input;
 }
 
-},{}],21:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 "use strict";
 /* global Symbol */
 var undef,
@@ -743,53 +563,232 @@ ObjectTransformer.prototype.init = function(){
 ObjectTransformer.prototype.step = merge;
 ObjectTransformer.prototype.result = identity;
 
-},{"transduce-util":20}],22:[function(require,module,exports){
+},{"transduce-util":13}],15:[function(require,module,exports){
 "use strict";
-var util = require('transduce-util'),
-    compose = require('transduce-compose'),
-    reduced = require('transduce-reduced'),
-    iter = require('iterator-protocol'),
-    transformer = require('transformer-protocol');
-
-module.exports = {
-  reduce: require('transduce-reduce'),
-  transduce: require('transduce-transduce'),
-  into: require('transduce-into'),
-  toArray: require('transduce-toarray'),
-  map: require('transduce-map'),
-  filter: require('transduce-filter'),
-  remove: require('transduce-remove'),
-  take: require('transduce-take'),
-  takeWhile: require('transduce-takewhile'),
-  drop: require('transduce-drop'),
-  dropWhile: require('transduce-dropwhile'),
-  cat: require('transduce-cat'),
-  mapcat: require('transduce-mapcat'),
-  partitionAll: require('transduce-partitionall'),
-  partitionBy: require('transduce-partitionby'),
-  compose: compose,
-  isIterable: iter.isIterable,
-  isIterator: iter.isIterator,
-  iterable: iter.iterable,
-  iterator: iter.iterator,
-  isTransformer: transformer.isTransformer,
-  transformer: transformer.transformer,
-  isReduced: reduced.isReduced,
-  reduced: reduced.reduced,
-  unreduced: reduced.unreduced,
-  deref: reduced.unreduced,
-  protocols: util.protocols,
-  isFunction: util.isFunction,
-  isArray: util.isArray,
-  isString: util.isString,
-  isRegExp: util.isRegExp,
-  isNumber: util.isNumber,
-  isUndefined: util.isUndefined,
-  arrayPush: util.arrayPush,
-  objectMerge: util.objectMerge,
-  stringAppend: util.stringAppend,
-  identity: util.identity,
+module.exports = partitionAll;
+function partitionAll(n) {
+  return function(xf){
+    return new PartitionAll(n, xf);
+  };
+}
+function PartitionAll(n, xf) {
+  this.xf = xf;
+  this.n = n;
+  this.inputs = [];
+}
+PartitionAll.prototype.init = function(){
+  return this.xf.init();
+};
+PartitionAll.prototype.result = function(result){
+  var ins = this.inputs;
+  if(ins.length){
+    this.inputs = [];
+    result = this.xf.step(result, ins);
+  }
+  return this.xf.result(result);
+};
+PartitionAll.prototype.step = function(result, input) {
+  var ins = this.inputs,
+      n = this.n;
+  ins.push(input);
+  if(n === ins.length){
+    this.inputs = [];
+    result = this.xf.step(result, ins);
+  }
+  return result;
 };
 
-},{"iterator-protocol":1,"transduce-cat":2,"transduce-compose":3,"transduce-drop":4,"transduce-dropwhile":5,"transduce-filter":6,"transduce-into":7,"transduce-map":8,"transduce-mapcat":9,"transduce-partitionall":10,"transduce-partitionby":11,"transduce-reduce":12,"transduce-reduced":13,"transduce-remove":14,"transduce-take":15,"transduce-takewhile":16,"transduce-toarray":18,"transduce-transduce":19,"transduce-util":20,"transformer-protocol":21}]},{},[22])(22)
+},{}],16:[function(require,module,exports){
+"use strict";
+var tp = require('transduce-reduced'),
+    undef;
+
+module.exports = partitionBy;
+function partitionBy(f) {
+  return function(xf){
+    return new PartitionBy(f, xf);
+  };
+}
+function PartitionBy(f, xf) {
+  this.xf = xf;
+  this.f = f;
+}
+PartitionBy.prototype.init = function(){
+  return this.xf.init();
+};
+PartitionBy.prototype.result = function(result){
+  var ins = this.inputs;
+  if(ins.length){
+    this.inputs = [];
+    result = this.xf.step(result, ins);
+  }
+  return this.xf.result(result);
+};
+PartitionBy.prototype.step = function(result, input) {
+  var ins = this.inputs,
+      curr = this.f(input),
+      prev = this.prev;
+  this.prev = curr;
+
+  if(ins === undef){
+    this.inputs = [input];
+  } else if(prev === curr){
+    ins.push(input);
+  } else {
+    this.inputs = [];
+    result = this.xf.step(result, ins);
+    if(!tp.isReduced(result)){
+      this.inputs.push(input);
+    }
+  }
+  return result;
+};
+
+},{"transduce-reduced":12}],17:[function(require,module,exports){
+"use strict";
+var iter = require('iterator-protocol'),
+    trans = require('transformer-protocol'),
+    red = require('transduce-reduced'),
+    util = require('transduce-util'),
+    isReduced = red.isReduced,
+    deref = red.deref,
+    transformer = trans.transformer,
+    iterator = iter.iterator,
+    isArray = util.isArray,
+    undef;
+module.exports = reduce;
+
+function reduce(xf, init, coll){
+  xf = transformer(xf);
+  if(isArray(coll)){
+    return arrayReduce(xf, init, coll);
+  }
+  return iteratorReduce(xf, init, coll);
+}
+
+function arrayReduce(xf, init, arr){
+  var value = init,
+      i = 0,
+      len = arr.length;
+  for(; i < len; i++){
+    value = xf.step(value, arr[i]);
+    if(isReduced(value)){
+      value = deref(value);
+      break;
+    }
+  }
+  return xf.result(value);
+}
+
+function iteratorReduce(xf, init, iter){
+  var value = init, next;
+  iter = iterator(iter);
+  while(true){
+    next = iter.next();
+    if(next.done){
+      break;
+    }
+
+    value = xf.step(value, next.value);
+    if(isReduced(value)){
+      value = deref(value);
+      break;
+    }
+  }
+  return xf.result(value);
+}
+
+},{"iterator-protocol":9,"transduce-reduced":12,"transduce-util":13,"transformer-protocol":14}],18:[function(require,module,exports){
+"use strict";
+var filter = require('./filter');
+
+module.exports = remove;
+function remove(p){
+  return filter(function(x){
+    return !p(x);
+  });
+}
+
+
+},{"./filter":4}],19:[function(require,module,exports){
+"use strict";
+
+var tp = require('transduce-reduced');
+
+module.exports = take;
+function take(n){
+  return function(xf){
+    return new Take(n, xf);
+  };
+}
+function Take(n, xf){
+  this.xf = xf;
+  this.n = n;
+}
+Take.prototype.init = function(){
+  return this.xf.init();
+};
+Take.prototype.result = function(value){
+  return this.xf.result(value);
+};
+Take.prototype.step = function(value, item){
+  if(this.n-- > 0){
+    value = this.xf.step(value, item);
+  }
+  if(this.n <= 0){
+    value = tp.reduced(value);
+  }
+  return value;
+};
+
+},{"transduce-reduced":12}],20:[function(require,module,exports){
+"use strict";
+var reduced = require('transduce-reduced').reduced;
+
+module.exports = takeWhile;
+function takeWhile(p){
+  return function(xf){
+    return new TakeWhile(p, xf);
+  };
+}
+function TakeWhile(p, xf){
+  this.xf = xf;
+  this.p = p;
+}
+TakeWhile.prototype.init = function(){
+  return this.xf.init();
+};
+TakeWhile.prototype.result = function(value){
+  return this.xf.result(value);
+};
+TakeWhile.prototype.step = function(value, item){
+  if(this.p(item)){
+    value = this.xf.step(value, item);
+  } else {
+    value = reduced(value);
+  }
+  return value;
+};
+
+},{"transduce-reduced":12}],21:[function(require,module,exports){
+"use strict";
+var implToArray = require('transduce-impl-toarray');
+module.exports = implToArray({
+  transduce: require('./transduce'),
+  reduce: require('./reduce')
+});
+
+},{"./reduce":17,"./transduce":22,"transduce-impl-toarray":11}],22:[function(require,module,exports){
+"use strict";
+var tp = require('transformer-protocol'),
+    reduce = require('./reduce'),
+    transformer = tp.transformer;
+
+module.exports = transduce;
+function transduce(xf, f, init, coll){
+  f = transformer(f);
+  return reduce(xf(f), init, coll);
+}
+
+},{"./reduce":17,"transformer-protocol":14}]},{},[5])(5)
 });
