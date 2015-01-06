@@ -1,7 +1,7 @@
 "use strict";
 var iter = require('iterator-protocol'),
     trans = require('transformer-protocol'),
-    util = require('transduce-util'),
+    util = require('./util'),
     isReduced = util.isReduced,
     deref = util.deref,
     transformer = trans.transformer,

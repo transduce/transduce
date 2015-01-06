@@ -40,7 +40,6 @@ iterator: function(value);
 isTransformer: function(value){},
 transformer: function(value){},
 
-// transduce-util
 compose: function(/*fns*/){}
 isReduced: function(value){}
 reduced: function(value, force?){}
@@ -140,8 +139,6 @@ Attempts to convert the parameter into a transformer.  If cannot be converted, r
 
 ### Util
 
-Mixes in all methods from [transduce-util][12].
-
 ##### compose()
 Simple function composition of arguments. Useful for composing (combining) transducers.
 
@@ -175,5 +172,4 @@ Appends item onto result using `+`.
 [5]: https://github.com/jlongster/transducers.js
 [10]: https://github.com/jlongster/transducers.js#the-transformer-protocol
 [11]: https://github.com/transduce/iterator-protocol
-[12]: https://github.com/transduce/transduce-util
 [14]: https://github.com/transduce/transformer-protocol

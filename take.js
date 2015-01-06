@@ -1,6 +1,6 @@
 "use strict";
 
-var tp = require('transduce-util');
+var tp = require('./util');
 
 module.exports = take;
 function take(n){

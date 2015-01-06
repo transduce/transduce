@@ -1,5 +1,5 @@
 "use strict";
-var tp = require('transduce-util'),
+var tp = require('./util'),
     undef;
 
 module.exports = partitionBy;

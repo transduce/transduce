@@ -1,5 +1,5 @@
 "use strict";
-var util = require('transduce-util'),
+var util = require('./util'),
     iter = require('iterator-protocol'),
     transformer = require('transformer-protocol');
 

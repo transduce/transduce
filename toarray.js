@@ -1,7 +1,7 @@
 "use strict";
 var transduce = require('./transduce'),
     reduce = require('./reduce'),
-    util = require('transduce-util'),
+    util = require('./util'),
     push = util.arrayPush,
     undef;
 

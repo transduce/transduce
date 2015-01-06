@@ -1,6 +1,6 @@
 "use strict";
 
-var tp = require('transduce-util'),
+var tp = require('./util'),
     reduce = require('./reduce');
 
 module.exports = cat;
