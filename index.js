@@ -1,7 +1,5 @@
 'use strict'
-var iter = require('./iterator'),
-    transformer = require('./transformer'),
-    protocols = {
+var protocols = {
       iterator: require('./iterator/symbol'),
       transformer: require('./transformer/symbol')
     }
@@ -22,12 +20,12 @@ module.exports = {
   mapcat: require('./mapcat'),
   partitionAll: require('./partitionall'),
   partitionBy: require('./partitionby'),
-  isIterable: iter.isIterable,
-  isIterator: iter.isIterator,
-  iterable: iter.iterable,
-  iterator: iter.iterator,
-  isTransformer: transformer.isTransformer,
-  transformer: transformer.transformer,
+  isIterable: require('./iterator/isIterable'),
+  isIterator: require('./iterator/isIterator'),
+  iterable: require('./iterator/iterable'),
+  iterator: require('./iterator/iterator'),
+  isTransformer: require('./transformer/isTransformer'),
+  transformer: require('./transformer/transformer'),
   compose: require('./util/compose'),
   isReduced: require('./util/isReduced'),
   reduced: require('./util/reduced'),

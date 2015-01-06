@@ -1,7 +1,6 @@
-"use strict";
-var tp = require('./transformer'),
-    reduce = require('./reduce'),
-    transformer = tp.transformer;
+'use strict'
+var transformer = require('./transformer/transformer'),
+    reduce = require('./reduce')
 
 module.exports = transduce;
 function transduce(xf, f, init, coll){

@@ -1,11 +1,9 @@
 'use strict'
-var iter = require('./iterator'),
-    trans = require('./transformer'),
+var transformer = require('./transformer/transformer'),
     isReduced = require('./util/isReduced'),
     unreduced = require('./util/unreduced'),
     isArray = require('./util/isArray'),
-    transformer = trans.transformer,
-    iterator = iter.iterator
+    iterator = require('./iterator/iterator')
 
 module.exports =
 function reduce(xf, init, coll){
