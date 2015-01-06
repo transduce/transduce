@@ -1,7 +1,7 @@
 "use strict";
 var util = require('./util'),
     iter = require('./iterator'),
-    transformer = require('transformer-protocol');
+    transformer = require('./transformer');
 
 module.exports = {
   reduce: require('./reduce'),

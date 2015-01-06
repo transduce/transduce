@@ -1,5 +1,5 @@
 "use strict";
-var tp = require('transformer-protocol'),
+var tp = require('./transformer'),
     reduce = require('./reduce'),
     transformer = tp.transformer;
 
