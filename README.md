@@ -30,13 +30,13 @@ mapcat: function(f);
 partitionAll: function(n);
 partitionBy: function(f);
 
-// iterator-protocol
+// iterator
 isIterable: function(value);
 isIterator: function(value);
 iterable: function(value);
 iterator: function(value);
 
-// transformer-protocol
+// transformer
 isTransformer: function(value){},
 transformer: function(value){},
 
@@ -59,10 +59,10 @@ stringAppend: function(str, item){}
 ```
 
 ##### reduce(f, init, coll)
-Reduces over a transformation, `f` is converted to a `transformer` and coll is converted to an `iterator` using [transduce-protocol][1]. Arrays are special cased to reduce using for loop.
+Reduces over a transformation, `f` is converted to a `transformer` and coll is converted to an `iterator`.   Arrays are special cased to reduce using for loop.
 
 ##### transduce(xf, f, init, coll)
-Transduces over a transformation, `f` is converted to a `transformer` using [transduce-protocol][1] and the initialized transformer is passed to [transduce-reduce][4].
+Transduces over a transformation, `f` is converted to a `transformer` and the initialized transformer is passed to reduce.
 
 ##### into(to, xf, from)
 Returns a new collection appending all items into the empty collection `to` by passing all items from source collection `from` through the transformation `xf`.  Chooses appropriate step function from type of `to`.  Can be array, object, string or have `@@transformer`.
@@ -106,7 +106,6 @@ Partitions the source into arrays of size `n`. When transformer completes, the t
 Partitions the source into sub arrays when the value of the function `f` changes equality.  When transformer completes, the transformer will be stepped with any remaining items.
 
 ### Iterator Protocol
-Mixes in all methods and [iterator-protocol][11].
 
 ##### isIterable(value)
 Does the parameter conform to the iterable protocol?
@@ -129,10 +128,9 @@ The return value will either have a `next` function that can be invoked for iter
 Supports anything that returns true for `isIterator` and converts arrays to iterators over each indexed item. Converts to functions to infinite iterators that always call function on next.
 
 ### Transformer Protocol
-Mixes in all methods [transformer-protocol][14].
 
 ##### isTransformer(value)
-Does the parameter have a [transformer protocol][10] or have `init`, `step`, `result` methods?
+Does the parameter have a transformer protocol or have `init`, `step`, `result` methods?
 
 ##### transformer(value)
 Attempts to convert the parameter into a transformer.  If cannot be converted, returns `undefined`.  If defined, the return value will have `init`, `step`, `result` methods that can be used for transformation.  Converts arrays (`arrayPush`), strings (`stringAppend`), objects (`objectMerge`), functions (wrap as reducing function) or anything that `isTransformer` into a transformer.
@@ -171,5 +169,3 @@ Appends item onto result using `+`.
 [4]: https://github.com/cognitect-labs/transducers-js
 [5]: https://github.com/jlongster/transducers.js
 [10]: https://github.com/jlongster/transducers.js#the-transformer-protocol
-[11]: https://github.com/transduce/iterator-protocol
-[14]: https://github.com/transduce/transformer-protocol

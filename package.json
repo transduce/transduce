@@ -21,7 +21,6 @@
   },
   "homepage": "http://github.com/transduce/transduce",
   "dependencies": {
-    "iterator-protocol": "~0.2.0",
     "transformer-protocol": "~0.2.0"
   },
   "devDependencies": {
