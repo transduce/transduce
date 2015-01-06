@@ -1,8 +1,10 @@
 "use strict";
 /* global Symbol */
 var util = require('../util'),
-    symbol = util.protocols.iterator,
-    isFunction = util.isFunction,
+    symbol = require('./symbol'),
+    isArray = require('../util/isArray'),
+    isFunction = require('../util/isFunction'),
+    isString = require('../util/isString'),
     keys = Object.keys || _keys,
     undef;
 
@@ -39,7 +41,7 @@ function iterable(value){
   var it;
   if(isIterable(value)){
     it = value;
-  } else if(util.isArray(value) || util.isString(value)){
+  } else if(isArray(value) || isString(value)){
     it = new ArrayIterable(value);
   } else if(isFunction(value)){
     it = new FunctionIterable(value);

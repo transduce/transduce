@@ -1,7 +1,8 @@
-"use strict";
+'use strict'
 
-var tp = require('./util'),
-    reduce = require('./reduce');
+var reduced = require('./util/reduced'),
+    isReduced = require('./util/isReduced'),
+    reduce = require('./reduce')
 
 module.exports = cat;
 function cat(xf){
@@ -31,8 +32,8 @@ PreserveReduced.prototype.result = function(value){
 };
 PreserveReduced.prototype.step = function(value, item){
   value = this.xf.step(value, item);
-  if(tp.isReduced(value)){
-    value = tp.reduced(value, true);
+  if(isReduced(value)){
+    value = reduced(value, true);
   }
   return value;
 };

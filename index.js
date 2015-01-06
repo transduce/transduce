@@ -1,7 +1,10 @@
-"use strict";
-var util = require('./util'),
-    iter = require('./iterator'),
-    transformer = require('./transformer');
+'use strict'
+var iter = require('./iterator'),
+    transformer = require('./transformer'),
+    protocols = {
+      iterator: require('./iterator/symbol'),
+      transformer: require('./transformer/symbol')
+    }
 
 module.exports = {
   reduce: require('./reduce'),
@@ -25,20 +28,19 @@ module.exports = {
   iterator: iter.iterator,
   isTransformer: transformer.isTransformer,
   transformer: transformer.transformer,
-  compose: util.compose,
-  isReduced: util.isReduced,
-  reduced: util.reduced,
-  unreduced: util.unreduced,
-  deref: util.unreduced,
-  protocols: util.protocols,
-  isFunction: util.isFunction,
-  isArray: util.isArray,
-  isString: util.isString,
-  isRegExp: util.isRegExp,
-  isNumber: util.isNumber,
-  isUndefined: util.isUndefined,
-  arrayPush: util.arrayPush,
-  objectMerge: util.objectMerge,
-  stringAppend: util.stringAppend,
-  identity: util.identity,
-};
+  compose: require('./util/compose'),
+  isReduced: require('./util/isReduced'),
+  reduced: require('./util/reduced'),
+  unreduced: require('./util/unreduced'),
+  protocols: protocols,
+  isFunction: require('./util/isFunction'),
+  isArray: require('./util/isArray'),
+  isString: require('./util/isString'),
+  isRegExp: require('./util/isRegExp'),
+  isNumber: require('./util/isNumber'),
+  isUndefined: require('./util/isUndefined'),
+  arrayPush: require('./util/arrayPush'),
+  objectMerge: require('./util/objectMerge'),
+  stringAppend: require('./util/stringAppend'),
+  identity: require('./util/identity'),
+}

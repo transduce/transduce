@@ -1,15 +1,13 @@
-"use strict";
+'use strict'
 var iter = require('./iterator'),
     trans = require('./transformer'),
-    util = require('./util'),
-    isReduced = util.isReduced,
-    deref = util.deref,
+    isReduced = require('./util/isReduced'),
+    unreduced = require('./util/unreduced'),
+    isArray = require('./util/isArray'),
     transformer = trans.transformer,
-    iterator = iter.iterator,
-    isArray = util.isArray,
-    undef;
-module.exports = reduce;
+    iterator = iter.iterator
 
+module.exports =
 function reduce(xf, init, coll){
   xf = transformer(xf);
   if(isArray(coll)){
@@ -25,7 +23,7 @@ function arrayReduce(xf, init, arr){
   for(; i < len; i++){
     value = xf.step(value, arr[i]);
     if(isReduced(value)){
-      value = deref(value);
+      value = unreduced(value)
       break;
     }
   }
@@ -43,7 +41,7 @@ function iteratorReduce(xf, init, iter){
 
     value = xf.step(value, next.value);
     if(isReduced(value)){
-      value = deref(value);
+      value = unreduced(value)
       break;
     }
   }

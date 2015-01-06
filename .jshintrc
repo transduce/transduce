@@ -1,4 +1,5 @@
 {
   "node":true,
-  "strict":true
+  "strict":true,
+  "asi": true
 }

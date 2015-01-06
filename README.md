@@ -44,7 +44,6 @@ compose: function(/*fns*/){}
 isReduced: function(value){}
 reduced: function(value, force?){}
 unreduced: function(value){}
-deref: unreduced
 protocols: {iterator, transformer}
 isFunction: function(value){}
 isArray: function(value){}
@@ -146,7 +145,7 @@ Is the value reduced? (signal for early termination)
 #### reduced(value, force?)
 Ensures the value is reduced (useful for early termination). If `force` is not provided or `false`, only wraps with Reduced value if not already `isReduced`.  If `force` is `true`, always wraps value with Reduced value.
 
-##### unreduced/deref(value)
+##### unreduced(value)
 Ensure the value is not reduced (unwraps reduced values if necessary)
 
 ##### protocols

@@ -1,6 +1,6 @@
-"use strict";
-var tp = require('./util'),
-    undef;
+'use strict'
+var isReduced = require('./util/isReduced'),
+    undef
 
 module.exports = partitionBy;
 function partitionBy(f) {
@@ -36,7 +36,7 @@ PartitionBy.prototype.step = function(result, input) {
   } else {
     this.inputs = [];
     result = this.xf.step(result, ins);
-    if(!tp.isReduced(result)){
+    if(!isReduced(result)){
       this.inputs.push(input);
     }
   }

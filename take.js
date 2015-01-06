@@ -1,6 +1,6 @@
-"use strict";
+'use strict'
 
-var tp = require('./util');
+var reduced = require('./util/reduced')
 
 module.exports = take;
 function take(n){
@@ -23,7 +23,7 @@ Take.prototype.step = function(value, item){
     value = this.xf.step(value, item);
   }
   if(this.n <= 0){
-    value = tp.reduced(value);
+    value = reduced(value);
   }
   return value;
 };

@@ -1,14 +1,12 @@
-"use strict";
+'use strict'
 var transduce = require('./transduce'),
     reduce = require('./reduce'),
-    util = require('./util'),
-    push = util.arrayPush,
-    undef;
+    push = require('./util/arrayPush')
 
 module.exports = toArray;
 function toArray(xf, coll){
   var init = [];
-  if(coll === undef){
+  if(coll === void 0){
     return reduce(push, init, xf);
   }
   return transduce(xf, push, init, coll);

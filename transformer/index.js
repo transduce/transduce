@@ -1,37 +1,38 @@
-"use strict";
-/* global Symbol */
+'use strict'
 var undef,
-    util = require('../util'),
     slice = Array.prototype.slice,
-    symTransformer = util.protocols.transformer,
-    isFunction = util.isFunction,
-    identity = util.identity,
-    merge = util.objectMerge;
-
+    symbol = require('./symbol'),
+    isArray = require('../util/isArray'),
+    isFunction = require('../util/isFunction'),
+    isString = require('../util/isString'),
+    identity = require('../util/identity'),
+    arrayPush = require('../util/arrayPush'),
+    objectMerge = require('../util/objectMerge'),
+    stringAppend = require('../util/stringAppend')
 
 module.exports = {
-  symbol: symTransformer,
+  symbol: symbol,
   isTransformer: isTransformer,
   transformer: transformer
 };
 
 function isTransformer(value){
-  return (value[symTransformer] !== undef) ||
+  return (value[symbol] !== undef) ||
     (isFunction(value.step) && isFunction(value.result));
 }
 
 function transformer(value){
   var xf;
   if(isTransformer(value)){
-    xf = value[symTransformer];
+    xf = value[symbol];
     if(xf === undef){
       xf = value;
     }
   } else if(isFunction(value)){
     xf = new FunctionTransformer(value);
-  } else if(util.isArray(value)){
+  } else if(isArray(value)){
     xf = new ArrayTransformer(value);
-  } else if(util.isString(value)){
+  } else if(isString(value)){
     xf = new StringTransformer(value);
   } else {
     xf = new ObjectTransformer(value);
@@ -49,8 +50,8 @@ function ArrayTransformer(arr){
 ArrayTransformer.prototype.init = function(){
   return slice.call(this.arrDefault);
 };
-ArrayTransformer.prototype.step = util.arrayPush;
-ArrayTransformer.prototype.result = identity;
+ArrayTransformer.prototype.step = arrayPush
+ArrayTransformer.prototype.result = identity
 
 // Turns a step function into a transfomer with init, step, result (init not supported and will error)
 // Like transducers-js Wrap
@@ -75,7 +76,7 @@ function StringTransformer(str){
 StringTransformer.prototype.init = function(){
   return this.strDefault;
 };
-StringTransformer.prototype.step = util.stringAppend;
+StringTransformer.prototype.step = stringAppend;
 StringTransformer.prototype.result = identity;
 
 // Merges value into object, using optional constructor arg as default, or {} if not provided
@@ -83,10 +84,10 @@ StringTransformer.prototype.result = identity;
 // step will merge input into object and return result
 // result is identity
 function ObjectTransformer(obj){
-  this.objDefault = obj === undef ? {} : merge({}, obj);
+  this.objDefault = obj === undef ? {} : objectMerge({}, obj);
 }
 ObjectTransformer.prototype.init = function(){
-  return merge({}, this.objDefault);
+  return objectMerge({}, this.objDefault);
 };
-ObjectTransformer.prototype.step = merge;
+ObjectTransformer.prototype.step = objectMerge;
 ObjectTransformer.prototype.result = identity;
