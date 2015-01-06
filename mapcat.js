@@ -1,8 +1,8 @@
-"use strict";
+'use strict'
 var compose = require('./util/compose'),
     map = require('./map'),
-    cat = require('./cat');
-module.exports = mapcat;
+    cat = require('./cat')
+module.exports =
 function mapcat(callback) {
-  return compose(map(callback), cat);
+  return compose(map(callback), cat)
 }

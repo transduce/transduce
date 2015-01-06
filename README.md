@@ -12,29 +12,29 @@ If you are not familiar with transducers, check out [Transducers Explained][3].
 Currently supports the following methods:
 
 ```javascript
-reduce: function(f, init, coll);
-transduce: function(xf, f, init, coll);
-into: function(to, xf, from);
-toArray: function(xf?, coll);
+reduce: function(f, init, coll)
+transduce: function(xf, f, init, coll)
+into: function(to, xf, from)
+toArray: function(xf?, coll)
 
 // transducers
-map: function(mappingFunction);
-filter: function(predicate);
-remove: function(predicate);
-take: function(n);
-takeWhile: function(predicate);
-drop: function(n);
-dropWhile: function(predicate);
+map: function(mappingFunction)
+filter: function(predicate)
+remove: function(predicate)
+take: function(n)
+takeWhile: function(predicate)
+drop: function(n)
+dropWhile: function(predicate)
 cat: transducer
-mapcat: function(f);
-partitionAll: function(n);
-partitionBy: function(f);
+mapcat: function(f)
+partitionAll: function(n)
+partitionBy: function(f)
 
 // iterator
-isIterable: function(value);
-isIterator: function(value);
-iterable: function(value);
-iterator: function(value);
+isIterable: function(value)
+isIterator: function(value)
+iterable: function(value)
+iterator: function(value)
 
 // transformer
 isTransformer: function(value){},
@@ -155,7 +155,7 @@ Symbols (or strings that act as symbols) for `@@iterator` and [`@@transformer`][
 Always returns value
 
 ##### arrayPush(arr, item)
-Array.push as a reducing function.  Calls push and returns array;
+Array.push as a reducing function.  Calls push and returns array.
 
 ##### objectMerge(object, item)
 Merges the item into the object.  If `item` is an array of length 2, uses first (0 index) as the key and the second (1 index) as the value.  Otherwise iterates over own properties of items and merges values with same keys into the result object.

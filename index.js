@@ -1,25 +1,24 @@
 'use strict'
-var protocols = {
-      iterator: require('./iterator/symbol'),
-      transformer: require('./transformer/symbol')
-    }
-
 module.exports = {
+  protocols: {
+    iterator: require('./iterator/symbol'),
+    transformer: require('./transformer/symbol')
+  },
   reduce: require('./reduce'),
   transduce: require('./transduce'),
   into: require('./into'),
-  toArray: require('./toarray'),
+  toArray: require('./toArray'),
   map: require('./map'),
   filter: require('./filter'),
   remove: require('./remove'),
   take: require('./take'),
-  takeWhile: require('./takewhile'),
+  takeWhile: require('./takeWhile'),
   drop: require('./drop'),
-  dropWhile: require('./dropwhile'),
+  dropWhile: require('./dropWhile'),
   cat: require('./cat'),
   mapcat: require('./mapcat'),
-  partitionAll: require('./partitionall'),
-  partitionBy: require('./partitionby'),
+  partitionAll: require('./partitionAll'),
+  partitionBy: require('./partitionBy'),
   isIterable: require('./iterator/isIterable'),
   isIterator: require('./iterator/isIterator'),
   iterable: require('./iterator/iterable'),
@@ -30,7 +29,6 @@ module.exports = {
   isReduced: require('./util/isReduced'),
   reduced: require('./util/reduced'),
   unreduced: require('./util/unreduced'),
-  protocols: protocols,
   isFunction: require('./util/isFunction'),
   isArray: require('./util/isArray'),
   isString: require('./util/isString'),
@@ -40,5 +38,5 @@ module.exports = {
   arrayPush: require('./util/arrayPush'),
   objectMerge: require('./util/objectMerge'),
   stringAppend: require('./util/stringAppend'),
-  identity: require('./util/identity'),
+  identity: require('./util/identity')
 }

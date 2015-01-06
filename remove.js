@@ -1,10 +1,10 @@
-"use strict";
-var filter = require('./filter');
+'use strict'
+var filter = require('./filter')
 
-module.exports = remove;
+module.exports = remove
 function remove(p){
   return filter(function(x){
-    return !p(x);
-  });
+    return !p(x)
+  })
 }
 
