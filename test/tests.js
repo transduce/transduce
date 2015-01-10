@@ -103,20 +103,24 @@ test('mapcat', function(t) {
 })
 
 test('partitionBy', function(t) {
-  t.plan(2)
+  t.plan(3)
   var result = tr.toArray(tr.partitionBy(isOdd), [0,1,1,3,4,6,8,7,7,8])
   t.deepEqual(result, [[0], [1,1,3], [4,6,8], [7,7], [8]])
   var arr = [1,1,1,2,2,3,3,3]
   result = tr.toArray(tr.compose(tr.partitionBy(identity), tr.take(2)), arr)
   t.deepEqual(result, [[1,1,1],[2,2]])
+  result = tr.toArray(tr.partitionBy(isOdd), [])
+  t.deepEqual(result, [])
 })
 
 test('partitionAll', function(t) {
-  t.plan(3)
+  t.plan(4)
   var result = tr.toArray(tr.partitionAll(2), [0,1,2,3,4,5,6,7,8,9])
   t.deepEqual(result, [[0,1],[2,3],[4,5],[6,7],[8,9]])
   result = tr.into([], tr.partitionAll(2), [0,1,2,3,4,5,6,7,8])
   t.deepEqual(result, [[0,1],[2,3],[4,5],[6,7],[8]])
   result = tr.toArray(tr.compose(tr.partitionAll(2), tr.take(2)), [0,1,2,3,4,5,6,7,8,9])
   t.deepEqual(result, [[0,1],[2,3]])
+  result = tr.toArray(tr.partitionAll(1), [])
+  t.deepEqual(result, [])
 })

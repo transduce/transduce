@@ -70,25 +70,25 @@ iterable: function(value)
 iterator: function(value)
 
 // transformer
-isTransformer: function(value){}
-transformer: function(value){}
+isTransformer: function(value)
+transformer: function(value)
 
 // util
-compose: function(/*fns*/){}
-isReduced: function(value){}
-reduced: function(value, force?){}
-unreduced: function(value){}
+compose: function(/*fns*/)
+isReduced: function(value)
+reduced: function(value, force?)
+unreduced: function(value)
 protocols: {iterator, transformer}
-isFunction: function(value){}
-isArray: function(value){}
-isString: function(value){}
-isRegExp: function(value){}
-isNumber: function(value){}
-isUndefined: function(value){}
-identity: function(value){}
-arrayPush: function(arr, item){}
-objectMerge: function(obj, item){}
-stringAppend: function(str, item){}
+isFunction: function(value)
+isArray: function(value)
+isString: function(value)
+isRegExp: function(value)
+isNumber: function(value)
+isUndefined: function(value)
+identity: function(value)
+arrayPush: function(arr, item)
+objectMerge: function(obj, item)
+stringAppend: function(str, item)
 ```
 
 ##### reduce(f, init, coll)
