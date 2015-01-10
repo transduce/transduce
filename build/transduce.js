@@ -903,7 +903,7 @@ PartitionAll.prototype.init = function(){
 }
 PartitionAll.prototype.result = function(result){
   var ins = this.inputs
-  if(ins.length){
+  if(ins && ins.length){
     this.inputs = []
     result = this.xf.step(result, ins)
   }
@@ -939,7 +939,7 @@ PartitionBy.prototype.init = function(){
 }
 PartitionBy.prototype.result = function(result){
   var ins = this.inputs
-  if(ins.length){
+  if(ins && ins.length){
     this.inputs = []
     result = this.xf.step(result, ins)
   }

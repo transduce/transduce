@@ -1,6 +1,6 @@
 {
   "name": "transduce",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "JavaScript transducers using transduce libraries",
   "main": "index.js",
   "scripts": {
