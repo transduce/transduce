@@ -1,7 +1,7 @@
 ## Transduce
 [![Build Status](https://secure.travis-ci.org/transduce/transduce.svg)](http://travis-ci.org/transduce/transduce)
 
-Transducers for JavaScript. Collected as a convenience for an aggregated API. Any function or transducer below can be bundled seperately in browserify builds by requiring with path from `transduce`.
+Transducers for JavaScript. Collected as a convenience for an aggregated API. Any function or transducer below can be bundled separately in browserify builds by requiring with path from `transduce`.
 
 Compatible with and inspired by both [transducers-js][4] and [transducers.js][5].
 
@@ -193,7 +193,7 @@ Note that no items will be sent until completion.
 
 ### Math
 
-###### math.min(f?) / math.max(f?)
+##### math.min(f?) / math.max(f?)
 Steps the min/max value on the result of the transformation. if `f` is provided, it is called with each item and the return value is used to compare values. Otherwise, the items are compared as numbers
 
 ### Push
@@ -223,7 +223,7 @@ Buffers all items and joins results on transducer `result`.
 ##### string.nonEmpty()
 Only steps items that are non empty strings (`input.trim().length > 0`).
 
-##### string.lines(limit) / string.chars(limit) / string.words(delimeter, limit)
+##### string.lines(limit) / string.chars(limit) / string.words(delimiter, limit)
 Split chunks into and steps each line/char/word.
 
 ### Unique
@@ -288,7 +288,7 @@ Simple function composition of arguments. Useful for composing (combining) trans
 ##### util.isReduced(value)
 Is the value reduced? (signal for early termination)
 
-#### util.reduced(value, force?)
+##### util.reduced(value, force?)
 Ensures the value is reduced (useful for early termination). If `force` is not provided or `false`, only wraps with Reduced value if not already `isReduced`.  If `force` is `true`, always wraps value with Reduced value.
 
 ##### util.unreduced(value)
