@@ -1,7 +1,7 @@
 'use strict'
 var transduce = require('./transduce'),
     reduce = require('./reduce'),
-    push = require('./util/arrayPush')
+    push = require('../util/arrayPush')
 
 module.exports =
 function toArray(xf, coll){

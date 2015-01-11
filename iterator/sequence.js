@@ -1,7 +1,7 @@
 'use strict'
 var iterator = require('./iterator'),
     symbol = require('./symbol'),
-    isReduced = require('../util/isReduced')
+    isReduced = require('../base/isReduced')
 
 module.exports =
 function sequence(xform, coll) {

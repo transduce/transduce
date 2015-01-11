@@ -1,6 +1,7 @@
 'use strict'
 var tr = require('../'),
-    test = require('tape')
+    test = require('tape'),
+    compose = tr.compose
 
 function isOdd(x){return x % 2 === 1}
 function not(p){
@@ -20,7 +21,7 @@ test('map', function(t){
   var tripled = tr.map(function(num){ return num * 3 })
   t.deepEqual([3,6,9], tr.toArray(tripled, [1,2,3]), 'can triple')
 
-  doubled = tr.compose(
+  doubled = compose(
     tr.map(function(num){ return num * 2 }),
     tr.map(function(num){ return num * 3 }))
   t.deepEqual([6,12,18], tr.toArray(doubled, [1,2,3]), 'can double and triple in chain value')
@@ -107,7 +108,7 @@ test('partitionBy', function(t) {
   var result = tr.toArray(tr.partitionBy(isOdd), [0,1,1,3,4,6,8,7,7,8])
   t.deepEqual(result, [[0], [1,1,3], [4,6,8], [7,7], [8]])
   var arr = [1,1,1,2,2,3,3,3]
-  result = tr.toArray(tr.compose(tr.partitionBy(identity), tr.take(2)), arr)
+  result = tr.toArray(compose(tr.partitionBy(identity), tr.take(2)), arr)
   t.deepEqual(result, [[1,1,1],[2,2]])
   result = tr.toArray(tr.partitionBy(isOdd), [])
   t.deepEqual(result, [])
@@ -119,7 +120,7 @@ test('partitionAll', function(t) {
   t.deepEqual(result, [[0,1],[2,3],[4,5],[6,7],[8,9]])
   result = tr.into([], tr.partitionAll(2), [0,1,2,3,4,5,6,7,8])
   t.deepEqual(result, [[0,1],[2,3],[4,5],[6,7],[8]])
-  result = tr.toArray(tr.compose(tr.partitionAll(2), tr.take(2)), [0,1,2,3,4,5,6,7,8,9])
+  result = tr.toArray(compose(tr.partitionAll(2), tr.take(2)), [0,1,2,3,4,5,6,7,8,9])
   t.deepEqual(result, [[0,1],[2,3]])
   result = tr.toArray(tr.partitionAll(1), [])
   t.deepEqual(result, [])

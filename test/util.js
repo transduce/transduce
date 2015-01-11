@@ -1,5 +1,6 @@
 'use strict'
-var tp = require('../'),
+var tr = require('../'),
+    tp = tr.util,
     test = require('tape')
 
 test('compose', function(t){
@@ -13,20 +14,20 @@ test('compose', function(t){
       return y * x
     }
   }
-  t.equals(tp.compose(minus(1), minus(2))(3), 0)
-  t.equals(tp.compose(minus(1), mult(2))(3), 5)
+  t.equals(tr.compose(minus(1), minus(2))(3), 0)
+  t.equals(tr.compose(minus(1), mult(2))(3), 5)
   t.end()
 })
 
 test('isReduced', function(t){
-  t.ok(!tp.isReduced(''), 'not isReduced')
-  t.ok(!tp.isReduced(false), 'not isReduced')
-  t.ok(!tp.isReduced({value:true}), 'not isReduced')
-  t.ok(tp.isReduced(tp.reduced('')), 'isReduced')
-  t.ok(!tp.isReduced(tp.unreduced(tp.reduced(''))), 'not isReduced')
-  t.ok(!tp.isReduced({}), 'not isReduced')
-  t.ok(!tp.isReduced({__transducers_reduced__:false}), 'not isReduced')
-  t.ok(tp.isReduced({__transducers_reduced__:true}), 'not isReduced')
+  t.ok(!tr.isReduced(''), 'not isReduced')
+  t.ok(!tr.isReduced(false), 'not isReduced')
+  t.ok(!tr.isReduced({value:true}), 'not isReduced')
+  t.ok(tr.isReduced(tr.reduced('')), 'isReduced')
+  t.ok(!tr.isReduced(tr.unreduced(tr.reduced(''))), 'not isReduced')
+  t.ok(!tr.isReduced({}), 'not isReduced')
+  t.ok(!tr.isReduced({__transducers_reduced__:false}), 'not isReduced')
+  t.ok(tr.isReduced({__transducers_reduced__:true}), 'not isReduced')
 
   t.end()
 })

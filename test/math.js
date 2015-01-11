@@ -1,6 +1,6 @@
 'use strict'
 var tr = require('../'),
-    math = tr,
+    math = tr.math,
     test = require('tape')
 
 test('max', function(t) {

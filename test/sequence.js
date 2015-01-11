@@ -1,7 +1,8 @@
 'use strict'
 var tr = require('../'),
-    sequence = tr.sequence,
-    toArray = tr.iteratorToArray,
+    sequence = tr.iterator.sequence,
+    toArray = tr.iterator.toArray,
+    compose = tr.compose,
     test = require('tape')
 
 test('sequence array', function(t){
@@ -14,10 +15,10 @@ test('sequence array', function(t){
   xf = tr.filter(isOdd)
   t.deepEqual(toArray(sequence(xf, [1,2,3,4,5,7,9,10,12,13,15])), [1,3,5,7,9,13,15])
 
-  xf = tr.compose(tr.filter(isOdd), tr.take(3))
+  xf = compose(tr.filter(isOdd), tr.take(3))
   t.deepEqual(toArray(sequence(xf, [1,2,3,4,5,7,9,10,12,13,15])), [1,3,5])
 
-  xf = tr.compose(tr.filter(isOdd), tr.drop(3))
+  xf = compose(tr.filter(isOdd), tr.drop(3))
   t.deepEqual(toArray(sequence(xf, [1,2,3,4,5,7,9,10,12,13,15])), [7,9,13,15])
 
   t.end()
@@ -26,10 +27,10 @@ test('sequence array', function(t){
 test('sequence fn', function(t){
   var xf
 
-  xf = tr.compose(tr.filter(isOdd), tr.take(3))
+  xf = compose(tr.filter(isOdd), tr.take(3))
   t.deepEqual(toArray(sequence(xf, count())), [1,3,5])
 
-  xf = tr.compose(tr.filter(isOdd), tr.drop(3), tr.take(4))
+  xf = compose(tr.filter(isOdd), tr.drop(3), tr.take(4))
   t.deepEqual(toArray(sequence(xf, count())), [7,9,11,13])
 
   t.end()

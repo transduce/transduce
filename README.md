@@ -9,9 +9,10 @@ If you are not familiar with transducers, check out [Transducers Explained][3].
 
 ## API
 
-Currently supports the following methods:
+Currently supports the following functions:
 
 ```javascript
+// base functions
 reduce: function(f, init, coll)
 transduce: function(xf, f, init, coll)
 into: function(to, xf, from)
@@ -30,65 +31,78 @@ mapcat: function(f)
 partitionAll: function(n)
 partitionBy: function(f)
 
-// array
-forEach: function(callback)
-find: function(predicate)
-push: function(/*args*/)
-unshift: function(/*args*/)
-every: function(predicate)
-some: function(predicate)
-contains: function(target)
-slice: function(begin?, end?)
-initial: function(n?)
-last: function(n?)
-
-// math
-min: function(f?)
-max: function(f?)
-
-// push
-tap: function(interceptor)
-asCallback: function(xf, reducer)
-asyncCallback: function(xf, continuation, reducer)
-
-// string
-split: function(separator, limit)
-join: function(separator)
-nonEmpty: function()
-lines: function(limit)
-chars: function(limit)
-words: function(delimiter, limit)
-
-// unique
-dedupe: function();
-unique: function(f?);
-
-// iterator
-isIterable: function(value)
-isIterator: function(value)
-iterable: function(value)
-iterator: function(value)
-
-// transformer
-isTransformer: function(value)
-transformer: function(value)
-
-// util
+// base utils
 compose: function(/*fns*/)
 isReduced: function(value)
 reduced: function(value, force?)
 unreduced: function(value)
-protocols: {iterator, transformer}
-isFunction: function(value)
-isArray: function(value)
-isString: function(value)
-isRegExp: function(value)
-isNumber: function(value)
-isUndefined: function(value)
-identity: function(value)
-arrayPush: function(arr, item)
-objectMerge: function(obj, item)
-stringAppend: function(str, item)
+
+array {
+  forEach: function(callback)
+  find: function(predicate)
+  push: function(/*args*/)
+  unshift: function(/*args*/)
+  every: function(predicate)
+  some: function(predicate)
+  contains: function(target)
+  slice: function(begin?, end?)
+  initial: function(n?)
+  last: function(n?)
+}
+
+math {
+  min: function(f?)
+  max: function(f?)
+}
+
+push {
+  tap: function(interceptor)
+  asCallback: function(xf, reducer)
+  asyncCallback: function(xf, continuation, reducer)
+}
+
+string {
+  split: function(separator, limit)
+  join: function(separator)
+  nonEmpty: function()
+  lines: function(limit)
+  chars: function(limit)
+  words: function(delimiter, limit)
+}
+
+unique {
+  dedupe: function();
+  unique: function(f?);
+}
+
+iterator {
+  symbol: Symbol.iterator || '@@iterator'
+  isIterable: function(value)
+  isIterator: function(value)
+  iterable: function(value)
+  iterator: function(value)
+  toArray: function(value)
+  sequence: function(xf, value)
+}
+
+transformer {
+  symbol: Symbol('transformer') || '@@transformer'
+  isTransformer: function(value),
+  transformer: function(value)
+}
+
+util {
+  isFunction: function(value)
+  isArray: function(value)
+  isString: function(value)
+  isRegExp: function(value)
+  isNumber: function(value)
+  isUndefined: function(value)
+  identity: function(value)
+  arrayPush: function(arr, item)
+  objectMerge: function(obj, item)
+  stringAppend: function(str, item)
+}
 ```
 
 ##### reduce(f, init, coll)
@@ -141,150 +155,155 @@ Partitions the source into sub arrays when the value of the function `f` changes
 ### Array
 Use Array methods as Transducers.  Treats each stepped item as an item in the array, and defines transducers that step items with the same contract as array methods.
 
-##### forEach(callback)
+##### array.forEach(callback)
 Passes every item through unchanged, but after executing `callback(item, idx)`.  Can be useful for "tapping into" composed transducer pipelines.   The return value of the callback is ignored, item is passed unchanged.
 
-##### find(predicate)
+##### array.find(predicate)
 Like filter, but terminates transducer pipeline with the result of the first item that passes the predicate test. Will always step either 0 (if not found) or 1 (if found) values.
 
-##### push(/*args*/)
+##### array.push(/*args*/)
 Passes all items straight through until the result is requested.  Once completed, steps every argument through the pipeline, before returning the result.  This effectively pushes values on the end of the stream.
 
-##### unshift(/*args*/)
+##### array.unshift(/*args*/)
 Before stepping the first item, steps all arguments through the pipeline, then passes every item through unchanged.  This effectively unshifts values onto the beginning of the stream.
 
-##### every(predicate)
+##### array.every(predicate)
 Checks to see if every item passes the predicate test.  Steps a single item `true` or `false`.  Early termination on `false`.
 
-##### some(predicate)
+##### array.some(predicate)
 Checks to see if some item passes the predicate test.  Steps a single item `true` or `false`.  Early termination on `true`.
 
-##### contains(target)
+##### array.contains(target)
 Does the stream contain the target value (`target === item`)? Steps a single item `true` or `false`. Early termination on `true`.
 
-##### slice(begin?, end?)
+##### array.slice(begin?, end?)
 Like array slice, but with transducers.  Steps items between `begin` (inclusive) and `end` (exclusive).  If either index is negative, indexes from end of transformation.  If `end` is undefined, steps until result of transformation. If `begin` is undefined, begins at 0.
 
 Note that if either index is negative, items will be buffered until completion.
 
-##### initial(n?)
+##### array.initial(n?)
 Steps everything but the last entry. Passing `n` will step all values excluding the last N.
 
 Note that no items will be sent and all items will be buffered until completion.
 
-##### last(n?)
+##### array.last(n?)
 Step the last element. Passing `n` will step the last N  values.
 
 Note that no items will be sent until completion.
 
 ### Math
 
-###### min(f?) / max(f?)
+###### math.min(f?) / math.max(f?)
 Steps the min/max value on the result of the transformation. if `f` is provided, it is called with each item and the return value is used to compare values. Otherwise, the items are compared as numbers
 
 ### Push
 Normally transducers are used with pull streams: reduce "pulls" values out of an array, iterator, etc.  This library adds basic support for using transducers with push streams. See [transduce-stream][2] for using transducers with Node.js streams, or the [underscore-transducer][6] [demo][7] for an example of using transducers as event listeners.
 
-##### tap(interceptor)
+##### push.tap(interceptor)
 Transducer that invokes interceptor with each result and input, and then passes through input. The primary purpose of this method is to "tap into" a method chain, in order to perform operations on intermediate results within the chain.  Executes interceptor with current result and input.
 
-##### asCallback(xf, reducer)
+##### push.asCallback(xf, reducer)
 Creates a callback that starts a transducer process and accepts parameter as a new item in the process. Each item advances the state of the transducer. If the transducer exhausts due to early termination, all subsequent calls to the callback will no-op and return the computed result. If the callback is called with no argument, the transducer terminates, and all subsequent calls will no-op and return the computed result. The callback returns undefined until completion. Once completed, the result is always returned. If reducer is not defined, maintains last value and does not buffer results.
 
-##### asyncCallback(xf, continuation, reducer)
+##### push.asyncCallback(xf, continuation, reducer)
 Creates an async callback that starts a transducer process and accepts parameter cb(err, item) as a new item in the process. The returned callback and the optional continuation follow Node.js conventions with  fn(err, item). Each item advances the state  of the transducer, if the continuation is provided, it will be called on completion or error. An error will terminate the transducer and be propagated to the continuation.  If the transducer exhausts due to early termination, any further call will be a no-op. If the callback is called with no item, it will terminate the transducer process. If reducer is not defined, maintains last value and does not buffer results.
 
 
 ### String
 Transduce over sequences of strings. Particularly useful with [transduce-stream][2].
 
-Treats every item as a substring, and splits across the entire transducer sequence.  This allows methods to work with chunks sent through streams.  When using transducers with streams, it is helpful to compose the transformation that you want with one of these methods to operate against a given line/word/etc.
+Treats every item as a substring, and splits across the entire transducer sequence.  This allows functions to work with chunks sent through streams.  When using transducers with streams, it is helpful to compose the transformation that you want with one of these functions to operate against a given line/word/etc.
 
-##### split(separator, limit)
+##### string.split(separator, limit)
 Works like `''.split` but splits across entire sequence of items. Accepts separator (String or RegExp) and limit of words to send.
 
-##### join(separator)
+##### string.join(separator)
 Buffers all items and joins results on transducer `result`.
 
-##### nonEmpty()
+##### string.nonEmpty()
 Only steps items that are non empty strings (`input.trim().length > 0`).
 
-##### lines(limit) / chars(limit) / words(delimeter, limit)
+##### string.lines(limit) / string.chars(limit) / string.words(delimeter, limit)
 Split chunks into and steps each line/char/word.
 
 ### Unique
 Transducers to remove duplicate values from the transformation.
 
-##### dedupe()
+##### unique.dedupe()
 Removes consecutive duplicates from the transformation. Subsequent stepped values are checked for equality using `===`.
 
-##### unique(f?)
+##### unique.unique(f?)
 Produce a duplicate-free version of the transformation. If `f` is passed, it will be called with each item and the return value for uniqueness check.  Uniqueness is checked across all values already seen, and as such, the items (or computed checks) are buffered.
 
 ### Iterator Protocol
 
-##### isIterable(value)
+##### iterator.symbol
+
+Symbol (or a string that acts as symbols) for `@@iterator` you can use to configure your custom objects.
+
+##### iterator.isIterable(value)
 Does the parameter conform to the iterable protocol?
 
-##### iterable(value)
+##### iterator.iterable(value)
 Returns the iterable for the parameter.  Returns value if conforms to iterable protocol. Returns `undefined` if cannot return en iterable.
 
 The return value will either conform to iterator protocol that can be invoked for iteration or will be undefined.
 
 Supports anything that returns true for `isIterable` and converts arrays to iterables over each indexed item. Converts to functions to infinite iterables that always call function on next
 
-##### isIterator(value)
+##### iterator.isIterator(value)
 Does the parameter have an iterator protocol or have a next method?
 
-##### iterator(value)
+##### iterator.iterator(value)
 Returns the iterator for the parameter, invoking if has an iterator protocol or returning if has a next method. Returns `undefined` if cannot create an iterator.
 
 The return value will either have a `next` function that can be invoked for iteration or will be undefined.
 
 Supports anything that returns true for `isIterator` and converts arrays to iterators over each indexed item. Converts to functions to infinite iterators that always call function on next.
 
-##### iteratorToArray(value)
+##### iterator.toArray(value)
 Converts the value to an iterator and iterates into an array.
 
-##### sequence(xf, value)
+##### iterator.sequence(xf, value)
 Create an ES6 Iterable by transforming an input source using transducer `xf`.
 
 
 ### Transformer Protocol
 
-##### isTransformer(value)
-Does the parameter have a transformer protocol or have `init`, `step`, `result` methods?
+##### transformer.symbol
+Symbol (or a string that acts as symbols) for [`@@transformer`][10] you can use to configure your custom objects.
 
-##### transformer(value)
-Attempts to convert the parameter into a transformer.  If cannot be converted, returns `undefined`.  If defined, the return value will have `init`, `step`, `result` methods that can be used for transformation.  Converts arrays (`arrayPush`), strings (`stringAppend`), objects (`objectMerge`), functions (wrap as reducing function) or anything that `isTransformer` into a transformer.
+
+##### transformer.isTransformer(value)
+Does the parameter have a transformer protocol or have `init`, `step`, `result` functions?
+
+##### transformer.transformer(value)
+Attempts to convert the parameter into a transformer.  If cannot be converted, returns `undefined`.  If defined, the return value will have `init`, `step`, `result` functions that can be used for transformation.  Converts arrays (`arrayPush`), strings (`stringAppend`), objects (`objectMerge`), functions (wrap as reducing function) or anything that `isTransformer` into a transformer.
 
 ### Util
 
-##### compose()
+##### util.compose(/\*fns\*/)
 Simple function composition of arguments. Useful for composing (combining) transducers.
 
-##### isReduced(value)
+##### util.isReduced(value)
 Is the value reduced? (signal for early termination)
 
-#### reduced(value, force?)
+#### util.reduced(value, force?)
 Ensures the value is reduced (useful for early termination). If `force` is not provided or `false`, only wraps with Reduced value if not already `isReduced`.  If `force` is `true`, always wraps value with Reduced value.
 
-##### unreduced(value)
+##### util.unreduced(value)
 Ensure the value is not reduced (unwraps reduced values if necessary)
 
-##### protocols
-Symbols (or strings that act as symbols) for `@@iterator` and [`@@transformer`][10] that you can use to configure your custom objects.
-
-##### identity(value)
+##### util.identity(value)
 Always returns value
 
-##### arrayPush(arr, item)
+##### util.arrayPush(arr, item)
 Array.push as a reducing function.  Calls push and returns array.
 
-##### objectMerge(object, item)
+##### util.objectMerge(object, item)
 Merges the item into the object.  If `item` is an array of length 2, uses first (0 index) as the key and the second (1 index) as the value.  Otherwise iterates over own properties of items and merges values with same keys into the result object.
 
-##### stringAppend(string, item)
+##### util.stringAppend(string, item)
 Appends item onto result using `+`.
 
 [1]: https://github.com/transduce

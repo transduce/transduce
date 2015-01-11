@@ -1,7 +1,7 @@
 'use strict'
 
-var reduced = require('./util/reduced'),
-    isReduced = require('./util/isReduced'),
+var reduced = require('./reduced'),
+    isReduced = require('./isReduced'),
     reduce = require('./reduce')
 
 module.exports =

@@ -1,6 +1,6 @@
 'use strict'
-var isReduced = require('../util/isReduced'),
-    unreduced = require('../util/unreduced')
+var isReduced = require('../base/isReduced'),
+    unreduced = require('../base/unreduced')
 
 // Get the last element. Passing **n** will return the last N  values.
 // Note that no items will be sent until completion.

@@ -1,5 +1,5 @@
 'use strict'
-var isReduced = require('./util/isReduced')
+var isReduced = require('./isReduced')
 
 module.exports =
 function partitionBy(f) {

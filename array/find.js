@@ -1,5 +1,5 @@
 'use strict'
-var reduced = require('../util/reduced')
+var reduced = require('../base/reduced')
 
 // Return the first value which passes a truth test. Aliased as `detect`.
 module.exports =

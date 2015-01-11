@@ -1,5 +1,5 @@
 'use strict'
-var isReduced = require('../util/isReduced'),
+var isReduced = require('../base/isReduced'),
     _slice = Array.prototype.slice
 
 // Adds one or more items to the beginning of the sequence, like Array.prototype.unshift.

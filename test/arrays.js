@@ -1,6 +1,6 @@
 "use strict"
 var tr = require('../'),
-    a = tr,
+    a = tr.array,
     comp = tr.compose,
     test = require('tape')
 

@@ -1,5 +1,5 @@
 'use strict'
-var transformer = require('./transformer/transformer'),
+var transformer = require('../transformer/transformer'),
     reduce = require('./reduce')
 
 module.exports =

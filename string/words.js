@@ -1,5 +1,5 @@
 'use strict'
-var compose = require('../util/compose'),
+var compose = require('../base/compose'),
     isNumber = require('../util/isNumber'),
     split = require('./split'),
     nonEmpty = require('./nonEmpty')

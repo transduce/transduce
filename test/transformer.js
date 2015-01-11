@@ -1,5 +1,5 @@
 'use strict'
-var tp = require('../'),
+var tp = require('../').transformer,
     test = require('tape')
 
 test('transform array', function(t){

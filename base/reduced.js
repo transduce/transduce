@@ -1,7 +1,6 @@
 'use strict'
 
-var isReduced = require('./isReduced'),
-    Reduced = require('./_Reduced')
+var isReduced = require('./isReduced')
 
 module.exports =
 function reduced(value, force){
@@ -9,4 +8,9 @@ function reduced(value, force){
     value = new Reduced(value)
   }
   return value
+}
+
+function Reduced(value){
+  this.value = value
+  this.__transducers_reduced__ = true
 }

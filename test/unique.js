@@ -1,6 +1,7 @@
 "use strict"
 var tr = require('../'),
-    un = tr,
+    un = tr.unique,
+    compose = tr.compose,
     test = require('tape')
 
 test('dedupe', function(t) {
@@ -16,7 +17,7 @@ test('unique', function(t) {
 
   list = [{name: 'moe'}, {name: 'curly'}, {name: 'larry'}, {name: 'curly'}]
   var iterator = function(value) { return value.name }
-  t.deepEqual(tr.into([], tr.compose(un.unique(iterator), tr.map(iterator)), list), ['moe', 'curly', 'larry'], 'can find the unique values of an array using a custom iterator')
+  t.deepEqual(tr.into([], compose(un.unique(iterator), tr.map(iterator)), list), ['moe', 'curly', 'larry'], 'can find the unique values of an array using a custom iterator')
 
   iterator = function(value) { return value + 1 }
   list = [1, 2, 2, 3, 4, 4]

@@ -1,5 +1,5 @@
 'use strict'
-var iter = require('../'),
+var iter = require('../').iterator,
     test = require('tape')
 
 test('iterate array', function(t){

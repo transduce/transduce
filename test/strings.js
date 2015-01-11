@@ -3,7 +3,7 @@ var tr = require('../'),
     test = require('tape')
 
 function join(sep, arr){
-  return tr.into([], tr.join(sep), arr)
+  return tr.into([], tr.string.join(sep), arr)
 }
 
 test('Strings: join', function(t) {
@@ -17,10 +17,10 @@ test('Strings: join', function(t) {
 })
 
 function split(sep, arr){
-  return tr.into([], tr.split(sep), arr)
+  return tr.into([], tr.string.split(sep), arr)
 }
 function splitLimit(sep, limit, arr){
-  return tr.into([], tr.split(sep, limit), arr)
+  return tr.into([], tr.string.split(sep, limit), arr)
 }
 test('split', function(t){
   t.deepEqual(split(',', ['foo,bar']), ['foo','bar'])
@@ -54,7 +54,7 @@ test('split', function(t){
 })
 
 function lines(arr, limit){
-  return tr.into([], tr.lines(limit), arr)
+  return tr.into([], tr.string.lines(limit), arr)
 }
 test('lines', function(t) {
   t.equal(lines(['Hello\nWorld']).length, 2)
@@ -73,7 +73,7 @@ test('lines', function(t) {
 })
 
 function chars(arr, limit){
-  return tr.into([], tr.chars(limit), arr)
+  return tr.into([], tr.string.chars(limit), arr)
 }
 test('chars', function(t) {
   t.equal(chars(['Hello']).length, 5)
@@ -90,7 +90,7 @@ test('chars', function(t) {
 
 
 function words(arr, sep){
-  return tr.into([], tr.words(sep), arr)
+  return tr.into([], tr.string.words(sep), arr)
 }
 test('words', function(t) {
   t.deepEqual(words(['I love you!']), ['I', 'love', 'you!'])

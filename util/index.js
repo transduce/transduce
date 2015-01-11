@@ -1,10 +1,6 @@
 'use strict'
 
 module.exports = {
-  compose: require('./compose'),
-  isReduced: require('./isReduced'),
-  reduced: require('./reduced'),
-  unreduced: require('./unreduced'),
   isFunction: require('./isFunction'),
   isArray: require('./isArray'),
   isString: require('./isString'),

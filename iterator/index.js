@@ -5,6 +5,6 @@ module.exports = {
   isIterator: require('./isIterator'),
   iterable: require('./iterable'),
   iterator: require('./iterator'),
-  iteratorToArray: require('./iteratorToArray'),
+  toArray: require('./toArray'),
   sequence: require('./sequence')
 }

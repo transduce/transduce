@@ -22,7 +22,7 @@ node_modules:
 
 js: $(JS_TARGET) $(JS_TARGET:.js=.min.js)
 
-$(JS_TARGET): *.js | build
+$(JS_TARGET): *.js base/*.js array/*.js math/*.js iterator/*.js transformer/*.js string/*.js push/*.js unique/*.js util/*.js | build
 	`npm bin`/browserify -s transduce index.js > $@
 
 build:
