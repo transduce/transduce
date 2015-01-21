@@ -11,21 +11,21 @@ test('iterate array', function(t){
   t.deepEquals({value: arr[idx++], done: false}, iterator.next())
   t.deepEquals({value: arr[idx++], done: false}, iterator.next())
   t.deepEquals({value: arr[idx++], done: false}, iterator.next())
-  t.deepEquals({done: true}, iterator.next())
-  t.deepEquals({done: true}, iterator.next())
+  t.ok(iterator.next().done)
+  t.ok(iterator.next().done)
 
   idx = 0
   arr = [2]
   iterator = iter.iterator(arr)
   t.deepEquals({value: arr[idx++], done: false}, iterator.next())
-  t.deepEquals({done: true}, iterator.next())
-  t.deepEquals({done: true}, iterator.next())
+  t.ok(iterator.next().done)
+  t.ok(iterator.next().done)
 
   idx = 0
   arr = []
   iterator = iter.iterator(arr)
-  t.deepEquals({done: true}, iterator.next())
-  t.deepEquals({done: true}, iterator.next())
+  t.ok(iterator.next().done)
+  t.ok(iterator.next().done)
 
   t.end()
 })
@@ -39,20 +39,20 @@ test('iterate string', function(t){
   t.deepEquals({value: arr[idx++], done: false}, iterator.next())
   t.deepEquals({value: arr[idx++], done: false}, iterator.next())
   t.deepEquals({value: arr[idx++], done: false}, iterator.next())
-  t.deepEquals({done: true}, iterator.next())
-  t.deepEquals({done: true}, iterator.next())
+  t.ok(iterator.next().done)
+  t.ok(iterator.next().done)
 
   idx = 0
   arr = ['2']
   iterator = iter.iterator('2')
   t.deepEquals({value: arr[idx++], done: false}, iterator.next())
-  t.deepEquals({done: true}, iterator.next())
-  t.deepEquals({done: true}, iterator.next())
+  t.ok(iterator.next().done)
+  t.ok(iterator.next().done)
 
   idx = 0
   iterator = iter.iterator('')
-  t.deepEquals({done: true}, iterator.next())
-  t.deepEquals({done: true}, iterator.next())
+  t.ok(iterator.next().done)
+  t.ok(iterator.next().done)
 
   t.end()
 })

@@ -71,8 +71,8 @@ string {
 }
 
 unique {
-  dedupe: function();
-  unique: function(f?);
+  dedupe: function()
+  unique: function(f?)
 }
 
 iterator {
@@ -87,7 +87,7 @@ iterator {
 
 transformer {
   symbol: Symbol('transformer') || '@@transformer'
-  isTransformer: function(value),
+  isTransformer: function(value)
   transformer: function(value)
 }
 
