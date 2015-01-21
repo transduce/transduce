@@ -8,6 +8,10 @@ var transformer = require('../transformer/transformer'),
 module.exports =
 function reduce(xf, init, coll){
   xf = transformer(xf)
+  if (arguments.length === 2) {
+    coll = init
+    init = xf.init()
+  }
   if(isArray(coll)){
     return arrayReduce(xf, init, coll)
   }
