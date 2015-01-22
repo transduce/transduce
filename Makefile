@@ -9,6 +9,7 @@ clean:
 	rm -rf build
 
 test: | node_modules
+	`npm bin`/jshint array/*.js base/*.js iterator/*.js math/*.js push/*.js string/*.js transformer/*.js unique/*.js util/*.js test/*.js
 	`npm bin`/tape test/*.js
 
 node_modules:
