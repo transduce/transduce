@@ -16,14 +16,14 @@ var isReduced = require('../base/isReduced'),
 //
 // If reducer is not defined, maintains last value and does not buffer results.
 module.exports =
-function asCallback(xf, reducer){
+function asCallback(t, reducer){
   var done = false, stepper, result
 
   if(reducer === void 0){
     reducer = lastValue
   }
 
-  stepper = xf(reducer)
+  stepper = t(reducer)
   result = stepper.init()
 
   return function(item){

@@ -13,8 +13,8 @@ Currently supports the following functions:
 
 ```javascript
 // base functions
-reduce: function(f, init, coll)
-transduce: function(xf, f, init, coll)
+reduce: function(xf, init?, coll)
+transduce: function(t, xf, init?, coll)
 into: function(to, xf, from)
 toArray: function(xf?, coll)
 
@@ -57,8 +57,8 @@ math {
 
 push {
   tap: function(interceptor)
-  asCallback: function(xf, reducer)
-  asyncCallback: function(xf, continuation, reducer)
+  asCallback: function(t, reducer)
+  asyncCallback: function(t, continuation, reducer)
 }
 
 string {
@@ -82,7 +82,7 @@ iterator {
   iterable: function(value)
   iterator: function(value)
   toArray: function(value)
-  sequence: function(xf, value)
+  sequence: function(t, value)
 }
 
 transformer {
@@ -105,11 +105,11 @@ util {
 }
 ```
 
-##### reduce(f, init, coll)
-Reduces over a transformation, `f` is converted to a `transformer` and coll is converted to an `iterator`.   Arrays are special cased to reduce using for loop.
+##### reduce(xf, init?, coll)
+Reduces over a transformation. If `xf` is not a `transformer`, it is converted to one. `coll` is converted to an `iterator`. Arrays are special cased to reduce using for loop. If the function is called with arity-2, the `xf.init()` is used as the `init` value.
 
-##### transduce(xf, f, init, coll)
-Transduces over a transformation, `f` is converted to a `transformer` and the initialized transformer is passed to reduce.
+##### transduce(t, xf, init?, coll)
+Transduces over a transformation. The transducer `t` is initialized with `xf` and is passed to `reduce`. `xf` is converted to a `transformer` if it is not one already. If the function is called with arity-3, the `xf.init()` is used as the `init` value.
 
 ##### into(to, xf, from)
 Returns a new collection appending all items into the empty collection `to` by passing all items from source collection `from` through the transformation `xf`.  Chooses appropriate step function from type of `to`.  Can be array, object, string or have `@@transformer`.
@@ -202,10 +202,10 @@ Normally transducers are used with pull streams: reduce "pulls" values out of an
 ##### push.tap(interceptor)
 Transducer that invokes interceptor with each result and input, and then passes through input. The primary purpose of this method is to "tap into" a method chain, in order to perform operations on intermediate results within the chain.  Executes interceptor with current result and input.
 
-##### push.asCallback(xf, reducer)
+##### push.asCallback(t, reducer)
 Creates a callback that starts a transducer process and accepts parameter as a new item in the process. Each item advances the state of the transducer. If the transducer exhausts due to early termination, all subsequent calls to the callback will no-op and return the computed result. If the callback is called with no argument, the transducer terminates, and all subsequent calls will no-op and return the computed result. The callback returns undefined until completion. Once completed, the result is always returned. If reducer is not defined, maintains last value and does not buffer results.
 
-##### push.asyncCallback(xf, continuation, reducer)
+##### push.asyncCallback(t, continuation, reducer)
 Creates an async callback that starts a transducer process and accepts parameter cb(err, item) as a new item in the process. The returned callback and the optional continuation follow Node.js conventions with  fn(err, item). Each item advances the state  of the transducer, if the continuation is provided, it will be called on completion or error. An error will terminate the transducer and be propagated to the continuation.  If the transducer exhausts due to early termination, any further call will be a no-op. If the callback is called with no item, it will terminate the transducer process. If reducer is not defined, maintains last value and does not buffer results.
 
 
@@ -264,8 +264,8 @@ Supports anything that returns true for `isIterator` and converts arrays to iter
 ##### iterator.toArray(value)
 Converts the value to an iterator and iterates into an array.
 
-##### iterator.sequence(xf, value)
-Create an ES6 Iterable by transforming an input source using transducer `xf`.
+##### iterator.sequence(t, value)
+Create an ES6 Iterable by transforming an input source using transducer `t`.
 
 
 ### Transformer Protocol

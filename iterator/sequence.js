@@ -4,17 +4,17 @@ var iterator = require('./iterator'),
     isReduced = require('../base/isReduced')
 
 module.exports =
-function sequence(xform, coll) {
-  return new LazyIterable(xform, coll)
+function sequence(t, coll) {
+  return new LazyIterable(t, coll)
 }
 
-function LazyIterable(xform, coll){
-  this.xform = xform
+function LazyIterable(t, coll){
+  this.t = t
   this.coll = coll
 }
 LazyIterable.prototype[symbol] = function(){
   var iter = iterator(this.coll)
-  return new LazyIterator(new Stepper(this.xform, iter))
+  return new LazyIterator(new Stepper(this.t, iter))
 }
 
 function LazyIterator(stepper){
@@ -46,8 +46,8 @@ StepTransformer.prototype.result = function(lt){
   return lt
 }
 
-function Stepper(xform, iter){
-  this.xf = xform(stepTransformer)
+function Stepper(t, iter){
+  this.xf = t(stepTransformer)
   this.iter = iter
 }
 Stepper.prototype.step = function(lt){
