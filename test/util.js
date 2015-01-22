@@ -94,3 +94,12 @@ test('objectMerge obj', function(t){
   t.deepEqual({a:0, b:2, c:2, d:4}, obj)
   t.end()
 })
+
+test('objectMerge Object.create(null)', function(t){
+  var obj = Object.create(null)
+  obj.a = 1;
+  obj = tp.objectMerge({}, obj)
+  t.deepEqual({a:1}, obj)
+  t.end()
+})
+

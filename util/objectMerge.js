@@ -1,6 +1,7 @@
 'use strict'
 
 var isArray = require('./isArray')
+var has = {}.hasOwnProperty
 
 module.exports =
 function objectMerge(result, input){
@@ -9,7 +10,7 @@ function objectMerge(result, input){
   } else {
     var prop
     for(prop in input){
-      if(input.hasOwnProperty(prop)){
+      if(has.call(input, prop)){
         result[prop] = input[prop]
       }
     }
