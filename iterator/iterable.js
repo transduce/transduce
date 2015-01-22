@@ -4,6 +4,7 @@ var isIterable = require('./isIterable'),
     isArray = require('../util/isArray'),
     isFunction = require('../util/isFunction'),
     isString = require('../util/isString'),
+    has = {}.hasOwnProperty,
     keys = Object.keys || _keys
 
 module.exports =
@@ -75,7 +76,7 @@ ObjectIterable.prototype[symbol] = function(){
 function _keys(obj){
   var prop, keys = []
   for(prop in obj){
-    if(obj.hasOwnProperty(prop)){
+    if(has.call(obj, prop)){
       keys.push(prop)
     }
   }
