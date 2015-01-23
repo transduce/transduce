@@ -62,12 +62,12 @@ push {
 }
 
 string {
-  split: function(separator, limit)
+  split: function(separator, limit?)
   join: function(separator)
   nonEmpty: function()
-  lines: function(limit)
-  chars: function(limit)
-  words: function(delimiter, limit)
+  lines: function(limit?)
+  chars: function(limit?)
+  words: function(delimiter?, limit?)
 }
 
 unique {
@@ -214,8 +214,8 @@ Transduce over sequences of strings. Particularly useful with [transduce-stream]
 
 Treats every item as a substring, and splits across the entire transducer sequence.  This allows functions to work with chunks sent through streams.  When using transducers with streams, it is helpful to compose the transformation that you want with one of these functions to operate against a given line/word/etc.
 
-##### string.split(separator, limit)
-Works like `''.split` but splits across entire sequence of items. Accepts separator (String or RegExp) and limit of words to send.
+##### string.split(separator, limit?)
+Works like `''.split` but splits across entire sequence of items. Accepts separator (String or RegExp) and optional limit of words to send.
 
 ##### string.join(separator)
 Buffers all items and joins results on transducer `result`.
@@ -223,8 +223,8 @@ Buffers all items and joins results on transducer `result`.
 ##### string.nonEmpty()
 Only steps items that are non empty strings (`input.trim().length > 0`).
 
-##### string.lines(limit) / string.chars(limit) / string.words(delimiter, limit)
-Split chunks into and steps each line/char/word.
+##### string.lines(limit?) / string.chars(limit?) / string.words(delimiter?, limit?)
+Split chunks into and steps each line/char/word with optional limit.
 
 ### Unique
 Transducers to remove duplicate values from the transformation.
