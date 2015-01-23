@@ -14,16 +14,16 @@ var isReduced = require('../base/isReduced'),
 //
 // If the callback is called with no item, it will terminate the transducer process.
 //
-// If reducer is not defined, maintains last value and does not buffer results.
+// If reducer, xf, is not defined, maintains last value and does not buffer results.
 module.exports =
-function asyncCallback(t, continuation, reducer){
+function asyncCallback(t, continuation, xf){
   var done = false, stepper, result
 
-  if(reducer === void 0){
-    reducer = lastValue
+  if(xf === void 0){
+    xf = lastValue
   }
 
-  stepper = t(reducer)
+  stepper = t(xf)
   result = stepper.init()
 
   function checkDone(err, item){

@@ -15,11 +15,11 @@ Currently supports the following functions:
 // base functions
 reduce: function(xf, init?, coll)
 transduce: function(t, xf, init?, coll)
-into: function(to, xf, from)
-toArray: function(xf?, coll)
+into: function(to, t, from)
+toArray: function(t?, coll)
 
 // base transducers
-map: function(mappingFunction)
+map: function(f)
 filter: function(predicate)
 remove: function(predicate)
 take: function(n)
@@ -57,8 +57,8 @@ math {
 
 push {
   tap: function(interceptor)
-  asCallback: function(t, reducer)
-  asyncCallback: function(t, continuation, reducer)
+  asCallback: function(t, xf?)
+  asyncCallback: function(t, continuation, xf?)
 }
 
 string {
@@ -111,16 +111,16 @@ Reduces over a transformation. If `xf` is not a `transformer`, it is converted t
 ##### transduce(t, xf, init?, coll)
 Transduces over a transformation. The transducer `t` is initialized with `xf` and is passed to `reduce`. `xf` is converted to a `transformer` if it is not one already. If the function is called with arity-3, the `xf.init()` is used as the `init` value.
 
-##### into(to, xf, from)
-Returns a new collection appending all items into the empty collection `to` by passing all items from source collection `from` through the transformation `xf`.  Chooses appropriate step function from type of `to`.  Can be array, object, string or have `@@transformer`.
+##### into(to, t, from)
+Returns a new collection appending all items into the empty collection `to` by passing all items from source collection `from` using the transducer `t`.  Chooses appropriate step function from type of `to`.  Can be array, object, string or have `@@transformer`.
 
-##### toArray(xf?, coll)
-Transduce a collection into an array with an optional transformation.
+##### toArray(t?, coll)
+Transduce a collection into an array with an optional transducer, `t`. `coll` is converted to an `iterator`.
 
 ### Transducers
 
-##### map(mappingFunction)
-Transducer that steps all items after applying a `mappingFunction` to each item.
+##### map(f)
+Transducer that steps all items after applying a mapping function `f` to each item.
 
 ##### filter(predicate)
 Transducer that steps items which pass predicate test.
@@ -202,11 +202,11 @@ Normally transducers are used with pull streams: reduce "pulls" values out of an
 ##### push.tap(interceptor)
 Transducer that invokes interceptor with each result and input, and then passes through input. The primary purpose of this method is to "tap into" a method chain, in order to perform operations on intermediate results within the chain.  Executes interceptor with current result and input.
 
-##### push.asCallback(t, reducer)
-Creates a callback that starts a transducer process and accepts parameter as a new item in the process. Each item advances the state of the transducer. If the transducer exhausts due to early termination, all subsequent calls to the callback will no-op and return the computed result. If the callback is called with no argument, the transducer terminates, and all subsequent calls will no-op and return the computed result. The callback returns undefined until completion. Once completed, the result is always returned. If reducer is not defined, maintains last value and does not buffer results.
+##### push.asCallback(t, xf?)
+Creates a callback that starts a transducer process and accepts parameter as a new item in the process. Each item advances the state of the transducer. If the transducer exhausts due to early termination, all subsequent calls to the callback will no-op and return the computed result. If the callback is called with no argument, the transducer terminates, and all subsequent calls will no-op and return the computed result. The callback returns undefined until completion. Once completed, the result is always returned. If `xf` is not defined, maintains last value and does not buffer results.
 
-##### push.asyncCallback(t, continuation, reducer)
-Creates an async callback that starts a transducer process and accepts parameter cb(err, item) as a new item in the process. The returned callback and the optional continuation follow Node.js conventions with  fn(err, item). Each item advances the state  of the transducer, if the continuation is provided, it will be called on completion or error. An error will terminate the transducer and be propagated to the continuation.  If the transducer exhausts due to early termination, any further call will be a no-op. If the callback is called with no item, it will terminate the transducer process. If reducer is not defined, maintains last value and does not buffer results.
+##### push.asyncCallback(t, continuation, xf?)
+Creates an async callback that starts a transducer process and accepts parameter cb(err, item) as a new item in the process. The returned callback and the optional continuation follow Node.js conventions with  fn(err, item). Each item advances the state  of the transducer, if the continuation is provided, it will be called on completion or error. An error will terminate the transducer and be propagated to the continuation.  If the transducer exhausts due to early termination, any further call will be a no-op. If the callback is called with no item, it will terminate the transducer process. If `xf` is not defined, maintains last value and does not buffer results.
 
 
 ### String

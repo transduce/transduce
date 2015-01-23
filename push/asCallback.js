@@ -14,16 +14,16 @@ var isReduced = require('../base/isReduced'),
 // The callback returns undefined until completion. Once completed, the result
 // is always returned.
 //
-// If reducer is not defined, maintains last value and does not buffer results.
+// If reducer, xf, is not defined, maintains last value and does not buffer results.
 module.exports =
-function asCallback(t, reducer){
+function asCallback(t, xf){
   var done = false, stepper, result
 
-  if(reducer === void 0){
-    reducer = lastValue
+  if(xf === void 0){
+    xf = lastValue
   }
 
-  stepper = t(reducer)
+  stepper = t(xf)
   result = stepper.init()
 
   return function(item){

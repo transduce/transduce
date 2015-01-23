@@ -4,10 +4,10 @@ var transduce = require('./transduce'),
     push = require('../util/arrayPush')
 
 module.exports =
-function toArray(xf, coll){
+function toArray(t, coll){
   var init = []
   if(coll === void 0){
-    return reduce(push, init, xf)
+    return reduce(push, init, t)
   }
-  return transduce(xf, push, init, coll)
+  return transduce(t, push, init, coll)
 }
