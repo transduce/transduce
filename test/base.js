@@ -9,6 +9,11 @@ function not(p){
     return !p(v)
   }
 }
+function add(x){
+  return function(y){
+    return x+y
+  }
+}
 var isEven = not(isOdd)
 function identity(v){return v}
 
@@ -44,15 +49,19 @@ test('reduce', function(t) {
 })
 
 test('into', function(t) {
-  t.deepEqual(tr.into([], [1,2,3,4,5,6]), [1,2,3,4,5,6]);
-  t.deepEqual(tr.into('', [1,2,3,4,5,6]), '123456');
-  t.deepEqual(tr.into('hi ', [1,2,3,4,5,6]), 'hi 123456');
-  t.deepEqual(tr.into([], tr.filter(isEven), [1,2,3,4,5,6]), [2,4,6]);
+  t.deepEqual(tr.into([], [1,2,3,4,5,6]), [1,2,3,4,5,6])
+  t.deepEqual(tr.into('', [1,2,3,4,5,6]), '123456')
+  t.deepEqual(tr.into('hi ', [1,2,3,4,5,6]), 'hi 123456')
+  t.deepEqual(tr.into([], tr.filter(isEven), [1,2,3,4,5,6]), [2,4,6])
 
-  t.deepEqual(tr.into([], [[1,2],[3,4],[5,6]]), [[1,2],[3,4],[5,6]]);
-  t.deepEqual(tr.into({}, [[1,2],[3,4],[5,6]]), {1:2,3:4,5:6});
-  t.deepEqual(tr.into({'hi':'world'}, [[1,2],[3,4],[5,6]]), {'hi':'world',1:2,3:4,5:6});
-  t.deepEqual(tr.into([], tr.cat, [[1,2],[3,4],[5,6]]), [1,2,3,4,5,6]);
+  t.deepEqual(tr.into([], [[1,2],[3,4],[5,6]]), [[1,2],[3,4],[5,6]])
+  t.deepEqual(tr.into({}, [[1,2],[3,4],[5,6]]), {1:2,3:4,5:6})
+  t.deepEqual(tr.into({'hi':'world'}, [[1,2],[3,4],[5,6]]), {'hi':'world',1:2,3:4,5:6})
+  t.deepEqual(tr.into([], tr.cat, [[1,2],[3,4],[5,6]]), [1,2,3,4,5,6])
+
+  var transducer = tr.compose(tr.cat, tr.array.unshift(0), tr.map(add(1)))
+  t.deepEqual(tr.into([], transducer, [[1,2],[3,4],[5,6]]), [1,2,3,4,5,6,7])
+
   t.end()
 })
 

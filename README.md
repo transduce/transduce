@@ -1,21 +1,104 @@
 ## Transduce
 [![Build Status](https://secure.travis-ci.org/transduce/transduce.svg)](http://travis-ci.org/transduce/transduce)
 
-Transducers for JavaScript. Collected as a convenience for an aggregated API. Any function or transducer below can be bundled separately in browserify builds by requiring with path from `transduce`.
+Transducers for JavaScript.
 
-Compatible with and inspired by both [transducers-js][4] and [transducers.js][5].
+> Transducers are composable algorithmic transformations. They are independent from the context of their input and output sources and specify only the essence of the transformation in terms of an individual element. Because transducers are decoupled from input or output sources, they can be used in many different processes - collections, streams, channels, observables, etc. Transducers compose directly, without awareness of input or creation of intermediate aggregates.
+
+http://clojure.org/transducers
 
 If you are not familiar with transducers, check out [Transducers Explained][3].
 
+### Usage and Custom Bundles
+Collected as a convenience for an aggregated API. Any function or transducer below can be bundled separately in browserify builds by requiring with path from `transduce`.
+
+What does this mean? You can require the whole thing:
+
+```javascript
+var tr = require('transduce')
+tr.into([], [1,2,3,4,5,6])
+// [1,2,3,4,5,6]
+
+tr.into('', [1,2,3,4,5,6])
+// '123456'
+
+tr.into([], tr.filter(isEven), [1,2,3,4,5,6])
+// [2,4,6]
+
+tr.into([], tr.cat, [[1,2],[3,4],[5,6]])
+// [1,2,3,4,5,6])
+
+tr.into({}, [[1,2],[3,4],[5,6]])
+// {1:2,3:4,5:6}
+
+var transducer = tr.compose(tr.cat, tr.array.unshift(0), tr.map(add(1))) 
+tr.into([], transducer, [[1,2],[3,4],[5,6]])
+// [1,2,3,4,5,6,7]
+```
+
+If you want to be reduce bundle size (or just like to be explicit), require with path from `transduce`.
+
+```javascript
+var into = require('transduce/base/into'),
+  compose = require('transduce/base/compose'),
+  cat = require('transduce/base/cat'),
+  map = require('transduce/base/map'),
+  unshift = require('transduce/array/unshift')
+
+var transducer = compose(cat, unshift(0), map(add(1))) 
+into([], transducer, [[1,2],[3,4],[5,6]])
+// [1,2,3,4,5,6,7])
+
+```
+
+Too explicit? Require the packages:
+
+```javascript
+  var base = require('transduce/base'),
+      array = require('transduce/array')
+  var transducer = base.compose(base.cat, array.unshift(0), base.map(add(1))) 
+  base.into([], transducer, [[1,2],[3,4],[5,6]])
+  // [1,2,3,4,5,6,7]
+```
+
+## Definitions
+
+##### Input Source
+A source of values, normally a collection, `coll`.  This library supports arrays, plain objects, strings, and anything that can be converted to iterators (see `iterator` package below).  Input sources can also be push based, see `push` package below.
+
+##### Reducing Function
+A two arity function appropriate for passing to `reduce`. The first argument is the accumulator and the second argument is the iteration value.  When using transducers, the accumulator is normally a collection, but it is not required.
+
+##### Initial Value
+The initial accumulator value, `init` to use with Reduce.
+
+##### Transformer
+An object that provides a reducing function, `step`, initial value function, `init`, and result extraction function, `result`.  Combines the steps of reduce into a single object.
+
+##### Reduce
+A function that folds over an input source to produce an Output Source.  Accepts a Reducing Function or Transformer, `xf`, as the first argument, an optional initial value, `init`, as the second argument and an Input Source, `coll` as the third argument.
+
+Also known as `foldLeft` or `foldl` in other languages and libraries.
+
+The function begins with calling the Reducing Function of `xf`, `step`, with the initial accumulator, `init`, and the first item of Input Source, `coll`.  The return value from the reducing function is used as the next accumulator with the next item in `coll`. The process repeats until either `coll` is exhausted or `xf` indicates early termination with `reduced`. Finally, the result extraction function of `xf`, `result`, is called with the final accumulator to perform potentially delayed actions and optionally convert the accumulator to the Output Source.
+
+Reduce defines a Transducible Process.
+
+##### Transducer
+A function, `t`, that accepts a transformer, `xf`, and returns a transformer. All transformations are defined in terms of transducers, independent of the Transducible Process. Can be composed directly to create new transducers.
+
+##### Transducible Process
+A process that begins with an initial value accumulator, steps through items of an input source and optionally transforming with transducer, `t`, and optionally completes with a result.  Transduce is one transducible process. Transducible Processes can also be push based. See `push` package below or [transduce-stream][2] for a few examples.  The same transducer can be used with any transducible process.
+
 ## API
 
-Currently supports the following functions:
+Supports the following functions:
 
 ```javascript
 // base functions
 reduce: function(xf, init?, coll)
 transduce: function(t, xf, init?, coll)
-into: function(to, t, from)
+into: function(init, t?, coll)
 toArray: function(t?, coll)
 
 // base transducers
@@ -306,6 +389,13 @@ Merges the item into the object.  If `item` is an array of length 2, uses first 
 ##### util.stringAppend(string, item)
 Appends item onto result using `+`.
 
+### Credits
+
+Extracted from [underscore-transducer][6], which was created initially as a translation from [Clojure][8]. Now compatible with and inspired by protocols defined by [transducers-js][4] and [transducers.js][5].
+
+### License
+MIT
+
 [1]: https://github.com/transduce
 [2]: https://github.com/transduce/transduce-stream
 [3]: http://simplectic.com/blog/2014/transducers-explained-1/
@@ -313,4 +403,5 @@ Appends item onto result using `+`.
 [5]: https://github.com/jlongster/transducers.js
 [6]: https://github.com/kevinbeaty/underscore-transducer
 [7]: http://simplectic.com/projects/underscore-transducer/
+[8]: http://clojure.org/transducers
 [10]: https://github.com/jlongster/transducers.js#the-transformer-protocol
