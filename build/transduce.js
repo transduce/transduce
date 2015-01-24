@@ -534,14 +534,19 @@ module.exports = {
 
 },{"./cat":12,"./compose":13,"./drop":14,"./dropWhile":15,"./filter":16,"./into":18,"./isReduced":19,"./map":20,"./mapcat":21,"./partitionAll":22,"./partitionBy":23,"./reduce":24,"./reduced":25,"./remove":26,"./take":27,"./takeWhile":28,"./toArray":29,"./transduce":30,"./unreduced":31}],18:[function(require,module,exports){
 'use strict'
-var transduce = require('./transduce')
+var transduce = require('./transduce'),
+    reduce = require('./reduce')
 
 module.exports =
-function into(to, xf, from){
-  return transduce(xf, to, to, from)
+function into(init, t, coll){
+  if (arguments.length === 2) {
+    coll = t
+    return reduce(init, init, coll)
+  }
+  return transduce(t, init, init, coll)
 }
 
-},{"./transduce":30}],19:[function(require,module,exports){
+},{"./reduce":24,"./transduce":30}],19:[function(require,module,exports){
 'use strict'
 
 module.exports =
@@ -672,6 +677,10 @@ var transformer = require('../transformer/transformer'),
 module.exports =
 function reduce(xf, init, coll){
   xf = transformer(xf)
+  if (arguments.length === 2) {
+    coll = init
+    init = xf.init()
+  }
   if(isArray(coll)){
     return arrayReduce(xf, init, coll)
   }
@@ -802,28 +811,26 @@ TakeWhile.prototype.step = function(value, item){
 
 },{"./reduced":25}],29:[function(require,module,exports){
 'use strict'
-var transduce = require('./transduce'),
-    reduce = require('./reduce'),
-    push = require('../util/arrayPush')
+var into = require('./into')
 
 module.exports =
-function toArray(xf, coll){
-  var init = []
-  if(coll === void 0){
-    return reduce(push, init, xf)
-  }
-  return transduce(xf, push, init, coll)
+function toArray(t, coll){
+  return into([], t, coll)
 }
 
-},{"../util/arrayPush":65,"./reduce":24,"./transduce":30}],30:[function(require,module,exports){
+},{"./into":18}],30:[function(require,module,exports){
 'use strict'
 var transformer = require('../transformer/transformer'),
     reduce = require('./reduce')
 
 module.exports =
-function transduce(xf, f, init, coll){
-  f = transformer(f)
-  return reduce(xf(f), init, coll)
+function transduce(t, xf, init, coll) {
+  xf = t(transformer(xf))
+  if (arguments.length === 3) {
+    coll = init;
+    init = xf.init();
+  }
+  return reduce(xf, init, coll)
 }
 
 },{"../transformer/transformer":59,"./reduce":24}],31:[function(require,module,exports){
@@ -892,6 +899,7 @@ var isIterable = require('./isIterable'),
     isArray = require('../util/isArray'),
     isFunction = require('../util/isFunction'),
     isString = require('../util/isString'),
+    has = {}.hasOwnProperty,
     keys = Object.keys || _keys
 
 module.exports =
@@ -963,7 +971,7 @@ ObjectIterable.prototype[symbol] = function(){
 function _keys(obj){
   var prop, keys = []
   for(prop in obj){
-    if(obj.hasOwnProperty(prop)){
+    if(has.call(obj, prop)){
       keys.push(prop)
     }
   }
@@ -995,17 +1003,17 @@ var iterator = require('./iterator'),
     isReduced = require('../base/isReduced')
 
 module.exports =
-function sequence(xform, coll) {
-  return new LazyIterable(xform, coll)
+function sequence(t, coll) {
+  return new LazyIterable(t, coll)
 }
 
-function LazyIterable(xform, coll){
-  this.xform = xform
+function LazyIterable(t, coll){
+  this.t = t
   this.coll = coll
 }
 LazyIterable.prototype[symbol] = function(){
   var iter = iterator(this.coll)
-  return new LazyIterator(new Stepper(this.xform, iter))
+  return new LazyIterator(new Stepper(this.t, iter))
 }
 
 function LazyIterator(stepper){
@@ -1037,8 +1045,8 @@ StepTransformer.prototype.result = function(lt){
   return lt
 }
 
-function Stepper(xform, iter){
-  this.xf = xform(stepTransformer)
+function Stepper(t, iter){
+  this.xf = t(stepTransformer)
   this.iter = iter
 }
 Stepper.prototype.step = function(lt){
@@ -1186,16 +1194,16 @@ var isReduced = require('../base/isReduced'),
 // The callback returns undefined until completion. Once completed, the result
 // is always returned.
 //
-// If reducer is not defined, maintains last value and does not buffer results.
+// If reducer, xf, is not defined, maintains last value and does not buffer results.
 module.exports =
-function asCallback(xf, reducer){
+function asCallback(t, xf){
   var done = false, stepper, result
 
-  if(reducer === void 0){
-    reducer = lastValue
+  if(xf === void 0){
+    xf = lastValue
   }
 
-  stepper = xf(reducer)
+  stepper = t(xf)
   result = stepper.init()
 
   return function(item){
@@ -1237,16 +1245,16 @@ var isReduced = require('../base/isReduced'),
 //
 // If the callback is called with no item, it will terminate the transducer process.
 //
-// If reducer is not defined, maintains last value and does not buffer results.
+// If reducer, xf, is not defined, maintains last value and does not buffer results.
 module.exports =
-function asyncCallback(xf, continuation, reducer){
+function asyncCallback(t, continuation, xf){
   var done = false, stepper, result
 
-  if(reducer === void 0){
-    reducer = lastValue
+  if(xf === void 0){
+    xf = lastValue
   }
 
-  stepper = xf(reducer)
+  stepper = t(xf)
   result = stepper.init()
 
   function checkDone(err, item){
@@ -1813,6 +1821,7 @@ function isUndefined(value){
 'use strict'
 
 var isArray = require('./isArray')
+var has = {}.hasOwnProperty
 
 module.exports =
 function objectMerge(result, input){
@@ -1821,7 +1830,7 @@ function objectMerge(result, input){
   } else {
     var prop
     for(prop in input){
-      if(input.hasOwnProperty(prop)){
+      if(has.call(input, prop)){
         result[prop] = input[prop]
       }
     }
