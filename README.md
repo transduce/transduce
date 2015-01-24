@@ -111,8 +111,8 @@ Reduces over a transformation. If `xf` is not a `transformer`, it is converted t
 ##### transduce(t, xf, init?, coll)
 Transduces over a transformation. The transducer `t` is initialized with `xf` and is passed to `reduce`. `xf` is converted to a `transformer` if it is not one already. If the function is called with arity-3, the `xf.init()` is used as the `init` value.
 
-##### into(to, t, from)
-Returns a new collection appending all items into the empty collection `to` by passing all items from source collection `from` using the transducer `t`.  Chooses appropriate step function from type of `to`.  Can be array, object, string or have `@@transformer`.
+##### into(init, t?, coll)
+Returns a new collection appending all items into `init` by passing all items from source collection `coll` through the optional transducer `t`.  Chooses transformer, `xf` from type of `to`.  Can be array, object, string or have `@@transformer`. `coll` is converted to an `iterator`
 
 ##### toArray(t?, coll)
 Transduce a collection into an array with an optional transducer, `t`. `coll` is converted to an `iterator`.

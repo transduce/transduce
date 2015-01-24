@@ -43,6 +43,19 @@ test('reduce', function(t) {
   t.end()
 })
 
+test('into', function(t) {
+  t.deepEqual(tr.into([], [1,2,3,4,5,6]), [1,2,3,4,5,6]);
+  t.deepEqual(tr.into('', [1,2,3,4,5,6]), '123456');
+  t.deepEqual(tr.into('hi ', [1,2,3,4,5,6]), 'hi 123456');
+  t.deepEqual(tr.into([], tr.filter(isEven), [1,2,3,4,5,6]), [2,4,6]);
+
+  t.deepEqual(tr.into([], [[1,2],[3,4],[5,6]]), [[1,2],[3,4],[5,6]]);
+  t.deepEqual(tr.into({}, [[1,2],[3,4],[5,6]]), {1:2,3:4,5:6});
+  t.deepEqual(tr.into({'hi':'world'}, [[1,2],[3,4],[5,6]]), {'hi':'world',1:2,3:4,5:6});
+  t.deepEqual(tr.into([], tr.cat, [[1,2],[3,4],[5,6]]), [1,2,3,4,5,6]);
+  t.end()
+})
+
 test('map', function(t){
   t.plan(3)
 

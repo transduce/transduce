@@ -1,7 +1,12 @@
 'use strict'
-var transduce = require('./transduce')
+var transduce = require('./transduce'),
+    reduce = require('./reduce')
 
 module.exports =
-function into(to, t, from){
-  return transduce(t, to, to, from)
+function into(init, t, coll){
+  if (arguments.length === 2) {
+    coll = t
+    return reduce(init, init, coll)
+  }
+  return transduce(t, init, init, coll)
 }
