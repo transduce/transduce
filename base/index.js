@@ -6,6 +6,7 @@ module.exports = {
   unreduced: require('./unreduced'),
   reduce: require('./reduce'),
   transduce: require('./transduce'),
+  eduction: require('./eduction'),
   into: require('./into'),
   toArray: require('./toArray'),
   map: require('./map'),

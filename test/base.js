@@ -65,6 +65,41 @@ test('into', function(t) {
   t.end()
 })
 
+test('eduction', function(t){
+  var xf,
+      eduction = tr.eduction,
+      iterToArray = tr.iterator.toArray,
+      into = tr.into
+
+  var divisibleBy2 = eduction(
+        tr.map(function(val){return [val, val % 2 === 0]}),
+        [1,2,3])
+  t.deepEqual(into([], divisibleBy2), [[1,false], [2,true], [3,false]])
+  t.deepEqual(into({}, divisibleBy2), {1:false, 2:true, 3:false})
+
+  xf = tr.map(add(1))
+  t.deepEqual(into([], eduction(xf, [1,2,3])), [2,3,4])
+  t.deepEqual(iterToArray(eduction(xf, [1,2,3])), [2,3,4])
+
+  xf = tr.map(add(2))
+  t.deepEqual(into([], eduction(xf, [1,2,3])), [3,4,5])
+  t.deepEqual(iterToArray(eduction(xf, [1,2,3])), [3,4,5])
+
+  xf = tr.filter(isOdd)
+  t.deepEqual(into([], eduction(xf, [1,2,3,4,5,7,9,10,12,13,15])), [1,3,5,7,9,13,15])
+  t.deepEqual(iterToArray(eduction(xf, [1,2,3,4,5,7,9,10,12,13,15])), [1,3,5,7,9,13,15])
+
+  xf = compose(tr.filter(isOdd), tr.take(3))
+  t.deepEqual(into([], eduction(xf, [1,2,3,4,5,7,9,10,12,13,15])), [1,3,5])
+  t.deepEqual(iterToArray(eduction(xf, [1,2,3,4,5,7,9,10,12,13,15])), [1,3,5])
+
+  xf = compose(tr.filter(isOdd), tr.drop(3))
+  t.deepEqual(into([], eduction(xf, [1,2,3,4,5,7,9,10,12,13,15])), [7,9,13,15])
+  t.deepEqual(iterToArray(eduction(xf, [1,2,3,4,5,7,9,10,12,13,15])), [7,9,13,15])
+
+  t.end()
+})
+
 test('map', function(t){
   t.plan(3)
 
