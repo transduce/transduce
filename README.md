@@ -10,6 +10,24 @@ http://clojure.org/transducers
 If you are not familiar with transducers, check out [Transducers Explained][3].
 
 ### Usage and Custom Bundles
+
+```bash
+$ npm install transduce
+$ bower install transduce
+```
+
+### Browser
+
+* [Development](https://raw.githubusercontent.com/transduce/transduce/master/build/transduce.js)
+* [Minified](https://raw.githubusercontent.com/transduce/transduce/master/build/transduce.min.js)
+
+Structured to allow creation of custom builds by loading only desired libs.  For example, see:
+
+* [Base Development](https://raw.githubusercontent.com/transduce/transduce/master/build/transduce.base.js)
+* [Base Minified](https://raw.githubusercontent.com/transduce/transduce/master/build/transduce.base.min.js)
+
+### Custom Bundles and Explicit Require
+
 Collected as a convenience for an aggregated API. Any function or transducer below can be bundled separately in browserify builds by requiring with path from `transduce`.
 
 What does this mean? You can require the whole thing:
@@ -40,10 +58,10 @@ If you want to be reduce bundle size (or just like to be explicit), require with
 
 ```javascript
 var into = require('transduce/base/into'),
-  compose = require('transduce/base/compose'),
-  cat = require('transduce/base/cat'),
-  map = require('transduce/base/map'),
-  unshift = require('transduce/array/unshift')
+    compose = require('transduce/base/compose'),
+    cat = require('transduce/base/cat'),
+    map = require('transduce/base/map'),
+    unshift = require('transduce/array/unshift')
 
 var transducer = compose(cat, unshift(0), map(add(1))) 
 into([], transducer, [[1,2],[3,4],[5,6]])

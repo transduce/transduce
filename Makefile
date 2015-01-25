@@ -1,30 +1,37 @@
 PROJECT:=transduce
+BUILD:=build/$(PROJECT)
+NPM_BIN:=$(shell npm bin)
 
-JS_TARGET ?= build/$(PROJECT).js
-
-.PHONY: all clean js test serve
+.PHONY: all clean js test
 all: test js
 
 clean:
 	rm -rf build
 
 test: | node_modules
-	`npm bin`/jshint array/*.js base/*.js iterator/*.js math/*.js push/*.js string/*.js transformer/*.js unique/*.js util/*.js test/*.js
-	`npm bin`/tape test/*.js
+	$(NPM_BIN)/jshint array/*.js base/*.js iterator/*.js math/*.js push/*.js string/*.js transformer/*.js unique/*.js util/*.js test/*.js
+	$(NPM_BIN)/tape test/*.js
+
+test-bail:
+	$(MAKE) test | $(NPM_BIN)/tap-bail
 
 node_modules:
 	npm install
 
 %.min.js: %.js | node_modules
-	`npm bin`/uglifyjs $< -o $@ -c -m
+	$(NPM_BIN)/uglifyjs $< -o $@ -c -m
 
 %.gz: %
 	gzip -c9 $^ > $@
 
-js: $(JS_TARGET) $(JS_TARGET:.js=.min.js)
+js: $(BUILD).js $(BUILD).min.js \
+	$(BUILD).base.js $(BUILD).base.min.js
 
-$(JS_TARGET): *.js base/*.js array/*.js math/*.js iterator/*.js transformer/*.js string/*.js push/*.js unique/*.js util/*.js | build
-	`npm bin`/browserify -s transduce index.js > $@
+$(BUILD).js: index.js base/*.js array/*.js math/*.js iterator/*.js transformer/*.js string/*.js push/*.js unique/*.js util/*.js | build
+	$(NPM_BIN)/browserify -p bundle-collapser/plugin -s transduce index.js > $@
+
+$(BUILD).base.js: base/*.js iterator/*.js transformer/*.js util/*.js | build
+	$(NPM_BIN)/browserify -p bundle-collapser/plugin -s transduce base/index.js > $@
 
 build:
 	mkdir -p build

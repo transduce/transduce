@@ -25,6 +25,8 @@
     "browserify": "~8.0.3",
     "jshint": "^2.6.0",
     "tape": "~3.0.3",
-    "uglify-js": "~2.4.16"
+    "uglify-js": "~2.4.16",
+    "bundle-collapser": "~1.1.1",
+    "tap-bail": "0.0.0"
   }
 }
