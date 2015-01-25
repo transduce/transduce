@@ -9,14 +9,17 @@ http://clojure.org/transducers
 
 If you are not familiar with transducers, check out [Transducers Explained][3].
 
-### Usage and Custom Bundles
+### Install and Usage
 
 ```bash
 $ npm install transduce
-$ bower install transduce
 ```
 
-### Browser
+#### Browser
+
+```bash
+$ bower install transduce
+```
 
 * [Development](https://raw.githubusercontent.com/transduce/transduce/master/build/transduce.js)
 * [Minified](https://raw.githubusercontent.com/transduce/transduce/master/build/transduce.min.js)
@@ -26,7 +29,7 @@ Structured to allow creation of custom builds by loading only desired libs.  For
 * [Base Development](https://raw.githubusercontent.com/transduce/transduce/master/build/transduce.base.js)
 * [Base Minified](https://raw.githubusercontent.com/transduce/transduce/master/build/transduce.base.min.js)
 
-### Custom Bundles and Explicit Require
+#### Explicit Require and Custom Bundles
 
 Collected as a convenience for an aggregated API. Any function or transducer below can be bundled separately in browserify builds by requiring with path from `transduce`.
 
@@ -79,7 +82,7 @@ Too explicit? Require the packages:
   // [1,2,3,4,5,6,7]
 ```
 
-## Definitions
+### Definitions
 
 ##### Input Source
 A source of values, normally a collection, `coll`.  This library supports arrays, plain objects, strings, and anything that can be converted to iterators (see `iterator` package below).  Input sources can also be push based, see `push` package below.
@@ -108,7 +111,7 @@ A function, `t`, that accepts a transformer, `xf`, and returns a transformer. Al
 ##### Transducible Process
 A process that begins with an initial value accumulator, steps through items of an input source and optionally transforming with transducer, `t`, and optionally completes with a result.  Transduce is one transducible process. Transducible Processes can also be push based. See `push` package below or [transduce-stream][2] for a few examples.  The same transducer can be used with any transducible process.
 
-## API
+### API
 
 Supports the following functions:
 
@@ -218,7 +221,7 @@ Returns a new collection appending all items into `init` by passing all items fr
 ##### toArray(t?, coll)
 Transduce a collection into an array with an optional transducer, `t`. `coll` is converted to an `iterator`.
 
-### Transducers
+#### Transducers
 
 ##### map(f)
 Transducer that steps all items after applying a mapping function `f` to each item.
@@ -253,7 +256,7 @@ Partitions the source into arrays of size `n`. When transformer completes, the t
 ##### partitionBy(f)
 Partitions the source into sub arrays when the value of the function `f` changes equality.  When transformer completes, the transformer will be stepped with any remaining items.
 
-### Array
+#### Array
 Use Array methods as Transducers.  Treats each stepped item as an item in the array, and defines transducers that step items with the same contract as array methods.
 
 ##### array.forEach(callback)
@@ -292,12 +295,12 @@ Step the last element. Passing `n` will step the last N  values.
 
 Note that no items will be sent until completion.
 
-### Math
+#### Math
 
 ##### math.min(f?) / math.max(f?)
 Steps the min/max value on the result of the transformation. if `f` is provided, it is called with each item and the return value is used to compare values. Otherwise, the items are compared as numbers
 
-### Push
+#### Push
 Normally transducers are used with pull streams: reduce "pulls" values out of an array, iterator, etc.  This library adds basic support for using transducers with push streams. See [transduce-stream][2] for using transducers with Node.js streams, or the [underscore-transducer][6] [demo][7] for an example of using transducers as event listeners.
 
 ##### push.tap(interceptor)
@@ -310,7 +313,7 @@ Creates a callback that starts a transducer process and accepts parameter as a n
 Creates an async callback that starts a transducer process and accepts parameter cb(err, item) as a new item in the process. The returned callback and the optional continuation follow Node.js conventions with  fn(err, item). Each item advances the state  of the transducer, if the continuation is provided, it will be called on completion or error. An error will terminate the transducer and be propagated to the continuation.  If the transducer exhausts due to early termination, any further call will be a no-op. If the callback is called with no item, it will terminate the transducer process. If `xf` is not defined, maintains last value and does not buffer results.
 
 
-### String
+#### String
 Transduce over sequences of strings. Particularly useful with [transduce-stream][2].
 
 Treats every item as a substring, and splits across the entire transducer sequence.  This allows functions to work with chunks sent through streams.  When using transducers with streams, it is helpful to compose the transformation that you want with one of these functions to operate against a given line/word/etc.
@@ -327,7 +330,7 @@ Only steps items that are non empty strings (`input.trim().length > 0`).
 ##### string.lines(limit?) / string.chars(limit?) / string.words(delimiter?, limit?)
 Split chunks into and steps each line/char/word with optional limit.
 
-### Unique
+#### Unique
 Transducers to remove duplicate values from the transformation.
 
 ##### unique.dedupe()
@@ -336,7 +339,7 @@ Removes consecutive duplicates from the transformation. Subsequent stepped value
 ##### unique.unique(f?)
 Produce a duplicate-free version of the transformation. If `f` is passed, it will be called with each item and the return value for uniqueness check.  Uniqueness is checked across all values already seen, and as such, the items (or computed checks) are buffered.
 
-### Iterator Protocol
+#### Iterator Protocol
 
 ##### iterator.symbol
 
@@ -369,7 +372,7 @@ Converts the value to an iterator and iterates into an array.
 Create an ES6 Iterable by transforming an input source using transducer `t`.
 
 
-### Transformer Protocol
+#### Transformer Protocol
 
 ##### transformer.symbol
 Symbol (or a string that acts as symbols) for [`@@transformer`][10] you can use to configure your custom objects.
@@ -381,7 +384,7 @@ Does the parameter have a transformer protocol or have `init`, `step`, `result` 
 ##### transformer.transformer(value)
 Attempts to convert the parameter into a transformer.  If cannot be converted, returns `undefined`.  If defined, the return value will have `init`, `step`, `result` functions that can be used for transformation.  Converts arrays (`arrayPush`), strings (`stringAppend`), objects (`objectMerge`), functions (wrap as reducing function) or anything that `isTransformer` into a transformer.
 
-### Util
+#### Util
 
 ##### util.compose(/\*fns\*/)
 Simple function composition of arguments. Useful for composing (combining) transducers.
