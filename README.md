@@ -187,6 +187,11 @@ iterator {
   iterator: function(value)
   toArray: function(value)
   sequence: function(t, value)
+  range: function(start?, stop, step?)
+  count: function(start?, step?)
+  cycle: function(iter)
+  repeat: function(elem, n?)
+  chain: function(/*args*/)
 }
 
 transformer {
@@ -371,6 +376,20 @@ Converts the value to an iterator and iterates into an array.
 ##### iterator.sequence(t, value)
 Create an ES6 Iterable by transforming an input source using transducer `t`.
 
+##### range(start?, stop, step?)
+Create a range of integers.  From start (default 0, inclusive) to stop (exclusive) incremented by step (default 1).
+
+##### count(start?, step?)
+Creates an infinite counting iterator from start (default 0) and incremented by step (default 1)
+
+##### cycle(iter)
+Creates an infinite iterator that accepts an iterable and repeatedly steps through every item of iterator. Once iterator completes, a new iterator is created from the iterable and steps through again.
+
+##### repeat(elem, n?)
+Repeats an elem up to n times.  If n is undefined, creates an infinite iterator that steps the element.
+
+##### chain(/*args*/)
+Combine multiple iterables into a chained iterable.  Once the first argument is exhausted, moves onto the next, until all argument iterables are exhausted.
 
 #### Transformer Protocol
 

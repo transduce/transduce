@@ -6,5 +6,10 @@ module.exports = {
   iterable: require('./iterable'),
   iterator: require('./iterator'),
   toArray: require('./toArray'),
-  sequence: require('./sequence')
+  sequence: require('./sequence'),
+  range: require('./range'),
+  count: require('./count'),
+  cycle: require('./cycle'),
+  repeat: require('./repeat'),
+  chain: require('./chain')
 }
