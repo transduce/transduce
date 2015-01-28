@@ -1,4 +1,4 @@
-## Transduce
+# Transduce
 [![Build Status](https://secure.travis-ci.org/transduce/transduce.svg)](http://travis-ci.org/transduce/transduce)
 
 Transducers for JavaScript.
@@ -52,7 +52,7 @@ tr.into([], tr.cat, [[1,2],[3,4],[5,6]])
 tr.into({}, [[1,2],[3,4],[5,6]])
 // {1:2,3:4,5:6}
 
-var transducer = tr.compose(tr.cat, tr.array.unshift(0), tr.map(add(1))) 
+var transducer = tr.compose(tr.cat, tr.array.unshift(0), tr.map(add(1)))
 tr.into([], transducer, [[1,2],[3,4],[5,6]])
 // [1,2,3,4,5,6,7]
 ```
@@ -66,7 +66,7 @@ var into = require('transduce/base/into'),
     map = require('transduce/base/map'),
     unshift = require('transduce/array/unshift')
 
-var transducer = compose(cat, unshift(0), map(add(1))) 
+var transducer = compose(cat, unshift(0), map(add(1)))
 into([], transducer, [[1,2],[3,4],[5,6]])
 // [1,2,3,4,5,6,7])
 
@@ -77,7 +77,7 @@ Too explicit? Require the packages:
 ```javascript
   var base = require('transduce/base'),
       array = require('transduce/array')
-  var transducer = base.compose(base.cat, array.unshift(0), base.map(add(1))) 
+  var transducer = base.compose(base.cat, array.unshift(0), base.map(add(1)))
   base.into([], transducer, [[1,2],[3,4],[5,6]])
   // [1,2,3,4,5,6,7]
 ```
@@ -88,7 +88,7 @@ Too explicit? Require the packages:
 A source of values, normally a collection, `coll`.  This library supports arrays, plain objects, strings, and anything that can be converted to iterators (see `iterator` package below).  Input sources can also be push based, see `push` package below.
 
 ##### Reducing Function
-A two arity function appropriate for passing to `reduce`. The first argument is the accumulator and the second argument is the iteration value.  When using transducers, the accumulator is normally a collection, but it is not required.
+A two arity function, `rf`, appropriate for passing to `reduce`. The first argument is the accumulator and the second argument is the iteration value.  When using transducers, the accumulator is normally a collection, but it is not required.
 
 ##### Initial Value
 The initial accumulator value, `init` to use with Reduce.
@@ -119,6 +119,7 @@ Supports the following functions:
 // base functions
 reduce: function(xf, init?, coll)
 transduce: function(t, xf, init?, coll)
+eduction(t, coll)
 into: function(init, t?, coll)
 toArray: function(t?, coll)
 
@@ -215,10 +216,13 @@ util {
 ```
 
 ##### reduce(xf, init?, coll)
-Reduces over a transformation. If `xf` is not a `transformer`, it is converted to one. `coll` is converted to an `iterator`. Arrays are special cased to reduce using for loop. If the function is called with arity-2, the `xf.init()` is used as the `init` value.
+Reduces over a transformation. If `xf` is not a `transformer`, it is converted to one. Arrays are special cased to reduce using for loop and to allow transducers using `reduced`.  If `coll` has a `reduce` method, it is called with `xf.step` and `init`. Otherwise,`coll` is converted to an `iterator`.  If the function is called with arity-2, the `xf.init()` is used as the `init` value.
 
 ##### transduce(t, xf, init?, coll)
 Transduces over a transformation. The transducer `t` is initialized with `xf` and is passed to `reduce`. `xf` is converted to a `transformer` if it is not one already. If the function is called with arity-3, the `xf.init()` is used as the `init` value.
+
+##### eduction(t, coll)
+Creates an iterable and reducible application of the collection `coll` transformed by transducer`t`.  The returned eduction will be iterable using `sequence` and have a `reduce(rf, init)` method using `transduce`.
 
 ##### into(init, t?, coll)
 Returns a new collection appending all items into `init` by passing all items from source collection `coll` through the optional transducer `t`.  Chooses transformer, `xf` from type of `to`.  Can be array, object, string or have `@@transformer`. `coll` is converted to an `iterator`

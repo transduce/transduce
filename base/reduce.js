@@ -3,6 +3,7 @@ var transformer = require('../transformer/transformer'),
     isReduced = require('./isReduced'),
     unreduced = require('./unreduced'),
     isArray = require('../util/isArray'),
+    isFunction = require('../util/isFunction'),
     iterator = require('../iterator/iterator')
 
 module.exports =
@@ -12,8 +13,12 @@ function reduce(xf, init, coll){
     coll = init
     init = xf.init()
   }
+
   if(isArray(coll)){
     return arrayReduce(xf, init, coll)
+  }
+  if(isFunction(coll.reduce)){
+    return xf.result(coll.reduce(xf.step, init))
   }
   return iteratorReduce(xf, init, coll)
 }
