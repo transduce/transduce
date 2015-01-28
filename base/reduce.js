@@ -1,5 +1,5 @@
 'use strict'
-var transformer = require('../transformer/transformer'),
+var completing = require('../transformer/completing'),
     isReduced = require('./isReduced'),
     unreduced = require('./unreduced'),
     isArray = require('../util/isArray'),
@@ -8,7 +8,10 @@ var transformer = require('../transformer/transformer'),
 
 module.exports =
 function reduce(xf, init, coll){
-  xf = transformer(xf)
+  if(isFunction(xf)){
+    xf = completing(xf)
+  }
+
   if (arguments.length === 2) {
     coll = init
     init = xf.init()
@@ -17,9 +20,11 @@ function reduce(xf, init, coll){
   if(isArray(coll)){
     return arrayReduce(xf, init, coll)
   }
+
   if(isFunction(coll.reduce)){
-    return xf.result(coll.reduce(xf.step, init))
+    return methodReduce(xf, init, coll)
   }
+
   return iteratorReduce(xf, init, coll)
 }
 
@@ -35,6 +40,13 @@ function arrayReduce(xf, init, arr){
     }
   }
   return xf.result(value)
+}
+
+function methodReduce(xf, init, coll){
+  var result = coll.reduce(function(result, value){
+    return xf.step(result, value)
+  }, init)
+  return xf.result(result)
 }
 
 function iteratorReduce(xf, init, iter){

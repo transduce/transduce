@@ -119,7 +119,7 @@ Supports the following functions:
 // base functions
 reduce: function(xf, init?, coll)
 transduce: function(t, xf, init?, coll)
-eduction(t, coll)
+eduction: function(t, coll)
 into: function(init, t?, coll)
 toArray: function(t?, coll)
 
@@ -199,6 +199,11 @@ transformer {
   symbol: Symbol('transformer') || '@@transformer'
   isTransformer: function(value)
   transformer: function(value)
+  completing: function(rf, result?)
+  lastValue: transformer
+  array: function(defaultValue?)
+  object: function(defaultValue?)
+  string: function(defaultValue?)
 }
 
 util {
@@ -316,10 +321,10 @@ Normally transducers are used with pull streams: reduce "pulls" values out of an
 Transducer that invokes interceptor with each result and input, and then passes through input. The primary purpose of this method is to "tap into" a method chain, in order to perform operations on intermediate results within the chain.  Executes interceptor with current result and input.
 
 ##### push.asCallback(t, xf?)
-Creates a callback that starts a transducer process and accepts parameter as a new item in the process. Each item advances the state of the transducer. If the transducer exhausts due to early termination, all subsequent calls to the callback will no-op and return the computed result. If the callback is called with no argument, the transducer terminates, and all subsequent calls will no-op and return the computed result. The callback returns undefined until completion. Once completed, the result is always returned. If `xf` is not defined, maintains last value and does not buffer results.
+Creates a callback that starts a transducer process and accepts parameter as a new item in the process. Each item advances the state of the transducer. If the transducer exhausts due to early termination, all subsequent calls to the callback will no-op and return the computed result. If the callback is called with no argument, the transducer terminates, and all subsequent calls will no-op and return the computed result. The callback returns undefined until completion. Once completed, the result is always returned. If `xf` is not defined, maintains `lastValue` and does not buffer results.
 
 ##### push.asyncCallback(t, continuation, xf?)
-Creates an async callback that starts a transducer process and accepts parameter cb(err, item) as a new item in the process. The returned callback and the optional continuation follow Node.js conventions with  fn(err, item). Each item advances the state  of the transducer, if the continuation is provided, it will be called on completion or error. An error will terminate the transducer and be propagated to the continuation.  If the transducer exhausts due to early termination, any further call will be a no-op. If the callback is called with no item, it will terminate the transducer process. If `xf` is not defined, maintains last value and does not buffer results.
+Creates an async callback that starts a transducer process and accepts parameter cb(err, item) as a new item in the process. The returned callback and the optional continuation follow Node.js conventions with  fn(err, item). Each item advances the state  of the transducer, if the continuation is provided, it will be called on completion or error. An error will terminate the transducer and be propagated to the continuation.  If the transducer exhausts due to early termination, any further call will be a no-op. If the callback is called with no item, it will terminate the transducer process. If `xf` is not defined, maintains `lastValue` and does not buffer results.
 
 
 #### String
@@ -406,6 +411,22 @@ Does the parameter have a transformer protocol or have `init`, `step`, `result` 
 
 ##### transformer.transformer(value)
 Attempts to convert the parameter into a transformer.  If cannot be converted, returns `undefined`.  If defined, the return value will have `init`, `step`, `result` functions that can be used for transformation.  Converts arrays (`arrayPush`), strings (`stringAppend`), objects (`objectMerge`), functions (wrap as reducing function) or anything that `isTransformer` into a transformer.
+
+##### transformer.completing(rf, result?)
+Lifts a reducing function, `rf`, into a transformer, `xf`.  Uses `identity` if `result` function is not provided. The `init` function calls `rf` with no arguments.
+
+##### transformer.lastValue
+A transformer that maintains the last value and does not buffer results. Ignores the accumulator and returns the input on every `step`.
+
+##### transformer.array(defaultValue?)
+Transformer for arrays using `arrayPush` as `step` and `identity` as `result`. The `defaultValue` is cloned on every call to  `init`. Uses `[]` for `defaultValue` if not defined.
+
+##### transformer.object(defaultValue?)
+Transformer for plain objects using `objectMerge` as `step` and `identity` as `result`. The `defaultValue` is cloned on every call to  `init`. Uses `{}` for `defaultValue` if not defined.
+
+##### transformer.string(defaultValue?)
+Transformer for plain objects using `stringAppend` as `step` and `identity` as `result`. The `defaultValue` is cloned on every call to  `init`. Uses `''` for `defaultValue` if not defined.
+
 
 #### Util
 

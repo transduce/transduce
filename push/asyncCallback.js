@@ -1,7 +1,7 @@
 'use strict'
 var isReduced = require('../base/isReduced'),
     unreduced = require('../base/unreduced'),
-    lastValue = require('./lastValue')
+    lastValue = require('../transformer/lastValue')
 
 // Creates an async callback that starts a transducer process and accepts
 // parameter cb(err, item) as a new item in the process. The returned callback
