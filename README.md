@@ -200,7 +200,7 @@ transformer {
   isTransformer: function(value)
   transformer: function(value)
   completing: function(rf, result?)
-  lastValue: transformer
+  lastValue: function(init?)
   array: function(defaultValue?)
   object: function(defaultValue?)
   string: function(defaultValue?)
@@ -221,10 +221,10 @@ util {
 ```
 
 ##### reduce(xf, init?, coll)
-Reduces over a transformation. If `xf` is not a `transformer`, it is converted to one. Arrays are special cased to reduce using for loop and to allow transducers using `reduced`.  If `coll` has a `reduce` method, it is called with `xf.step` and `init`. Otherwise,`coll` is converted to an `iterator`.  If the function is called with arity-2, the `xf.init()` is used as the `init` value.
+Reduces over a transformation. If `xf` is not a `transformer`, it is converted to one using `completing`. Arrays are special cased to reduce using for loop and to allow transducers using `reduced`.  If `coll` has a `reduce` method, it is called with `xf.step` and `init`. Otherwise,`coll` is converted to an `iterator`.  If the function is called with arity-2, the `xf.init()` is used as the `init` value.
 
 ##### transduce(t, xf, init?, coll)
-Transduces over a transformation. The transducer `t` is initialized with `xf` and is passed to `reduce`. `xf` is converted to a `transformer` if it is not one already. If the function is called with arity-3, the `xf.init()` is used as the `init` value.
+Transduces over a transformation. The transducer `t` is initialized with `xf` and is passed to `reduce`. `xf` is converted to a `transformer` if it is not one already using `completing`. If the function is called with arity-3, the `xf.init()` is used as the `init` value.
 
 ##### eduction(t, coll)
 Creates an iterable and reducible application of the collection `coll` transformed by transducer`t`.  The returned eduction will be iterable using `sequence` and have a `reduce(rf, init)` method using `transduce`.
@@ -321,10 +321,10 @@ Normally transducers are used with pull streams: reduce "pulls" values out of an
 Transducer that invokes interceptor with each result and input, and then passes through input. The primary purpose of this method is to "tap into" a method chain, in order to perform operations on intermediate results within the chain.  Executes interceptor with current result and input.
 
 ##### push.asCallback(t, xf?)
-Creates a callback that starts a transducer process and accepts parameter as a new item in the process. Each item advances the state of the transducer. If the transducer exhausts due to early termination, all subsequent calls to the callback will no-op and return the computed result. If the callback is called with no argument, the transducer terminates, and all subsequent calls will no-op and return the computed result. The callback returns undefined until completion. Once completed, the result is always returned. If `xf` is not defined, maintains `lastValue` and does not buffer results.
+Creates a callback that starts a transducer process and accepts parameter as a new item in the process. Each item advances the state of the transducer. If the transducer exhausts due to early termination, all subsequent calls to the callback will no-op and return the computed result. If the callback is called with no argument, the transducer terminates, and all subsequent calls will no-op and return the computed result. The callback returns undefined until completion. Once completed, the result is always returned. If `xf` is not defined, maintains `lastValue()` and does not buffer results.
 
 ##### push.asyncCallback(t, continuation, xf?)
-Creates an async callback that starts a transducer process and accepts parameter cb(err, item) as a new item in the process. The returned callback and the optional continuation follow Node.js conventions with  fn(err, item). Each item advances the state  of the transducer, if the continuation is provided, it will be called on completion or error. An error will terminate the transducer and be propagated to the continuation.  If the transducer exhausts due to early termination, any further call will be a no-op. If the callback is called with no item, it will terminate the transducer process. If `xf` is not defined, maintains `lastValue` and does not buffer results.
+Creates an async callback that starts a transducer process and accepts parameter cb(err, item) as a new item in the process. The returned callback and the optional continuation follow Node.js conventions with  fn(err, item). Each item advances the state  of the transducer, if the continuation is provided, it will be called on completion or error. An error will terminate the transducer and be propagated to the continuation.  If the transducer exhausts due to early termination, any further call will be a no-op. If the callback is called with no item, it will terminate the transducer process. If `xf` is not defined, maintains `lastValue()` and does not buffer results.
 
 
 #### String
@@ -415,8 +415,8 @@ Attempts to convert the parameter into a transformer.  If cannot be converted, r
 ##### transformer.completing(rf, result?)
 Lifts a reducing function, `rf`, into a transformer, `xf`.  Uses `identity` if `result` function is not provided. The `init` function calls `rf` with no arguments.
 
-##### transformer.lastValue
-A transformer that maintains the last value and does not buffer results. Ignores the accumulator and returns the input on every `step`.
+##### transformer.lastValue(init?)
+A transformer that maintains the last value and does not buffer results. Ignores the accumulator and returns the input on every `step`. If an `init` function is provided, it will be used for `init` of the transformer. Otherwise, the `init` valueu will be `undefined`.
 
 ##### transformer.array(defaultValue?)
 Transformer for arrays using `arrayPush` as `step` and `identity` as `result`. The `defaultValue` is cloned on every call to  `init`. Uses `[]` for `defaultValue` if not defined.

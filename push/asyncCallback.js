@@ -20,7 +20,7 @@ function asyncCallback(t, continuation, xf){
   var done = false, stepper, result
 
   if(xf === void 0){
-    xf = lastValue
+    xf = lastValue()
   }
 
   stepper = t(xf)
