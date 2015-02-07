@@ -12,7 +12,7 @@ function contains(target) {
 
 },{}],2:[function(require,module,exports){
 'use strict'
-var reduced = require(25)
+var reduced = require(26)
 
 // Determine whether all of the elements match a truth test.
 // Early termination if item does not match predicate.
@@ -46,7 +46,7 @@ Every.prototype.step = function(result, input) {
 
 },{}],3:[function(require,module,exports){
 'use strict'
-var reduced = require(25)
+var reduced = require(26)
 
 // Return the first value which passes a truth test. Aliased as `detect`.
 module.exports =
@@ -117,8 +117,8 @@ module.exports = {
 
 },{}],6:[function(require,module,exports){
 'use strict'
-var isReduced = require(19),
-    unreduced = require(31)
+var isReduced = require(20),
+    unreduced = require(32)
 
 // Returns everything but the last entry. Passing **n** will return all the values
 // excluding the last N.
@@ -157,8 +157,8 @@ Initial.prototype.step = function(result, input){
 
 },{}],7:[function(require,module,exports){
 'use strict'
-var isReduced = require(19),
-    unreduced = require(31)
+var isReduced = require(20),
+    unreduced = require(32)
 
 // Get the last element. Passing **n** will return the last N  values.
 // Note that no items will be sent until completion.
@@ -204,8 +204,8 @@ Last.prototype.step = function(result, input){
 
 },{}],8:[function(require,module,exports){
 'use strict'
-var isReduced = require(19),
-    unreduced = require(31),
+var isReduced = require(20),
+    unreduced = require(32),
     _slice = Array.prototype.slice
 
 // Adds one or more items to the end of the sequence, like Array.prototype.push.
@@ -241,7 +241,7 @@ Push.prototype.step = function(result, input){
 },{}],9:[function(require,module,exports){
 'use strict'
 var compose = require(13),
-    reduced = require(25),
+    reduced = require(26),
     initial = require(6),
     last = require(7)
 
@@ -299,7 +299,7 @@ Slice.prototype.step = function(result, input){
 
 },{}],10:[function(require,module,exports){
 'use strict'
-var reduced = require(25)
+var reduced = require(26)
 
 // Determine if at least one element in the object matches a truth test.
 // Aliased as `any`.
@@ -334,7 +334,7 @@ Some.prototype.step = function(result, input) {
 
 },{}],11:[function(require,module,exports){
 'use strict'
-var isReduced = require(19),
+var isReduced = require(20),
     _slice = Array.prototype.slice
 
 // Adds one or more items to the beginning of the sequence, like Array.prototype.unshift.
@@ -374,9 +374,9 @@ Unshift.prototype.step = function(result, input){
 },{}],12:[function(require,module,exports){
 'use strict'
 
-var reduced = require(25),
-    isReduced = require(19),
-    reduce = require(24)
+var reduced = require(26),
+    isReduced = require(20),
+    reduce = require(25)
 
 module.exports =
 function cat(xf){
@@ -484,6 +484,28 @@ DropWhile.prototype.step = function(value, item){
 
 },{}],16:[function(require,module,exports){
 'use strict'
+var transduce = require(31),
+    sequence = require(44),
+    symbol = require(45)
+
+module.exports =
+function eduction(t, coll) {
+  return new Eduction(t, coll)
+}
+
+function Eduction(t, coll){
+  this.t = t
+  this.coll = coll
+}
+Eduction.prototype[symbol] = function(){
+  return sequence(this.t, this.coll)[symbol]()
+}
+Eduction.prototype.reduce = function(rf, init){
+  return transduce(this.t, rf, init, this.coll)
+}
+
+},{}],17:[function(require,module,exports){
+'use strict'
 module.exports = filter
 
 function filter(predicate) {
@@ -508,45 +530,48 @@ Filter.prototype.step = function(result, input) {
   return result
 }
 
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 'use strict'
 module.exports = {
   compose: require(13),
-  isReduced: require(19),
-  reduced: require(25),
-  unreduced: require(31),
-  reduce: require(24),
-  transduce: require(30),
-  into: require(18),
-  toArray: require(29),
-  map: require(20),
-  filter: require(16),
-  remove: require(26),
-  take: require(27),
-  takeWhile: require(28),
+  isReduced: require(20),
+  reduced: require(26),
+  unreduced: require(32),
+  reduce: require(25),
+  transduce: require(31),
+  eduction: require(16),
+  into: require(19),
+  toArray: require(30),
+  map: require(21),
+  filter: require(17),
+  remove: require(27),
+  take: require(28),
+  takeWhile: require(29),
   drop: require(14),
   dropWhile: require(15),
   cat: require(12),
-  mapcat: require(21),
-  partitionAll: require(22),
-  partitionBy: require(23)
-}
-
-},{}],18:[function(require,module,exports){
-'use strict'
-var transduce = require(30),
-    reduce = require(24)
-
-module.exports =
-function into(init, t, coll){
-  if (arguments.length === 2) {
-    coll = t
-    return reduce(init, init, coll)
-  }
-  return transduce(t, init, init, coll)
+  mapcat: require(22),
+  partitionAll: require(23),
+  partitionBy: require(24)
 }
 
 },{}],19:[function(require,module,exports){
+'use strict'
+var transduce = require(31),
+    transformer = require(69),
+    reduce = require(25)
+
+module.exports =
+function into(init, t, coll){
+  var xf = transformer(init)
+  if (arguments.length === 2) {
+    coll = t
+    return reduce(xf, init, coll)
+  }
+  return transduce(t, xf, init, coll)
+}
+
+},{}],20:[function(require,module,exports){
 'use strict'
 
 module.exports =
@@ -554,7 +579,7 @@ function isReduced(value){
   return !!(value && value.__transducers_reduced__)
 }
 
-},{}],20:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 'use strict'
 module.exports =
 function map(callback) {
@@ -576,17 +601,17 @@ Map.prototype.step = function(result, input) {
   return this.xf.step(result, this.f(input))
 }
 
-},{}],21:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 'use strict'
 var compose = require(13),
-    map = require(20),
+    map = require(21),
     cat = require(12)
 module.exports =
 function mapcat(callback) {
   return compose(map(callback), cat)
 }
 
-},{}],22:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 'use strict'
 module.exports = partitionAll
 function partitionAll(n) {
@@ -621,9 +646,9 @@ PartitionAll.prototype.step = function(result, input) {
   return result
 }
 
-},{}],23:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 'use strict'
-var isReduced = require(19)
+var isReduced = require(20)
 
 module.exports =
 function partitionBy(f) {
@@ -666,24 +691,34 @@ PartitionBy.prototype.step = function(result, input) {
   return result
 }
 
-},{}],24:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 'use strict'
-var transformer = require(59),
-    isReduced = require(19),
-    unreduced = require(31),
-    isArray = require(68),
-    iterator = require(37)
+var completing = require(62),
+    isReduced = require(20),
+    unreduced = require(32),
+    isArray = require(78),
+    isFunction = require(79),
+    iterator = require(41)
 
 module.exports =
 function reduce(xf, init, coll){
-  xf = transformer(xf)
+  if(isFunction(xf)){
+    xf = completing(xf)
+  }
+
   if (arguments.length === 2) {
     coll = init
     init = xf.init()
   }
+
   if(isArray(coll)){
     return arrayReduce(xf, init, coll)
   }
+
+  if(isFunction(coll.reduce)){
+    return methodReduce(xf, init, coll)
+  }
+
   return iteratorReduce(xf, init, coll)
 }
 
@@ -699,6 +734,13 @@ function arrayReduce(xf, init, arr){
     }
   }
   return xf.result(value)
+}
+
+function methodReduce(xf, init, coll){
+  var result = coll.reduce(function(result, value){
+    return xf.step(result, value)
+  }, init)
+  return xf.result(result)
 }
 
 function iteratorReduce(xf, init, iter){
@@ -719,10 +761,10 @@ function iteratorReduce(xf, init, iter){
   return xf.result(value)
 }
 
-},{}],25:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 'use strict'
 
-var isReduced = require(19)
+var isReduced = require(20)
 
 module.exports =
 function reduced(value, force){
@@ -737,9 +779,9 @@ function Reduced(value){
   this.__transducers_reduced__ = true
 }
 
-},{}],26:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 'use strict'
-var filter = require(16)
+var filter = require(17)
 
 module.exports = remove
 function remove(p){
@@ -749,10 +791,10 @@ function remove(p){
 }
 
 
-},{}],27:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 'use strict'
 
-var reduced = require(25)
+var reduced = require(26)
 
 module.exports =
 function take(n){
@@ -780,9 +822,9 @@ Take.prototype.step = function(value, item){
   return value
 }
 
-},{}],28:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 'use strict'
-var reduced = require(25)
+var reduced = require(26)
 
 module.exports =
 function takeWhile(p){
@@ -809,23 +851,28 @@ TakeWhile.prototype.step = function(value, item){
   return value
 }
 
-},{}],29:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 'use strict'
-var into = require(18)
+var into = require(19)
 
 module.exports =
 function toArray(t, coll){
   return into([], t, coll)
 }
 
-},{}],30:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 'use strict'
-var transformer = require(59),
-    reduce = require(24)
+var completing = require(62),
+    reduce = require(25),
+    isFunction = require(79)
 
 module.exports =
 function transduce(t, xf, init, coll) {
-  xf = t(transformer(xf))
+  if(isFunction(xf)){
+    xf = completing(xf)
+  }
+
+  xf = t(xf)
   if (arguments.length === 3) {
     coll = init;
     init = xf.init();
@@ -833,10 +880,10 @@ function transduce(t, xf, init, coll) {
   return reduce(xf, init, coll)
 }
 
-},{}],31:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 'use strict'
 
-var isReduced = require(19)
+var isReduced = require(20)
 
 module.exports =
 function unreduced(value){
@@ -846,45 +893,148 @@ function unreduced(value){
   return value
 }
 
-},{}],32:[function(require,module,exports){
-'use strict'
-var util = require(67)
-module.exports = util.objectMerge({
-  iterator: require(33),
-  transformer: require(56),
-  array: require(5),
-  math: require(41),
-  push: require(46),
-  string: require(50),
-  unique: require(62),
-  util: util
-}, require(17))
-
 },{}],33:[function(require,module,exports){
 'use strict'
-module.exports = {
-  symbol: require(39),
-  isIterable: require(34),
-  isIterator: require(35),
-  iterable: require(36),
+var util = require(77)
+module.exports = util.objectMerge({
   iterator: require(37),
-  toArray: require(40),
-  sequence: require(38)
-}
+  transformer: require(63),
+  array: require(5),
+  math: require(47),
+  push: require(52),
+  string: require(55),
+  unique: require(72),
+  util: util
+}, require(18))
 
 },{}],34:[function(require,module,exports){
 'use strict'
-var symbol = require(39)
+var iterator = require(41),
+    symbol = require(45),
+    slice = [].slice,
+    EMPTY = { next: function(){ return {done:true} } }
+
+module.exports =
+function chain(){
+  return new Chain(slice.call(arguments))
+}
+
+function Chain(iters){
+  this.iters = iters
+}
+Chain.prototype[symbol] = function(){
+  var iters = slice.call(this.iters),
+      it = shift()
+
+  if(it === void 0) return EMPTY
+
+  return {
+    next: function(){
+      var next = it.next()
+      if(!next.done){
+        return next
+      }
+
+      it = shift()
+      if(it === void 0){
+        return {done: true}
+      }
+      return it.next()
+    }
+  }
+
+  function shift(){
+    var itb = iters.shift()
+    return itb && iterator(itb)
+  }
+}
+
+},{}],35:[function(require,module,exports){
+"use strict"
+var symbol = require(45)
+
+module.exports =
+function count(start, step){
+  return new Count(start, step)
+}
+function Count(start, step){
+  if(start === void 0){
+    start = 0
+  }
+  if(step === void 0){
+    step = 1
+  }
+  this.start = start
+  this.step = step
+}
+Count.prototype[symbol] = function(){
+  var val = this.start, step = this.step
+  return {
+    next: function(){
+      var prev = val
+      val = val + step
+      return {done: false, value: prev}
+    }
+  }
+}
+
+},{}],36:[function(require,module,exports){
+'use strict'
+var iterator = require(41),
+    symbol = require(45)
+
+module.exports =
+function cycle(iter){
+  return new Cycle(iter)
+}
+
+function Cycle(iter){
+  this.iter = iter
+}
+Cycle.prototype[symbol] = function(){
+  var iter = this.iter, it = iterator(iter)
+  return {
+    next: function(){
+      var next = it.next()
+      if(next.done){
+        it = iterator(iter)
+        next = it.next()
+      }
+      return next
+    }
+  }
+}
+
+},{}],37:[function(require,module,exports){
+'use strict'
+module.exports = {
+  symbol: require(45),
+  isIterable: require(38),
+  isIterator: require(39),
+  iterable: require(40),
+  iterator: require(41),
+  toArray: require(46),
+  sequence: require(44),
+  range: require(42),
+  count: require(35),
+  cycle: require(36),
+  repeat: require(43),
+  chain: require(34)
+}
+
+},{}],38:[function(require,module,exports){
+'use strict'
+var symbol = require(45)
 
 module.exports =
 function isIterable(value){
   return (value[symbol] !== void 0)
 }
 
-},{}],35:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 'use strict'
-var isIterable = require(34),
-    isFunction = require(69)
+var isIterable = require(38),
+    isFunction = require(79)
 
 module.exports =
 function isIterator(value){
@@ -892,13 +1042,13 @@ function isIterator(value){
     isFunction(value.next)
 }
 
-},{}],36:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 'use strict'
-var isIterable = require(34),
-    symbol = require(39),
-    isArray = require(68),
-    isFunction = require(69),
-    isString = require(72),
+var isIterable = require(38),
+    symbol = require(45),
+    isArray = require(78),
+    isFunction = require(79),
+    isString = require(82),
     has = {}.hasOwnProperty,
     keys = Object.keys || _keys
 
@@ -978,11 +1128,11 @@ function _keys(obj){
   return keys
 }
 
-},{}],37:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 'use strict'
-var symbol = require(39),
-    iterable = require(36),
-    isFunction = require(69)
+var symbol = require(45),
+    iterable = require(40),
+    isFunction = require(79)
 
 module.exports =
 function iterator(value){
@@ -996,11 +1146,81 @@ function iterator(value){
   return it
 }
 
-},{}],38:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 'use strict'
-var iterator = require(37),
-    symbol = require(39),
-    isReduced = require(19)
+var symbol = require(45)
+
+module.exports =
+function range(start, stop, step){
+  return new Range(start, stop, step)
+}
+function Range(start, stop, step){
+  if(step === void 0){
+    step = 1
+  }
+  if(stop === void 0){
+    stop = start
+    start = 0
+  }
+  this.start = start
+  this.stop = stop
+  this.step = step
+}
+Range.prototype[symbol] = function(){
+  var start = this.start,
+      stop = this.stop,
+      step = this.step,
+      val = start
+  return {
+    next: function(){
+      var prev = val
+      val = val + step
+      if(step > 0 && prev >= stop || step < 0 && prev <= stop){
+        return {done: true}
+      } else {
+        return {done: false, value: prev}
+      }
+    }
+  }
+}
+
+},{}],43:[function(require,module,exports){
+'use strict'
+var iterable = require(40),
+    symbol = require(45)
+
+module.exports =
+function repeat(elem, n){
+  if(n === void 0){
+    return iterable(function(){
+      return elem
+    })
+  }
+  return new Repeat(elem, n)
+}
+
+function Repeat(elem, n){
+  this.elem = elem
+  this.n = n
+}
+Repeat.prototype[symbol] = function(){
+  var elem = this.elem, n = this.n,  idx = 1
+  return {
+    next: function(){
+      if(idx++ > n){
+        return {done: true}
+      } else {
+        return {done: false, value: elem}
+      }
+    }
+  }
+}
+
+},{}],44:[function(require,module,exports){
+'use strict'
+var iterator = require(41),
+    symbol = require(45),
+    isReduced = require(20)
 
 module.exports =
 function sequence(t, coll) {
@@ -1071,16 +1291,16 @@ Stepper.prototype.step = function(lt){
 }
 
 
-},{}],39:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 'use strict'
 var /* global Symbol */
     /* jshint newcap:false */
     symbolExists = typeof Symbol !== 'undefined'
 module.exports = symbolExists ? Symbol.iterator : '@@iterator'
 
-},{}],40:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 'use strict'
-var iterator = require(37)
+var iterator = require(41)
 
 module.exports =
 function toArray(iter){
@@ -1094,17 +1314,17 @@ function toArray(iter){
   return arr
 }
 
-},{}],41:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 'use strict'
 module.exports = {
-  min: require(43),
-  max: require(42)
+  min: require(49),
+  max: require(48)
 }
 
-},{}],42:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 'use strict'
 
-var identity = require(66)
+var identity = require(76)
 
 // Return the maximum element (or element-based computation).
 module.exports =
@@ -1139,10 +1359,10 @@ Max.prototype.step = function(result, input) {
   return result
 }
 
-},{}],43:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 'use strict'
 
-var identity = require(66)
+var identity = require(76)
 
 // Return the minimum element (or element-based computation).
 module.exports =
@@ -1177,11 +1397,11 @@ Min.prototype.step = function(result, input) {
   return result
 }
 
-},{}],44:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 'use strict'
-var isReduced = require(19),
-    unreduced = require(31),
-    lastValue = require(47)
+var isReduced = require(20),
+    unreduced = require(32),
+    lastValue = require(65)
 
 // Creates a callback that starts a transducer process and accepts
 // parameter as a new item in the process. Each item advances the state
@@ -1200,7 +1420,7 @@ function asCallback(t, xf){
   var done = false, stepper, result
 
   if(xf === void 0){
-    xf = lastValue
+    xf = lastValue()
   }
 
   stepper = t(xf)
@@ -1228,11 +1448,11 @@ function asCallback(t, xf){
   }
 }
 
-},{}],45:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 'use strict'
-var isReduced = require(19),
-    unreduced = require(31),
-    lastValue = require(47)
+var isReduced = require(20),
+    unreduced = require(32),
+    lastValue = require(65)
 
 // Creates an async callback that starts a transducer process and accepts
 // parameter cb(err, item) as a new item in the process. The returned callback
@@ -1251,7 +1471,7 @@ function asyncCallback(t, continuation, xf){
   var done = false, stepper, result
 
   if(xf === void 0){
-    xf = lastValue
+    xf = lastValue()
   }
 
   stepper = t(xf)
@@ -1302,25 +1522,15 @@ function asyncCallback(t, continuation, xf){
   }
 }
 
-},{}],46:[function(require,module,exports){
+},{}],52:[function(require,module,exports){
 'use strict'
 module.exports = {
-  tap: require(48),
-  asCallback: require(44),
-  asyncCallback: require(45),
-  lastValue: require(47)
+  tap: require(53),
+  asCallback: require(50),
+  asyncCallback: require(51)
 }
 
-},{}],47:[function(require,module,exports){
-'use strict'
-
-module.exports = {
-  init: function(){},
-  step: function(result, input){return input},
-  result: function(result){return result}
-}
-
-},{}],48:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 'use strict'
 
 // Invokes interceptor with each result and input, and then passes through input.
@@ -1348,27 +1558,27 @@ Tap.prototype.step = function(result, input) {
   return this.xf.step(result, input)
 }
 
-},{}],49:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 'use strict'
-var split = require(54)
+var split = require(59)
 
 module.exports =
 function chars(limit){
   return split('', limit)
 }
 
-},{}],50:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 'use strict'
 module.exports = {
-  split: require(54),
-  join: require(51),
-  nonEmpty: require(53),
-  lines: require(52),
-  chars: require(49),
-  words: require(55)
+  split: require(59),
+  join: require(56),
+  nonEmpty: require(58),
+  lines: require(57),
+  chars: require(54),
+  words: require(60)
 }
 
-},{}],51:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 'use strict'
 
 module.exports =
@@ -1392,18 +1602,18 @@ Join.prototype.result = function(result){
   return this.xf.result(result)
 }
 
-},{}],52:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 'use strict'
-var split = require(54)
+var split = require(59)
 
 module.exports =
 function lines(limit){
   return split('\n', limit)
 }
 
-},{}],53:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 'use strict'
-var isString = require(72)
+var isString = require(82)
 
 module.exports =
 function nonEmpty(){
@@ -1425,10 +1635,10 @@ NonEmpty.prototype.result = function(result){
   return this.xf.result(result)
 }
 
-},{}],54:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 'use strict'
-var reduced = require(25),
-    isRegExp = require(71)
+var reduced = require(26),
+    isRegExp = require(81)
 
 module.exports =
 function split(separator, limit){
@@ -1548,12 +1758,12 @@ function cloneRegExp(regexp){
   return new RegExp(regexp.source, flags.join(''))
 }
 
-},{}],55:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 'use strict'
 var compose = require(13),
-    isNumber = require(70),
-    split = require(54),
-    nonEmpty = require(53)
+    isNumber = require(80),
+    split = require(59),
+    nonEmpty = require(58)
 
 module.exports =
 function words(delimiter, limit) {
@@ -1564,19 +1774,65 @@ function words(delimiter, limit) {
   return compose(split(delimiter, limit), nonEmpty())
 }
 
-},{}],56:[function(require,module,exports){
+},{}],61:[function(require,module,exports){
+'use strict'
+var slice = Array.prototype.slice,
+    identity = require(76),
+    arrayPush = require(75)
+
+module.exports =
+// Pushes value on array, using optional constructor arg as default, or [] if not provided
+// init will clone the default
+// step will push input onto array and return result
+// result is identity
+function arrayTransformer(defaultValue){
+  return new ArrayTransformer(defaultValue)
+}
+function ArrayTransformer(defaultValue){
+  this.defaultValue = defaultValue === void 0 ? [] : defaultValue
+}
+ArrayTransformer.prototype.init = function(){
+  return slice.call(this.defaultValue)
+}
+ArrayTransformer.prototype.step = arrayPush
+ArrayTransformer.prototype.result = identity
+
+},{}],62:[function(require,module,exports){
+'use strict'
+var identity = require(76)
+
+module.exports =
+// Turns a step function into a transfomer with init, step, result
+// If init not provided, calls `step()`.  If result not provided, calls `idenity`
+function completing(rf, result){
+  return new Completing(rf, result)
+}
+function Completing(rf, result){
+  this.step = rf
+  this.result = result || identity
+}
+Completing.prototype.init = function(){
+  return this.step()
+}
+
+},{}],63:[function(require,module,exports){
 'use strict'
 
 module.exports = {
-  symbol: require(58),
-  isTransformer: require(57),
-  transformer: require(59)
+  symbol: require(68),
+  isTransformer: require(64),
+  transformer: require(69),
+  array: require(61),
+  completing: require(62),
+  lastValue: require(65),
+  object: require(66),
+  string: require(67)
 }
 
-},{}],57:[function(require,module,exports){
+},{}],64:[function(require,module,exports){
 'use strict'
-var symbol = require(58),
-    isFunction = require(69)
+var symbol = require(68),
+    isFunction = require(79)
 
 module.exports =
 function isTransformer(value){
@@ -1584,92 +1840,38 @@ function isTransformer(value){
     (isFunction(value.step) && isFunction(value.result))
 }
 
-},{}],58:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
 'use strict'
-var /* global Symbol */
-    /* jshint newcap:false */
-    symbolExists = typeof Symbol !== 'undefined'
-module.exports = symbolExists ? Symbol('transformer') : '@@transformer'
-
-},{}],59:[function(require,module,exports){
-'use strict'
-var undef,
-    slice = Array.prototype.slice,
-    symbol = require(58),
-    isTransformer = require(57),
-    isArray = require(68),
-    isFunction = require(69),
-    isString = require(72),
-    identity = require(66),
-    arrayPush = require(65),
-    objectMerge = require(74),
-    stringAppend = require(75)
+var identity = require(76)
 
 module.exports =
-function transformer(value){
-  var xf
-  if(isTransformer(value)){
-    xf = value[symbol]
-    if(xf === undef){
-      xf = value
-    }
-  } else if(isFunction(value)){
-    xf = new FunctionTransformer(value)
-  } else if(isArray(value)){
-    xf = new ArrayTransformer(value)
-  } else if(isString(value)){
-    xf = new StringTransformer(value)
-  } else {
-    xf = new ObjectTransformer(value)
+function lastValueTransformer(init){
+  return new LastValueTransformer(init)
+}
+function LastValueTransformer(init){
+  if(init){
+    this.init = init
   }
-  return xf
 }
+LastValueTransformer.prototype.init = function(){}
+LastValueTransformer.prototype.step =  function(result, input){return input}
+LastValueTransformer.prototype.result = identity
 
-// Pushes value on array, using optional constructor arg as default, or [] if not provided
-// init will clone the default
-// step will push input onto array and return result
-// result is identity
-function ArrayTransformer(arr){
-  this.arrDefault = arr === undef ? [] : arr
-}
-ArrayTransformer.prototype.init = function(){
-  return slice.call(this.arrDefault)
-}
-ArrayTransformer.prototype.step = arrayPush
-ArrayTransformer.prototype.result = identity
+},{}],66:[function(require,module,exports){
+'use strict'
+var identity = require(76),
+    objectMerge = require(84)
 
-// Turns a step function into a transfomer with init, step, result (init not supported and will error)
-// Like transducers-js Wrap
-function FunctionTransformer(step){
-  this.step = step
-}
-FunctionTransformer.prototype.init = function(){
-  throw new Error('Cannot init wrapped function, use proper transformer instead')
-}
-FunctionTransformer.prototype.step = function(result, input){
-  return this.step(result, input)
-}
-FunctionTransformer.prototype.result = identity
-
-// Appends value onto string, using optional constructor arg as default, or '' if not provided
-// init will return the default
-// step will append input onto string and return result
-// result is identity
-function StringTransformer(str){
-  this.strDefault = str === undef ? '' : str
-}
-StringTransformer.prototype.init = function(){
-  return this.strDefault
-}
-StringTransformer.prototype.step = stringAppend
-StringTransformer.prototype.result = identity
-
-// Merges value into object, using optional constructor arg as default, or {} if not provided
+module.exports =
+// Merges value into object, using optional constructor arg as default, or {} if undefined
 // init will clone the default
 // step will merge input into object and return result
 // result is identity
+function objectTranformer(obj){
+  return new ObjectTransformer(obj)
+}
 function ObjectTransformer(obj){
-  this.objDefault = obj === undef ? {} : objectMerge({}, obj)
+  this.objDefault = obj === void 0 ? {} : objectMerge({}, obj)
 }
 ObjectTransformer.prototype.init = function(){
   return objectMerge({}, this.objDefault)
@@ -1677,7 +1879,68 @@ ObjectTransformer.prototype.init = function(){
 ObjectTransformer.prototype.step = objectMerge
 ObjectTransformer.prototype.result = identity
 
-},{}],60:[function(require,module,exports){
+},{}],67:[function(require,module,exports){
+'use strict'
+var identity = require(76),
+    stringAppend = require(85)
+
+module.exports =
+// Appends value onto string, using optional constructor arg as default, or '' if not provided
+// init will return the default
+// step will append input onto string and return result
+// result is identity
+function stringTransformer(value){
+  return new StringTransformer(value)
+}
+function StringTransformer(str){
+  this.strDefault = str === void 0 ? '' : str
+}
+StringTransformer.prototype.init = function(){
+  return this.strDefault
+}
+StringTransformer.prototype.step = stringAppend
+StringTransformer.prototype.result = identity
+
+},{}],68:[function(require,module,exports){
+'use strict'
+var /* global Symbol */
+    /* jshint newcap:false */
+    symbolExists = typeof Symbol !== 'undefined'
+module.exports = symbolExists ? Symbol('transformer') : '@@transformer'
+
+},{}],69:[function(require,module,exports){
+'use strict'
+var symbol = require(68),
+    isTransformer = require(64),
+    isArray = require(78),
+    isFunction = require(79),
+    isString = require(82),
+    arrayXf = require(61),
+    completing = require(62),
+    objectXf = require(66),
+    stringXf = require(67)
+
+module.exports =
+function transformer(value){
+  var xf
+  if(isTransformer(value)){
+    xf = value[symbol]
+    if(xf === void 0){
+      xf = value
+    }
+  } else if(isFunction(value)){
+    xf = completing(value)
+  } else if(isArray(value)){
+    xf = arrayXf(value)
+  } else if(isString(value)){
+    xf = stringXf(value)
+  } else {
+    xf = objectXf(value)
+  }
+  return xf
+}
+
+},{}],70:[function(require,module,exports){
 'use strict'
 module.exports =
 function _unique(f, buffer) {
@@ -1719,32 +1982,32 @@ Uniq.prototype.step = function(result, input){
   return result
 }
 
-},{}],61:[function(require,module,exports){
+},{}],71:[function(require,module,exports){
 'use strict'
-var _unique = require(60)
+var _unique = require(70)
 
 module.exports =
 function dedupe(){
   return _unique()
 }
 
-},{}],62:[function(require,module,exports){
+},{}],72:[function(require,module,exports){
 'use strict'
 module.exports = {
-  unique: require(63),
-  dedupe: require(61)
+  unique: require(73),
+  dedupe: require(71)
 }
 
-},{}],63:[function(require,module,exports){
+},{}],73:[function(require,module,exports){
 'use strict'
-var _unique = require(60)
+var _unique = require(70)
 
 module.exports =
 function unique(f) {
   return _unique(f, true)
 }
 
-},{}],64:[function(require,module,exports){
+},{}],74:[function(require,module,exports){
 'use strict'
 var toString = Object.prototype.toString
 
@@ -1756,7 +2019,7 @@ function predicateToString(type){
   }
 }
 
-},{}],65:[function(require,module,exports){
+},{}],75:[function(require,module,exports){
 'use strict'
 
 module.exports =
@@ -1765,7 +2028,7 @@ function push(result, input){
   return result
 }
 
-},{}],66:[function(require,module,exports){
+},{}],76:[function(require,module,exports){
 'use strict'
 
 module.exports =
@@ -1773,26 +2036,26 @@ function identity(result){
   return result
 }
 
-},{}],67:[function(require,module,exports){
+},{}],77:[function(require,module,exports){
 'use strict'
 
 module.exports = {
-  isFunction: require(69),
-  isArray: require(68),
-  isString: require(72),
-  isRegExp: require(71),
-  isNumber: require(70),
-  isUndefined: require(73),
-  identity: require(66),
-  arrayPush: require(65),
-  objectMerge: require(74),
-  stringAppend: require(75)
+  isFunction: require(79),
+  isArray: require(78),
+  isString: require(82),
+  isRegExp: require(81),
+  isNumber: require(80),
+  isUndefined: require(83),
+  identity: require(76),
+  arrayPush: require(75),
+  objectMerge: require(84),
+  stringAppend: require(85)
 }
 
-},{}],68:[function(require,module,exports){
-module.exports = Array.isArray || require(64)('Array')
+},{}],78:[function(require,module,exports){
+module.exports = Array.isArray || require(74)('Array')
 
-},{}],69:[function(require,module,exports){
+},{}],79:[function(require,module,exports){
 'use strict'
 
 module.exports =
@@ -1800,16 +2063,16 @@ function isFunction(value){
   return typeof value === 'function'
 }
 
-},{}],70:[function(require,module,exports){
-module.exports = require(64)('Number')
+},{}],80:[function(require,module,exports){
+module.exports = require(74)('Number')
 
-},{}],71:[function(require,module,exports){
-module.exports = require(64)('RegExp')
+},{}],81:[function(require,module,exports){
+module.exports = require(74)('RegExp')
 
-},{}],72:[function(require,module,exports){
-module.exports = require(64)('String')
+},{}],82:[function(require,module,exports){
+module.exports = require(74)('String')
 
-},{}],73:[function(require,module,exports){
+},{}],83:[function(require,module,exports){
 'use strict'
 
 module.exports =
@@ -1817,10 +2080,10 @@ function isUndefined(value){
   return value === void 0
 }
 
-},{}],74:[function(require,module,exports){
+},{}],84:[function(require,module,exports){
 'use strict'
 
-var isArray = require(68)
+var isArray = require(78)
 var has = {}.hasOwnProperty
 
 module.exports =
@@ -1838,7 +2101,7 @@ function objectMerge(result, input){
   return result
 }
 
-},{}],75:[function(require,module,exports){
+},{}],85:[function(require,module,exports){
 'use strict'
 
 module.exports =
@@ -1846,5 +2109,5 @@ function stringAppend(result, input){
   return result + input
 }
 
-},{}]},{},[32])(32)
+},{}]},{},[33])(33)
 });
