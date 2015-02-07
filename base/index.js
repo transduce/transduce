@@ -9,6 +9,8 @@ module.exports = {
   eduction: require('./eduction'),
   into: require('./into'),
   toArray: require('./toArray'),
+  toString: require('./toString'),
+  toObject: require('./toObject'),
   map: require('./map'),
   filter: require('./filter'),
   remove: require('./remove'),

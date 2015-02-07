@@ -120,8 +120,10 @@ Supports the following functions:
 reduce: function(xf, init?, coll)
 transduce: function(t, xf, init?, coll)
 eduction: function(t, coll)
-into: function(init, t?, coll)
-toArray: function(t?, coll)
+into: function(init, t?, coll?)
+toArray: function(t?, coll?)
+toObject: function(t?, coll?)
+toString: function(t?, coll?)
 
 // base transducers
 map: function(f)
@@ -229,11 +231,17 @@ Transduces over a transformation. The transducer `t` is initialized with `xf` an
 ##### eduction(t, coll)
 Creates an iterable and reducible application of the collection `coll` transformed by transducer`t`.  The returned eduction will be iterable using `sequence` and have a `reduce(rf, init)` method using `transduce`.
 
-##### into(init, t?, coll)
-Returns a new collection appending all items into `init` by passing all items from source collection `coll` through the optional transducer `t`.  Chooses transformer, `xf` from type of `to`.  Can be array, object, string or have `@@transformer`. `coll` is converted to an `iterator`
+##### into(init, t?, coll?)
+Returns a new collection appending all items into `init` by passing all items from source collection `coll` through the optional transducer `t`.  Chooses transformer, `xf` from type of `to`.  Can be array, object, string or have `@@transformer`. `coll` is converted to an `iterator`.  If `coll` is not provided, returns a curried function using `transformer` from `init` and the same transformation can be used for multiple collections.
 
-##### toArray(t?, coll)
-Transduce a collection into an array with an optional transducer, `t`. `coll` is converted to an `iterator`.
+##### toArray(t?, coll?)
+Transduce a collection into an array with an optional transducer, `t`. `coll` is converted to an `iterator`. If `coll` is not provided, returns a curried function using `transformer` from `init`.  Equivalent to `into([])`
+
+##### toObject(t?, coll?)
+Transduce a collection into an object with an optional transducer, `t`. `coll` is converted to an `iterator`. If `coll` is not provided, returns a curried function using `transformer` from `init`.  Equivalent to `into({})`
+
+##### toString(t?, coll?)
+Transduce a collection into an string with an optional transducer, `t`. `coll` is converted to an `iterator`. If `coll` is not provided, returns a curried function using `transformer` from `init`.  Equivalent to `into('')`
 
 #### Transducers
 
