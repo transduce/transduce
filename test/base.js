@@ -54,14 +54,90 @@ test('into', function(t) {
   t.deepEqual(tr.into('hi ', [1,2,3,4,5,6]), 'hi 123456')
   t.deepEqual(tr.into([], tr.filter(isEven), [1,2,3,4,5,6]), [2,4,6])
 
+  t.deepEqual(tr.into([])([1,2,3,4,5,6]), [1,2,3,4,5,6])
+  t.deepEqual(tr.into('')([1,2,3,4,5,6]), '123456')
+  t.deepEqual(tr.into('hi ')([1,2,3,4,5,6]), 'hi 123456')
+  t.deepEqual(tr.into([])(tr.filter(isEven), [1,2,3,4,5,6]), [2,4,6])
+
   t.deepEqual(tr.into([], [[1,2],[3,4],[5,6]]), [[1,2],[3,4],[5,6]])
   t.deepEqual(tr.into({}, [[1,2],[3,4],[5,6]]), {1:2,3:4,5:6})
   t.deepEqual(tr.into({'hi':'world'}, [[1,2],[3,4],[5,6]]), {'hi':'world',1:2,3:4,5:6})
   t.deepEqual(tr.into([], tr.cat, [[1,2],[3,4],[5,6]]), [1,2,3,4,5,6])
 
+  t.deepEqual(tr.into([])([[1,2],[3,4],[5,6]]), [[1,2],[3,4],[5,6]])
+  t.deepEqual(tr.into({})([[1,2],[3,4],[5,6]]), {1:2,3:4,5:6})
+  t.deepEqual(tr.into({'hi':'world'})([[1,2],[3,4],[5,6]]), {'hi':'world',1:2,3:4,5:6})
+
+  t.deepEqual(tr.into([], tr.cat)([[1,2],[3,4],[5,6]]), [1,2,3,4,5,6])
+  t.deepEqual(tr.into([])(tr.cat)([[1,2],[3,4],[5,6]]), [1,2,3,4,5,6])
+  t.deepEqual(tr.into([])(tr.cat, [[1,2],[3,4],[5,6]]), [1,2,3,4,5,6])
+
   var transducer = tr.compose(tr.cat, tr.array.unshift(0), tr.map(add(1)))
   t.deepEqual(tr.into([], transducer, [[1,2],[3,4],[5,6]]), [1,2,3,4,5,6,7])
+  t.deepEqual(tr.into([])(transducer, [[1,2],[3,4],[5,6]]), [1,2,3,4,5,6,7])
+  t.deepEqual(tr.into([])(transducer)([[1,2],[3,4],[5,6]]), [1,2,3,4,5,6,7])
+  t.deepEqual(tr.into([], transducer)([[1,2],[3,4],[5,6]]), [1,2,3,4,5,6,7])
 
+  var tx
+
+  tx = tr.into([], tr.compose(tr.map(add(1)), tr.filter(isEven)))
+  t.deepEqual([[1,2,3], [2,3,4], [5,6,7]].map(tx), [[2,4], [4], [6,8]])
+
+  tx = tr.into(stringReduce, tr.unique.dedupe())
+  t.equal('abc', tx(['a', 'b', 'b', 'c']))
+
+  tx = tr.into('', tr.unique.dedupe())
+  t.equal(tx(['a', 'b', 'b', 'c']), 'abc')
+
+  tx = tr.into('hi ', tr.unique.dedupe())
+  t.equal(tx(['a', 'b', 'b', 'c']), 'hi abc')
+
+  tx = tr.into([], tr.unique.dedupe())
+  t.deepEqual(tx(['a', 'b', 'b', 'c']), ['a', 'b', 'c'])
+
+  tx = tr.into([1, 2], tr.unique.dedupe())
+  t.deepEqual(tx(['a', 'b', 'b', 'c']), [1, 2, 'a', 'b', 'c'])
+  t.deepEqual(tx(['a', 'b', 'b', 'c', 'd']), [1, 2, 'a', 'b', 'c', 'd'])
+
+  tx = tr.into({}, tr.partitionAll(2))
+  t.deepEqual(tx(['a', 'b', 'b', 'c']), {a: 'b', b: 'c'})
+
+  tx = tr.into({c: 'd'}, tr.partitionAll(2))
+  t.deepEqual(tx(['a', 'b', 'b', 'c']), {a: 'b', b: 'c', c: 'd'})
+  t.deepEqual(tx(['a', 'b', 'c', 'c']), {a: 'b', c: 'c'})
+  t.deepEqual(tx(['a', 'b', 'b', 'c']), {a: 'b', b: 'c', c: 'd'})
+
+  t.end()
+})
+
+test('toArray', function(t){
+  t.deepEqual(tr.toArray([1,2,3]), [1,2,3])
+  t.deepEqual(tr.toArray(tr.map(add(1)), [1,2,3]), [2,3,4])
+  t.deepEqual(tr.toArray(tr.map(add(1)))([1,2,3]), [2,3,4])
+
+  var range = tr.iterator.range
+  t.deepEqual(tr.toArray(range(1,4)), [1,2,3])
+  t.deepEqual(tr.toArray(tr.map(add(2)), range(3)), [2,3,4])
+  t.deepEqual(tr.toArray(tr.map(add(2)))(range(3)), [2,3,4])
+  t.end()
+})
+
+test('toString', function(t){
+  t.deepEqual(tr.toString([1,2,3]), '123')
+  t.deepEqual(tr.toString(tr.map(add(1)), [1,2,3]), '234')
+  t.deepEqual(tr.toString(tr.map(add(1)))([1,2,3]), '234')
+
+  var range = tr.iterator.range
+  t.deepEqual(tr.toString(range(1,4)), '123')
+  t.deepEqual(tr.toString(tr.map(add(2)), range(3)), '234')
+  t.deepEqual(tr.toString(tr.map(add(2)))(range(3)), '234')
+  t.end()
+})
+
+test('toObject', function(t){
+  t.deepEqual(tr.toObject([['a', 'b'], ['b', 'c']]), {a: 'b', b: 'c'})
+  t.deepEqual(tr.toObject(tr.partitionAll(2), ['a', 'b', 'b', 'c']), {a: 'b', b: 'c'})
+  t.deepEqual(tr.toObject(tr.partitionAll(2))(['a', 'b', 'b', 'c']), {a: 'b', b: 'c'})
   t.end()
 })
 
