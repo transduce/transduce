@@ -232,7 +232,7 @@ Transduces over a transformation. The transducer `t` is initialized with `xf` an
 Creates an iterable and reducible application of the collection `coll` transformed by transducer`t`.  The returned eduction will be iterable using `sequence` and have a `reduce(rf, init)` method using `transduce`.
 
 ##### into(init, t?, coll?)
-Returns a new collection appending all items into `init` by passing all items from source collection `coll` through the optional transducer `t`.  Chooses transformer, `xf` from type of `to`.  Can be array, object, string or have `@@transformer`. `coll` is converted to an `iterator`.  If `coll` is not provided, returns a curried function using `transformer` from `init` and the same transformation can be used for multiple collections.
+Returns a new collection appending all items into `init` by passing all items from source collection `coll` through the optional transducer `t`.  Chooses transformer, `xf` from type of `init`.  Can be array, object, string or have `@@transformer`. `coll` is converted to an `iterator`.  If `coll` is not provided, returns a curried function using `transformer` from `init` and the same transformation can be used for multiple collections.
 
 ##### toArray(t?, coll?)
 Transduce a collection into an array with an optional transducer, `t`. `coll` is converted to an `iterator`. If `coll` is not provided, returns a curried function using `transformer` from `init`.  Equivalent to `into([])`
@@ -272,11 +272,25 @@ Concatenating transducer.  Reducing over every item in the transformation using 
 ##### mapcat(mappingFunction)
 Transducer that applies a `mappingFunction` to each item, then concatenates the result of the mapping function.  Same is `compose(map(mappingFunction), cat)`
 
-##### partitionAll(n)
-Partitions the source into arrays of size `n`. When transformer completes, the transformer will be stepped with any remaining items.
+##### partitionAll(n?)
+Partitions the source into arrays of size `n`. When transformer completes, the transformer will be stepped with any remaining items. If `n` is not provided or size `0` it will collect all values and step with this value.
 
 ##### partitionBy(f)
 Partitions the source into sub arrays when the value of the function `f` changes equality.  When transformer completes, the transformer will be stepped with any remaining items.
+
+#### Base Utils
+
+##### compose(/\*fns\*/)
+Simple function composition of arguments. Useful for composing (combining) transducers.
+
+##### isReduced(value)
+Is the value reduced? (signal for early termination)
+
+##### reduced(value, force?)
+Ensures the value is reduced (useful for early termination). If `force` is not provided or `false`, only wraps with Reduced value if not already `isReduced`.  If `force` is `true`, always wraps value with Reduced value.
+
+##### unreduced(value)
+Ensure the value is not reduced (unwraps reduced values if necessary)
 
 #### Array
 Use Array methods as Transducers.  Treats each stepped item as an item in the array, and defines transducers that step items with the same contract as array methods.
@@ -437,18 +451,6 @@ Transformer for plain objects using `stringAppend` as `step` and `identity` as `
 
 
 #### Util
-
-##### util.compose(/\*fns\*/)
-Simple function composition of arguments. Useful for composing (combining) transducers.
-
-##### util.isReduced(value)
-Is the value reduced? (signal for early termination)
-
-##### util.reduced(value, force?)
-Ensures the value is reduced (useful for early termination). If `force` is not provided or `false`, only wraps with Reduced value if not already `isReduced`.  If `force` is `true`, always wraps value with Reduced value.
-
-##### util.unreduced(value)
-Ensure the value is not reduced (unwraps reduced values if necessary)
 
 ##### util.identity(value)
 Always returns value
