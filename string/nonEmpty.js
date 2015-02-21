@@ -1,5 +1,5 @@
 'use strict'
-var isString = require('../util/isString')
+var isString = require('../core/util').isString
 
 module.exports =
 function nonEmpty(){

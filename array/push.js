@@ -1,6 +1,6 @@
 'use strict'
-var isReduced = require('../base/isReduced'),
-    unreduced = require('../base/unreduced'),
+var isReduced = require('../core/isReduced'),
+    unreduced = require('../core/unreduced'),
     _slice = Array.prototype.slice
 
 // Adds one or more items to the end of the sequence, like Array.prototype.push.

@@ -1,12 +1,10 @@
 'use strict'
-var util = require('./util')
-module.exports = util.objectMerge({
-  iterator: require('./iterator'),
-  transformer: require('./transformer'),
-  array: require('./array'),
-  math: require('./math'),
-  push: require('./push'),
-  string: require('./string'),
-  unique: require('./unique'),
-  util: util
-}, require('./base'))
+var core = require('./core'),
+    merge = core.util.objectMerge
+module.exports = merge(merge({
+    array: require('./array'),
+    string: require('./string'),
+    math: require('./math'),
+    push: require('./push'),
+    iterators: require('./iterators')
+  }, core), require('./transducers'))

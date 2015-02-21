@@ -1,6 +1,6 @@
 'use strict'
-var compose = require('../base/compose'),
-    reduced = require('../base/reduced'),
+var compose = require('../core/compose'),
+    reduced = require('../core/reduced'),
     initial = require('./initial'),
     last = require('./last')
 

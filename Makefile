@@ -9,7 +9,7 @@ clean:
 	rm -rf build
 
 test: | node_modules
-	$(NPM_BIN)/jshint array/*.js base/*.js iterator/*.js math/*.js push/*.js string/*.js transformer/*.js unique/*.js util/*.js test/*.js
+	$(NPM_BIN)/jshint array/*.js core/*.js transducers/*.js iterators/*.js math/*.js push/*.js string/*.js test/*.js
 	$(NPM_BIN)/tape test/*.js
 
 test-bail:
@@ -27,11 +27,11 @@ node_modules:
 js: $(BUILD).js $(BUILD).min.js \
 	$(BUILD).base.js $(BUILD).base.min.js
 
-$(BUILD).js: index.js base/*.js array/*.js math/*.js iterator/*.js transformer/*.js string/*.js push/*.js unique/*.js util/*.js | build
+$(BUILD).js: index.js core/*.js transducers/*.js array/*.js math/*.js iterators/*.js string/*.js push/*.js | build
 	$(NPM_BIN)/browserify -p bundle-collapser/plugin -s transduce index.js > $@
 
-$(BUILD).base.js: base/*.js iterator/*.js transformer/*.js util/*.js | build
-	$(NPM_BIN)/browserify -p bundle-collapser/plugin -s transduce base/index.js > $@
+$(BUILD).base.js: core/*.js transducers/*.js | build
+	$(NPM_BIN)/browserify -p bundle-collapser/plugin -s transduce base.js > $@
 
 build:
 	mkdir -p build
