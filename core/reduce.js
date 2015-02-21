@@ -1,5 +1,5 @@
 'use strict'
-var completing = require('../transformer/completing'),
+var completing = require('./completing'),
     isReduced = require('./isReduced'),
     unreduced = require('./unreduced'),
     isArray = require('../util/isArray'),

@@ -1,15 +1,22 @@
 'use strict'
-var util = require('./util'),
-    merge = util.objectMerge
 module.exports = merge(merge({
     iterator: require('./iterator'),
-    transformer: require('./transformer'),
     array: require('./array'),
     math: require('./math'),
     push: require('./push'),
     string: require('./string'),
     unique: require('./unique'),
-    util: util
+    util: require('./util')
   },
   require('./core')),
   require('./common'))
+
+function merge(result, input){
+  var prop
+  for(prop in input){
+    if(input.hasOwnProperty(prop)){
+      result[prop] = input[prop]
+    }
+  }
+  return result
+}

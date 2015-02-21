@@ -1,7 +1,7 @@
 'use strict'
 var transduce = require('./transduce'),
     reduce = require('./reduce'),
-    transformer = require('../transformer/transformer'),
+    transformer = require('./transformer'),
     isFunction = require('../util/isFunction')
 
 module.exports =

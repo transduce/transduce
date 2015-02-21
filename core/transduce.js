@@ -1,5 +1,5 @@
 'use strict'
-var completing = require('../transformer/completing'),
+var completing = require('./completing'),
     reduce = require('./reduce'),
     isFunction = require('../util/isFunction')
 

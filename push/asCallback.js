@@ -1,7 +1,7 @@
 'use strict'
 var isReduced = require('../core/isReduced'),
     unreduced = require('../core/unreduced'),
-    lastValue = require('../transformer/lastValue')
+    transformer = require('../core/transformer')
 
 // Creates a callback that starts a transducer process and accepts
 // parameter as a new item in the process. Each item advances the state
@@ -14,15 +14,11 @@ var isReduced = require('../core/isReduced'),
 // The callback returns undefined until completion. Once completed, the result
 // is always returned.
 //
-// If reducer, xf, is not defined, maintains last value and does not buffer results.
+// If iniit, is not defined, maintains last value and does not buffer results.
 module.exports =
-function asCallback(t, xf){
-  var done = false, stepper, result
-
-  if(xf === void 0){
-    xf = lastValue()
-  }
-
+function asCallback(t, init){
+  var done = false, stepper, result,
+      xf = transformer(init)
   stepper = t(xf)
   result = stepper.init()
 

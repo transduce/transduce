@@ -128,6 +128,12 @@ isReduced: function(value)
 reduced: function(value, force?)
 unreduced: function(value)
 
+completing: function(rf, result?)
+transformer: function(value)
+transformer.symbol: Symbol('transformer') || '@@transformer'
+
+identity: function(value)
+
 // common
 map: function(f)
 filter: function(predicate)
@@ -194,14 +200,6 @@ iterator {
 }
 
 transformer {
-  symbol: Symbol('transformer') || '@@transformer'
-  isTransformer: function(value)
-  transformer: function(value)
-  completing: function(rf, result?)
-  lastValue: function(init?)
-  array: function(defaultValue?)
-  object: function(defaultValue?)
-  string: function(defaultValue?)
 }
 
 util {
@@ -211,10 +209,6 @@ util {
   isRegExp: function(value)
   isNumber: function(value)
   isUndefined: function(value)
-  identity: function(value)
-  arrayPush: function(arr, item)
-  objectMerge: function(obj, item)
-  stringAppend: function(str, item)
 }
 ```
 #### Core
@@ -247,6 +241,19 @@ Ensures the value is reduced (useful for early termination). If `force` is not p
 
 ##### unreduced(value)
 Ensure the value is not reduced (unwraps reduced values if necessary)
+
+##### transformer(value)
+Attempts to convert the parameter into a transformer.  If cannot be converted, returns `undefined`.  If defined, the return value will have `init`, `step`, `result` functions that can be used for transformation.  Converts arrays, strings, objects, functions (`completing`) or anything that follows the transformer protocol into a transformer.
+
+Objects support pairs or objects. If `item` is an array of length 2, uses first (0 index) as the key and the second (1 index) as the value.  Otherwise iterates over own properties of items and merges values with same keys into the result object.
+
+If `value` is `undefined`, returns a transformer that maintains the last value and does not buffer results. Ignores the accumulator and returns the input on every `step`. The `init` value will be `undefined`.
+
+##### transformer.symbol
+Symbol (or a string that acts as symbols) for [`@@transformer`][10] you can use to configure your custom objects.
+
+##### identity(value)
+Always returns value
 
 #### Common
 Common transducers mixed into `transduce` directly or available by explictly requiring from `transduce/common`, e.g. `require('transduce').map` or `require('transduce/common/map')`.
@@ -340,7 +347,6 @@ Creates a callback that starts a transducer process and accepts parameter as a n
 ##### push.asyncCallback(t, continuation, xf?)
 Creates an async callback that starts a transducer process and accepts parameter cb(err, item) as a new item in the process. The returned callback and the optional continuation follow Node.js conventions with  fn(err, item). Each item advances the state  of the transducer, if the continuation is provided, it will be called on completion or error. An error will terminate the transducer and be propagated to the continuation.  If the transducer exhausts due to early termination, any further call will be a no-op. If the callback is called with no item, it will terminate the transducer process. If `xf` is not defined, maintains `lastValue()` and does not buffer results.
 
-
 #### String
 Transduce over sequences of strings. Particularly useful with [transduce-stream][2].
 
@@ -411,47 +417,8 @@ Repeats an elem up to n times.  If n is undefined, creates an infinite iterator 
 ##### chain(/*args*/)
 Combine multiple iterables into a chained iterable.  Once the first argument is exhausted, moves onto the next, until all argument iterables are exhausted.
 
-#### Transformer Protocol
-
-##### transformer.symbol
-Symbol (or a string that acts as symbols) for [`@@transformer`][10] you can use to configure your custom objects.
-
-
-##### transformer.isTransformer(value)
-Does the parameter have a transformer protocol or have `init`, `step`, `result` functions?
-
-##### transformer.transformer(value)
-Attempts to convert the parameter into a transformer.  If cannot be converted, returns `undefined`.  If defined, the return value will have `init`, `step`, `result` functions that can be used for transformation.  Converts arrays (`arrayPush`), strings (`stringAppend`), objects (`objectMerge`), functions (wrap as reducing function) or anything that `isTransformer` into a transformer.
-
-##### transformer.completing(rf, result?)
+##### completing(rf, result?)
 Lifts a reducing function, `rf`, into a transformer, `xf`.  Uses `identity` if `result` function is not provided. The `init` function calls `rf` with no arguments.
-
-##### transformer.lastValue(init?)
-A transformer that maintains the last value and does not buffer results. Ignores the accumulator and returns the input on every `step`. If an `init` function is provided, it will be used for `init` of the transformer. Otherwise, the `init` valueu will be `undefined`.
-
-##### transformer.array(defaultValue?)
-Transformer for arrays using `arrayPush` as `step` and `identity` as `result`. The `defaultValue` is cloned on every call to  `init`. Uses `[]` for `defaultValue` if not defined.
-
-##### transformer.object(defaultValue?)
-Transformer for plain objects using `objectMerge` as `step` and `identity` as `result`. The `defaultValue` is cloned on every call to  `init`. Uses `{}` for `defaultValue` if not defined.
-
-##### transformer.string(defaultValue?)
-Transformer for plain objects using `stringAppend` as `step` and `identity` as `result`. The `defaultValue` is cloned on every call to  `init`. Uses `''` for `defaultValue` if not defined.
-
-
-#### Util
-
-##### util.identity(value)
-Always returns value
-
-##### util.arrayPush(arr, item)
-Array.push as a reducing function.  Calls push and returns array.
-
-##### util.objectMerge(object, item)
-Merges the item into the object.  If `item` is an array of length 2, uses first (0 index) as the key and the second (1 index) as the value.  Otherwise iterates over own properties of items and merges values with same keys into the result object.
-
-##### util.stringAppend(string, item)
-Appends item onto result using `+`.
 
 ### Credits
 

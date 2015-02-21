@@ -7,8 +7,5 @@ module.exports = {
   isRegExp: require('./isRegExp'),
   isNumber: require('./isNumber'),
   isUndefined: require('./isUndefined'),
-  identity: require('./identity'),
-  arrayPush: require('./arrayPush'),
-  objectMerge: require('./objectMerge'),
-  stringAppend: require('./stringAppend')
+  identity: require('./identity')
 }
