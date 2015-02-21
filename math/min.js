@@ -1,6 +1,6 @@
 'use strict'
 
-var identity = require('../core/identity')
+var identity = require('../core/util').identity
 
 // Return the minimum element (or element-based computation).
 module.exports =

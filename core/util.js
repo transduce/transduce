@@ -10,6 +10,7 @@ module.exports = {
   isRegExp: predicateToString('RegExp'),
   isString: predicateToString('String'),
   isUndefined: isUndefined,
+  identity: identity,
   objectMerge: objectMerge
 }
 
@@ -26,6 +27,10 @@ function predicateToString(type){
   return function(value){
     return toString.call(value) === str
   }
+}
+
+function identity(result){
+  return result
 }
 
 function objectMerge(result, input){

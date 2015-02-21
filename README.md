@@ -135,8 +135,6 @@ transformer.symbol: Symbol('transformer') || '@@transformer'
 iterator: function(value)
 iterator.symbol: Symbol.iterator || '@@iterator'
 
-identity: function(value)
-
 // common
 map: function(f)
 filter: function(predicate)
@@ -250,8 +248,6 @@ Converts arrays to iterators over each indexed item. Converts to functions to in
 
 ##### iterator.symbol
 Symbol (or a string that acts as symbols) for `@@iterator` you can use to configure your custom objects.
-##### identity(value)
-Always returns value
 
 #### Common
 Common transducers mixed into `transduce` directly or available by explictly requiring from `transduce/common`, e.g. `require('transduce').map` or `require('transduce/common/map')`.

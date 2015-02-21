@@ -12,6 +12,5 @@ module.exports = {
   completing: require('./completing'),
   transformer: require('./transformer'),
   iterator: require('./iterator'),
-  identity: require('./identity'),
   util: require('./util')
 }
