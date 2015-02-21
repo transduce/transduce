@@ -1,9 +1,10 @@
 'use strict'
 var isIterable = require('./isIterable'),
     symbol = require('./symbol'),
-    isArray = require('../util/isArray'),
-    isFunction = require('../util/isFunction'),
-    isString = require('../util/isString'),
+    util = require('../core/util'),
+    isArray = util.isArray,
+    isFunction = util.isFunction,
+    isString = util.isString,
     has = {}.hasOwnProperty,
     keys = Object.keys || _keys
 

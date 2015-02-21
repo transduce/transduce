@@ -1,7 +1,7 @@
 'use strict'
 var symbol = require('./symbol'),
     iterable = require('./iterable'),
-    isFunction = require('../util/isFunction')
+    isFunction = require('../core/util').isFunction
 
 module.exports =
 function iterator(value){

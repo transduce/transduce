@@ -1,6 +1,6 @@
 'use strict'
 var reduced = require('../core/reduced'),
-    isRegExp = require('../util/isRegExp')
+    isRegExp = require('../core/util').isRegExp
 
 module.exports =
 function split(separator, limit){

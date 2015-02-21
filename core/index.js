@@ -10,5 +10,7 @@ module.exports = {
   reduced: require('./reduced'),
   unreduced: require('./unreduced'),
   completing: require('./completing'),
-  transformer: require('./transformer')
+  transformer: require('./transformer'),
+  identity: require('./identity'),
+  util: require('./util')
 }

@@ -198,18 +198,6 @@ iterator {
   repeat: function(elem, n?)
   chain: function(/*args*/)
 }
-
-transformer {
-}
-
-util {
-  isFunction: function(value)
-  isArray: function(value)
-  isString: function(value)
-  isRegExp: function(value)
-  isNumber: function(value)
-  isUndefined: function(value)
-}
 ```
 #### Core
 

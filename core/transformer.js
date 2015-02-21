@@ -3,13 +3,14 @@ var /* global Symbol */
     /* jshint newcap:false */
     symbolExists = typeof Symbol !== 'undefined',
     symbol = symbolExists ? Symbol('transformer') : '@@transformer',
-    isArray = require('../util/isArray'),
-    isFunction = require('../util/isFunction'),
-    isString = require('../util/isString'),
     completing = require('./completing'),
+    identity = require('./identity'),
+    util = require('./util'),
+    isArray = util.isArray,
+    isFunction = util.isFunction,
+    isString = util.isString,
+    objectMerge = util.objectMerge,
     slice = Array.prototype.slice,
-    has = {}.hasOwnProperty,
-    identity = require('../util/identity'),
     lastValue = {
       init: function(){},
       step: function(result, input){return input},
@@ -88,17 +89,3 @@ ObjectTransformer.prototype.init = function(){
 }
 ObjectTransformer.prototype.step = objectMerge
 ObjectTransformer.prototype.result = identity
-
-function objectMerge(result, input){
-  if(isArray(input) && input.length === 2){
-    result[input[0]] = input[1]
-  } else {
-    var prop
-    for(prop in input){
-      if(has.call(input, prop)){
-        result[prop] = input[prop]
-      }
-    }
-  }
-  return result
-}

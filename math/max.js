@@ -1,6 +1,6 @@
 'use strict'
 
-var identity = require('../util/identity')
+var identity = require('../core/identity')
 
 // Return the maximum element (or element-based computation).
 module.exports =

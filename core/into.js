@@ -2,7 +2,7 @@
 var transduce = require('./transduce'),
     reduce = require('./reduce'),
     transformer = require('./transformer'),
-    isFunction = require('../util/isFunction')
+    isFunction = require('./util').isFunction
 
 module.exports =
 function into(init, t, coll){

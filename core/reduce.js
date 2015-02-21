@@ -2,8 +2,9 @@
 var completing = require('./completing'),
     isReduced = require('./isReduced'),
     unreduced = require('./unreduced'),
-    isArray = require('../util/isArray'),
-    isFunction = require('../util/isFunction'),
+    util = require('./util'),
+    isArray = util.isArray,
+    isFunction = util.isFunction,
     iterator = require('../iterator/iterator')
 
 module.exports =

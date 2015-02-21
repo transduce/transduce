@@ -1,6 +1,6 @@
 'use strict'
 var isIterable = require('./isIterable'),
-    isFunction = require('../util/isFunction')
+    isFunction = require('../core/util').isFunction
 
 module.exports =
 function isIterator(value){

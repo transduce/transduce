@@ -1,5 +1,5 @@
 'use strict'
-var identity = require('../util/identity')
+var identity = require('./identity')
 
 module.exports =
 // Turns a step function into a transfomer with init, step, result

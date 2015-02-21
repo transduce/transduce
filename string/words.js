@@ -1,6 +1,6 @@
 'use strict'
 var compose = require('../core/compose'),
-    isNumber = require('../util/isNumber'),
+    isNumber = require('../core/util').isNumber,
     split = require('./split'),
     nonEmpty = require('./nonEmpty')
 

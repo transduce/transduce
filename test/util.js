@@ -1,6 +1,6 @@
 'use strict'
 var tr = require('../'),
-    tp = tr.util,
+    tp = require('../core/util'),
     test = require('tape')
 
 test('compose', function(t){
@@ -34,7 +34,7 @@ test('isReduced', function(t){
 
 test('is', function(t){
   t.ok(tp.isFunction(test))
-  t.ok(tp.isFunction(tp.identity))
+  t.ok(tp.isFunction(tr.identity))
   t.ok(tp.isString(''))
   t.ok(tp.isRegExp(/./))
   t.ok(tp.isUndefined())

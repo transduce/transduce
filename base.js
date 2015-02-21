@@ -1,14 +1,4 @@
 'use strict'
-module.exports = merge(merge({},
-  require('./core')),
-  require('./common'))
-
-function merge(result, input){
-  var prop
-  for(prop in input){
-    if(input.hasOwnProperty(prop)){
-      result[prop] = input[prop]
-    }
-  }
-  return result
-}
+var core = require('./core'),
+    merge = core.util.objectMerge
+module.exports = merge(merge({}, core), require('./common'))

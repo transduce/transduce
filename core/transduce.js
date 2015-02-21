@@ -1,7 +1,7 @@
 'use strict'
 var completing = require('./completing'),
     reduce = require('./reduce'),
-    isFunction = require('../util/isFunction')
+    isFunction = require('./util').isFunction
 
 module.exports =
 function transduce(t, xf, init, coll) {
