@@ -1,5 +1,5 @@
 'use strict'
-var transduce = require('./transduce'),
+var transduce = require('./_core').transduce,
     sequence = require('./sequence'),
     symbol = require('./iterator').symbol
 

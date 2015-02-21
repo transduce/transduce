@@ -3,7 +3,7 @@ var /* global Symbol */
     /* jshint newcap:false */
     symbolExists = typeof Symbol !== 'undefined',
     symbol = symbolExists ? Symbol.iterator : '@@iterator',
-    util = require('../core/util'),
+    util = require('./util'),
     isArray = util.isArray,
     isFunction = util.isFunction,
     isString = util.isString,

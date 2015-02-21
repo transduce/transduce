@@ -1,6 +1,7 @@
 'use strict'
-var transduce = require('./transduce'),
-    reduce = require('./reduce'),
+var core = require('./_core'),
+    transduce = core._transduce,
+    reduce = core._reduce,
     transformer = require('./transformer'),
     isFunction = require('./util').isFunction
 
