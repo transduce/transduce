@@ -135,7 +135,7 @@ transformer.symbol: Symbol('transformer') || '@@transformer'
 iterator: function(value)
 iterator.symbol: Symbol.iterator || '@@iterator'
 
-// common
+// transducers
 map: function(f)
 filter: function(predicate)
 remove: function(predicate)
@@ -195,7 +195,7 @@ iterators {
 
 #### Core
 
-Core functionality mixed into `transduce` directly or available by explictly requiring from `transduce/core`, e.g. `require('transduce').reduce` or `require('transduce/core/reduce')`.
+Core functionality mixed into `transduce` directly or available by explictly requiring from `transduce/core`, e.g. `require('transduce').reduce` or `require('transduce/core/reduce')` or `require('transduce/core').reduce`.
 
 ##### reduce(xf, init?, coll)
 Reduces over a transformation. If `xf` is not a `transformer`, it is converted to one using `completing`. Arrays are special cased to reduce using for loop and to allow transducers using `reduced`.  If `coll` has a `reduce` method, it is called with `xf.step` and `init`. Otherwise,`coll` is converted to an `iterator`.  If the function is called with arity-2, the `xf.init()` is used as the `init` value.
@@ -247,8 +247,8 @@ Converts arrays to iterators over each indexed item. Converts to functions to in
 ##### iterator.symbol
 Symbol (or a string that acts as symbols) for `@@iterator` you can use to configure your custom objects.
 
-#### Common
-Common transducers mixed into `transduce` directly or available by explictly requiring from `transduce/common`, e.g. `require('transduce').map` or `require('transduce/common/map')`.
+#### Transducers
+Common transducers mixed into `transduce` directly or available by explictly requiring from `transduce/transducers`, e.g. `require('transduce').map` or `require('transduce/transducers/map')` or require('transduce/transducers).map`.
 
 ##### map(f)
 Transducer that steps all items after applying a mapping function `f` to each item.

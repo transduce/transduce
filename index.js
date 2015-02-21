@@ -7,4 +7,4 @@ module.exports = merge(merge({
     math: require('./math'),
     push: require('./push'),
     iterators: require('./iterators')
-  }, core), require('./common'))
+  }, core), require('./transducers'))
