@@ -1,5 +1,5 @@
 'use strict'
-var symbol = require('../core/iterator').symbol
+var symbol = require('../core/protocols').iterator
 
 module.exports =
 function range(start, stop, step){

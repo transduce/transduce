@@ -1,8 +1,5 @@
 'use strict'
-var /* global Symbol */
-    /* jshint newcap:false */
-    symbolExists = typeof Symbol !== 'undefined',
-    symbol = symbolExists ? Symbol('transformer') : '@@transformer',
+var symbol = require('./protocols').transformer,
     completing = require('./completing'),
     util = require('./util'),
     identity = util.identity,
@@ -17,7 +14,7 @@ var /* global Symbol */
       result: identity
     }
 
-module.exports = transformer
+module.exports =
 function transformer(value){
   var xf
   if(value === void 0){
@@ -38,7 +35,6 @@ function transformer(value){
   }
   return xf
 }
-transformer.symbol = symbol
 
 function isTransformer(value){
   return (value[symbol] !== void 0) ||

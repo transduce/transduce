@@ -1,7 +1,7 @@
 'use strict'
 var iterator = require('../core/iterator'),
     iterable = iterator.iterable,
-    symbol = iterator.symbol
+    symbol = require('../core/protocols').iterator
 
 module.exports =
 function repeat(elem, n){

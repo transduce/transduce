@@ -131,10 +131,13 @@ unreduced: function(value)
 
 completing: function(rf, result?)
 transformer: function(value)
-transformer.symbol: Symbol('transformer') || '@@transformer'
 
 iterator: function(value)
-iterator.symbol: Symbol.iterator || '@@iterator'
+
+protocols: {
+  iterator: Symbol.iterator || '@@iterator'
+  transformer: Symbol('transformer') || '@@transformer'
+}
 
 // transducers
 map: function(f)
@@ -274,9 +277,6 @@ Objects support pairs or objects. If `item` is an array of length 2, uses first 
 
 If `value` is `undefined`, returns a transformer that maintains the last value and does not buffer results. Ignores the accumulator and returns the input on every `step`. The `init` value will be `undefined`.
 
-##### transformer.symbol
-Symbol (or a string that acts as symbols) for [`@@transformer`][10] you can use to configure your custom objects.
-
 ##### iterator(value)
 Returns the iterator for the parameter, invoking if has an iterator protocol or returning if has a next method. Returns `undefined` if cannot create an iterator.
 
@@ -284,8 +284,11 @@ The return value will either have a `next` function that can be invoked for iter
 
 Converts arrays to iterators over each indexed item. Converts to functions to infinite iterators that always call function on next.
 
-##### iterator.symbol
+##### protocols.iterator
 Symbol (or a string that acts as symbols) for `@@iterator` you can use to configure your custom objects.
+
+##### protocols.transformer
+Symbol (or a string that acts as symbols) for [`@@transformer`][10] you can use to configure your custom objects.
 
 #### Transducers
 Common transducers mixed into `transduce` directly or available by explictly requiring from `transduce/transducers`. The following are equivalent:

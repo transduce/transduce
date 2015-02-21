@@ -1,8 +1,5 @@
 'use strict'
-var /* global Symbol */
-    /* jshint newcap:false */
-    symbolExists = typeof Symbol !== 'undefined',
-    symbol = symbolExists ? Symbol.iterator : '@@iterator',
+var symbol = require('./protocols').iterator,
     util = require('./util'),
     isArray = util.isArray,
     isFunction = util.isFunction,
@@ -21,7 +18,6 @@ function iterator(value){
   }
   return it
 }
-iterator.symbol = symbol
 iterator.iterable = iterable
 
 function isIterable(value){

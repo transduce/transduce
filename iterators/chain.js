@@ -1,6 +1,6 @@
 'use strict'
 var iterator = require('../core/iterator'),
-    symbol = iterator.symbol,
+    symbol = require('../core/protocols').iterator,
     slice = [].slice,
     EMPTY = { next: function(){ return {done:true} } }
 

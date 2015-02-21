@@ -1,6 +1,6 @@
 'use strict'
 var iterator = require('../core/iterator'),
-    symbol = iterator.symbol
+    symbol = require('../core/protocols').iterator
 
 module.exports =
 function cycle(iter){

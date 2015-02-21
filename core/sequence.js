@@ -1,7 +1,7 @@
 'use strict'
 var isReduced = require('./isReduced'),
     iterator = require('./iterator'),
-    symbol = iterator.symbol
+    symbol = require('./protocols').iterator
 
 module.exports =
 function sequence(t, coll) {
