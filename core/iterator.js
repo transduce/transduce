@@ -1,6 +1,8 @@
 'use strict'
-var isIterable = require('./isIterable'),
-    symbol = require('./symbol'),
+var /* global Symbol */
+    /* jshint newcap:false */
+    symbolExists = typeof Symbol !== 'undefined',
+    symbol = symbolExists ? Symbol.iterator : '@@iterator',
     util = require('../core/util'),
     isArray = util.isArray,
     isFunction = util.isFunction,
@@ -8,7 +10,24 @@ var isIterable = require('./isIterable'),
     has = {}.hasOwnProperty,
     keys = Object.keys || _keys
 
-module.exports =
+module.exports = iterator
+function iterator(value){
+  var it = iterable(value)
+  if(it !== void 0){
+    it = it[symbol]()
+  } else if(isFunction(value.next)){
+    // handle non-well-formed iterators that only have a next method
+    it = value
+  }
+  return it
+}
+iterator.symbol = symbol
+iterator.iterable = iterable
+
+function isIterable(value){
+  return (value[symbol] !== void 0)
+}
+
 function iterable(value){
   var it
   if(isIterable(value)){

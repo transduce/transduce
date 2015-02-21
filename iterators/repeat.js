@@ -1,6 +1,7 @@
 'use strict'
-var iterable = require('./iterable'),
-    symbol = require('./symbol')
+var iterator = require('../core/iterator'),
+    iterable = iterator.iterable,
+    symbol = iterator.symbol
 
 module.exports =
 function repeat(elem, n){

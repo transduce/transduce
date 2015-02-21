@@ -1,7 +1,7 @@
 'use strict'
 var tr = require('../'),
     sequence = tr.sequence,
-    toArray = tr.iterator.toArray,
+    toArray = tr.iterators.toArray,
     compose = tr.compose,
     test = require('tape')
 

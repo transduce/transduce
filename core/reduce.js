@@ -2,10 +2,10 @@
 var completing = require('./completing'),
     isReduced = require('./isReduced'),
     unreduced = require('./unreduced'),
+    iterator = require('./iterator'),
     util = require('./util'),
     isArray = util.isArray,
-    isFunction = util.isFunction,
-    iterator = require('../iterator/iterator')
+    isFunction = util.isFunction
 
 module.exports =
 function reduce(xf, init, coll){

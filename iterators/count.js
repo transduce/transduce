@@ -1,5 +1,5 @@
 "use strict"
-var symbol = require('./symbol')
+var symbol = require('../core/iterator').symbol
 
 module.exports =
 function count(start, step){

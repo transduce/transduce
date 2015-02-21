@@ -1,5 +1,5 @@
 'use strict'
-var iterator = require('./iterator')
+var iterator = require('../core/iterator')
 
 module.exports =
 function toArray(iter){

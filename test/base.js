@@ -112,7 +112,7 @@ test('into', function(t) {
   t.deepEqual(toArray(tr.map(add(1)), [1,2,3]), [2,3,4])
   t.deepEqual(toArray(tr.map(add(1)))([1,2,3]), [2,3,4])
 
-  var range = tr.iterator.range
+  var range = tr.iterators.range
   t.deepEqual(toArray(range(1,4)), [1,2,3])
   t.deepEqual(toArray(tr.map(add(2)), range(3)), [2,3,4])
   t.deepEqual(toArray(tr.map(add(2)))(range(3)), [2,3,4])
@@ -137,7 +137,7 @@ test('into', function(t) {
 test('eduction', function(t){
   var xf,
       eduction = tr.eduction,
-      iterToArray = tr.iterator.toArray,
+      iterToArray = tr.iterators.toArray,
       into = tr.into
 
   var divisibleBy2 = eduction(

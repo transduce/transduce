@@ -132,6 +132,9 @@ completing: function(rf, result?)
 transformer: function(value)
 transformer.symbol: Symbol('transformer') || '@@transformer'
 
+iterator: function(value)
+iterator.symbol: Symbol.iterator || '@@iterator'
+
 identity: function(value)
 
 // common
@@ -185,12 +188,7 @@ unique {
   unique: function(f?)
 }
 
-iterator {
-  symbol: Symbol.iterator || '@@iterator'
-  isIterable: function(value)
-  isIterator: function(value)
-  iterable: function(value)
-  iterator: function(value)
+iterators {
   toArray: function(value)
   range: function(start?, stop, step?)
   count: function(start?, step?)
@@ -230,6 +228,9 @@ Ensures the value is reduced (useful for early termination). If `force` is not p
 ##### unreduced(value)
 Ensure the value is not reduced (unwraps reduced values if necessary)
 
+##### completing(rf, result?)
+Lifts a reducing function, `rf`, into a transformer, `xf`.  Uses `identity` if `result` function is not provided. The `init` function calls `rf` with no arguments.
+
 ##### transformer(value)
 Attempts to convert the parameter into a transformer.  If cannot be converted, returns `undefined`.  If defined, the return value will have `init`, `step`, `result` functions that can be used for transformation.  Converts arrays, strings, objects, functions (`completing`) or anything that follows the transformer protocol into a transformer.
 
@@ -240,6 +241,15 @@ If `value` is `undefined`, returns a transformer that maintains the last value a
 ##### transformer.symbol
 Symbol (or a string that acts as symbols) for [`@@transformer`][10] you can use to configure your custom objects.
 
+##### iterator.iterator(value)
+Returns the iterator for the parameter, invoking if has an iterator protocol or returning if has a next method. Returns `undefined` if cannot create an iterator.
+
+The return value will either have a `next` function that can be invoked for iteration or will be undefined.
+
+Converts arrays to iterators over each indexed item. Converts to functions to infinite iterators that always call function on next.
+
+##### iterator.symbol
+Symbol (or a string that acts as symbols) for `@@iterator` you can use to configure your custom objects.
 ##### identity(value)
 Always returns value
 
@@ -361,52 +371,25 @@ Removes consecutive duplicates from the transformation. Subsequent stepped value
 ##### unique.unique(f?)
 Produce a duplicate-free version of the transformation. If `f` is passed, it will be called with each item and the return value for uniqueness check.  Uniqueness is checked across all values already seen, and as such, the items (or computed checks) are buffered.
 
-#### Iterator Protocol
+#### Iterators
 
-##### iterator.symbol
-
-Symbol (or a string that acts as symbols) for `@@iterator` you can use to configure your custom objects.
-
-##### iterator.isIterable(value)
-Does the parameter conform to the iterable protocol?
-
-##### iterator.iterable(value)
-Returns the iterable for the parameter.  Returns value if conforms to iterable protocol. Returns `undefined` if cannot return en iterable.
-
-The return value will either conform to iterator protocol that can be invoked for iteration or will be undefined.
-
-Supports anything that returns true for `isIterable` and converts arrays to iterables over each indexed item. Converts to functions to infinite iterables that always call function on next
-
-##### iterator.isIterator(value)
-Does the parameter have an iterator protocol or have a next method?
-
-##### iterator.iterator(value)
-Returns the iterator for the parameter, invoking if has an iterator protocol or returning if has a next method. Returns `undefined` if cannot create an iterator.
-
-The return value will either have a `next` function that can be invoked for iteration or will be undefined.
-
-Supports anything that returns true for `isIterator` and converts arrays to iterators over each indexed item. Converts to functions to infinite iterators that always call function on next.
-
-##### iterator.toArray(value)
+##### iterators.toArray(value)
 Converts the value to an iterator and iterates into an array.
 
-##### range(start?, stop, step?)
+##### iterators.range(start?, stop, step?)
 Create a range of integers.  From start (default 0, inclusive) to stop (exclusive) incremented by step (default 1).
 
-##### count(start?, step?)
+##### iterators.count(start?, step?)
 Creates an infinite counting iterator from start (default 0) and incremented by step (default 1)
 
-##### cycle(iter)
+##### iterators.cycle(iter)
 Creates an infinite iterator that accepts an iterable and repeatedly steps through every item of iterator. Once iterator completes, a new iterator is created from the iterable and steps through again.
 
-##### repeat(elem, n?)
+##### iterators.repeat(elem, n?)
 Repeats an elem up to n times.  If n is undefined, creates an infinite iterator that steps the element.
 
-##### chain(/*args*/)
+##### iterators.chain(/*args*/)
 Combine multiple iterables into a chained iterable.  Once the first argument is exhausted, moves onto the next, until all argument iterables are exhausted.
-
-##### completing(rf, result?)
-Lifts a reducing function, `rf`, into a transformer, `xf`.  Uses `identity` if `result` function is not provided. The `init` function calls `rf` with no arguments.
 
 ### Credits
 
