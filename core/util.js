@@ -11,6 +11,8 @@ module.exports = {
   isString: predicateToString('String'),
   isUndefined: isUndefined,
   identity: identity,
+  arrayPush: arrayPush,
+  stringAppend: stringAppend,
   objectMerge: objectMerge
 }
 
@@ -31,6 +33,15 @@ function predicateToString(type){
 
 function identity(result){
   return result
+}
+
+function arrayPush(result, input){
+  result.push(input)
+  return result
+}
+
+function stringAppend(result, input){
+  return result + input
 }
 
 function objectMerge(result, input){

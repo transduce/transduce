@@ -7,6 +7,8 @@ var symbol = require('./protocols').transformer,
     isFunction = util.isFunction,
     isString = util.isString,
     objectMerge = util.objectMerge,
+    arrayPush = util.arrayPush,
+    stringAppend = util.stringAppend,
     slice = Array.prototype.slice,
     lastValue = {
       init: function(){},
@@ -51,10 +53,7 @@ function ArrayTransformer(defaultValue){
 ArrayTransformer.prototype.init = function(){
   return slice.call(this.defaultValue)
 }
-ArrayTransformer.prototype.step = function (result, input){
-  result.push(input)
-  return result
-}
+ArrayTransformer.prototype.step = arrayPush
 ArrayTransformer.prototype.result = identity
 
 
@@ -68,9 +67,7 @@ function StringTransformer(str){
 StringTransformer.prototype.init = function(){
   return this.strDefault
 }
-StringTransformer.prototype.step = function(result, input){
-  return result + input
-}
+StringTransformer.prototype.step = stringAppend
 StringTransformer.prototype.result = identity
 
 // Merges value into object, using optional constructor arg as default, or {} if undefined
