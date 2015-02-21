@@ -150,6 +150,7 @@ partitionAll: function(n)
 partitionBy: function(f)
 dedupe: function()
 unique: function(f?)
+transformStep: function(xfStep)
 
 array {
   forEach: function(callback)
@@ -196,7 +197,11 @@ iterators {
 
 #### Core
 
-Core functionality mixed into `transduce` directly or available by explictly requiring from `transduce/core`, e.g. `require('transduce').into` or `require('transduce/core/into')` or `require('transduce/core').into`.
+Core functionality mixed into `transduce` directly or available by explictly requiring from `transduce/core`.  The following are equivalent:
+
+- `require('transduce').into`
+- `require('transduce/core/into')`
+- `require('transduce/core').into`
 
 ##### into(init, t?, coll?)
 Returns a new collection appending all items into `init` by passing all items from source collection `coll` through the optional transducer `t`.  Chooses transformer, `xf` from type of `init`.  Can be array, object, string or have `@@transformer`. `coll` is converted to an `iterator`.
@@ -283,7 +288,10 @@ Converts arrays to iterators over each indexed item. Converts to functions to in
 Symbol (or a string that acts as symbols) for `@@iterator` you can use to configure your custom objects.
 
 #### Transducers
-Common transducers mixed into `transduce` directly or available by explictly requiring from `transduce/transducers`, e.g. `require('transduce').map` or `require('transduce/transducers/map')` or require('transduce/transducers).map`.
+Common transducers mixed into `transduce` directly or available by explictly requiring from `transduce/transducers`. The following are equivalent:
+- `require('transduce').map`
+- `require('transduce/transducers/map')`
+- `require('transduce/transducers).map`
 
 ##### map(f)
 Transducer that steps all items after applying a mapping function `f` to each item.
@@ -323,6 +331,36 @@ Removes consecutive duplicates from the transformation. Subsequent stepped value
 
 ##### unique(f?)
 Produce a duplicate-free version of the transformation. If `f` is passed, it will be called with each item and the return value for uniqueness check.  Uniqueness is checked across all values already seen, and as such, the items (or computed checks) are buffered.
+
+##### transformStep(xfStep)
+Creates a transducer from a function called on every `step`.  The `step` function of the transducer delegates to `xfStep(xf, result, input)` bound to an empty context.  This is useful for creating custom transducers defined by a step function.  `init` returns `xf.init()` and `result` returns `xf.result(result)`.
+
+```javascript
+// Map from a step function
+function map(f) {
+  return tr.transformStep(function(xf, result, input){
+    return xf.step(result, f(input))
+  })
+}
+
+// using reduced
+function takeWhile(p){
+  return tr.transformStep(function(xf, result, item){
+    return p(item) ? xf.step(result, item) : tr.reduced(result)
+  })
+}
+
+// using context for stateful transducers
+function drop(n){
+  return tr.transformStep(function(xf, result, item){
+    if(this.n === void 0) this.n = n
+    if(--this.n < 0){
+      result = xf.step(result, item)
+    }
+    return result
+  })
+}
+```
 
 #### Array
 Use Array methods as Transducers.  Treats each stepped item as an item in the array, and defines transducers that step items with the same contract as array methods.
@@ -429,7 +467,7 @@ Creates an infinite iterator that accepts an iterable and repeatedly steps throu
 ##### iterators.repeat(elem, n?)
 Repeats an elem up to n times.  If n is undefined, creates an infinite iterator that steps the element.
 
-##### iterators.chain(/*args*/)
+##### iterators.chain(/\*args\*/)
 Combine multiple iterables into a chained iterable.  Once the first argument is exhausted, moves onto the next, until all argument iterables are exhausted.
 
 ### Credits
