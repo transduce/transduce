@@ -147,6 +147,8 @@ cat: transducer
 mapcat: function(f)
 partitionAll: function(n)
 partitionBy: function(f)
+dedupe: function()
+unique: function(f?)
 
 array {
   forEach: function(callback)
@@ -181,11 +183,6 @@ string {
   words: function(delimiter?, limit?)
 }
 
-unique {
-  dedupe: function()
-  unique: function(f?)
-}
-
 iterators {
   toArray: function(value)
   range: function(start?, stop, step?)
@@ -195,6 +192,7 @@ iterators {
   chain: function(/*args*/)
 }
 ```
+
 #### Core
 
 Core functionality mixed into `transduce` directly or available by explictly requiring from `transduce/core`, e.g. `require('transduce').reduce` or `require('transduce/core/reduce')`.
@@ -285,6 +283,12 @@ Partitions the source into arrays of size `n`. When transformer completes, the t
 ##### partitionBy(f)
 Partitions the source into sub arrays when the value of the function `f` changes equality.  When transformer completes, the transformer will be stepped with any remaining items.
 
+##### dedupe()
+Removes consecutive duplicates from the transformation. Subsequent stepped values are checked for equality using `===`.
+
+##### unique(f?)
+Produce a duplicate-free version of the transformation. If `f` is passed, it will be called with each item and the return value for uniqueness check.  Uniqueness is checked across all values already seen, and as such, the items (or computed checks) are buffered.
+
 #### Array
 Use Array methods as Transducers.  Treats each stepped item as an item in the array, and defines transducers that step items with the same contract as array methods.
 
@@ -357,15 +361,6 @@ Only steps items that are non empty strings (`input.trim().length > 0`).
 
 ##### string.lines(limit?) / string.chars(limit?) / string.words(delimiter?, limit?)
 Split chunks into and steps each line/char/word with optional limit.
-
-#### Unique
-Transducers to remove duplicate values from the transformation.
-
-##### unique.dedupe()
-Removes consecutive duplicates from the transformation. Subsequent stepped values are checked for equality using `===`.
-
-##### unique.unique(f?)
-Produce a duplicate-free version of the transformation. If `f` is passed, it will be called with each item and the return value for uniqueness check.  Uniqueness is checked across all values already seen, and as such, the items (or computed checks) are buffered.
 
 #### Iterators
 

@@ -10,5 +10,7 @@ module.exports = {
   cat: require('./cat'),
   mapcat: require('./mapcat'),
   partitionAll: require('./partitionAll'),
-  partitionBy: require('./partitionBy')
+  partitionBy: require('./partitionBy'),
+  unique: require('./unique'),
+  dedupe: require('./dedupe')
 }

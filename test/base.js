@@ -30,8 +30,8 @@ var stringReduce = {
 }
 
 test('transduce', function(t) {
-  t.equal(tr.transduce(tr.unique.dedupe(), stringReduce, '', ['a', 'b', 'b', 'c']), 'abc')
-  t.equal(tr.transduce(tr.unique.dedupe(), stringReduce, ['a', 'b', 'b', 'c']), 'abc')
+  t.equal(tr.transduce(tr.dedupe(), stringReduce, '', ['a', 'b', 'b', 'c']), 'abc')
+  t.equal(tr.transduce(tr.dedupe(), stringReduce, ['a', 'b', 'b', 'c']), 'abc')
   t.end()
 })
 
@@ -42,7 +42,7 @@ test('reduce', function(t) {
   var prod = tr.reduce(function(prod, num){ return prod * num }, 1, [1, 2, 3, 4])
   t.equal(prod, 24, 'can reduce via multiplication')
 
-  var reducer  = tr.unique.dedupe()(stringReduce)
+  var reducer  = tr.dedupe()(stringReduce)
   t.equal(tr.reduce(reducer, '', ['a', 'b', 'b', 'c']), 'abc')
   t.equal(tr.reduce(reducer, ['a', 'b', 'b', 'c']), 'abc')
   t.end()
@@ -83,19 +83,19 @@ test('into', function(t) {
   tx = tr.into([], tr.compose(tr.map(add(1)), tr.filter(isEven)))
   t.deepEqual([[1,2,3], [2,3,4], [5,6,7]].map(tx), [[2,4], [4], [6,8]])
 
-  tx = tr.into(stringReduce, tr.unique.dedupe())
+  tx = tr.into(stringReduce, tr.dedupe())
   t.equal('abc', tx(['a', 'b', 'b', 'c']))
 
-  tx = tr.into('', tr.unique.dedupe())
+  tx = tr.into('', tr.dedupe())
   t.equal(tx(['a', 'b', 'b', 'c']), 'abc')
 
-  tx = tr.into('hi ', tr.unique.dedupe())
+  tx = tr.into('hi ', tr.dedupe())
   t.equal(tx(['a', 'b', 'b', 'c']), 'hi abc')
 
-  tx = tr.into([], tr.unique.dedupe())
+  tx = tr.into([], tr.dedupe())
   t.deepEqual(tx(['a', 'b', 'b', 'c']), ['a', 'b', 'c'])
 
-  tx = tr.into([1, 2], tr.unique.dedupe())
+  tx = tr.into([1, 2], tr.dedupe())
   t.deepEqual(tx(['a', 'b', 'b', 'c']), [1, 2, 'a', 'b', 'c'])
   t.deepEqual(tx(['a', 'b', 'b', 'c', 'd']), [1, 2, 'a', 'b', 'c', 'd'])
 

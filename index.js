@@ -2,10 +2,9 @@
 var core = require('./core'),
     merge = core.util.objectMerge
 module.exports = merge(merge({
-    iterators: require('./iterators'),
     array: require('./array'),
+    string: require('./string'),
     math: require('./math'),
     push: require('./push'),
-    string: require('./string'),
-    unique: require('./unique')
+    iterators: require('./iterators')
   }, core), require('./common'))
