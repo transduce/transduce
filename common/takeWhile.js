@@ -1,5 +1,5 @@
 'use strict'
-var reduced = require('./reduced')
+var reduced = require('../core/reduced')
 
 module.exports =
 function takeWhile(p){

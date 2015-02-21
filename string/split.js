@@ -1,5 +1,5 @@
 'use strict'
-var reduced = require('../base/reduced'),
+var reduced = require('../core/reduced'),
     isRegExp = require('../util/isRegExp')
 
 module.exports =

@@ -1,5 +1,5 @@
 'use strict'
-var reduced = require('../base/reduced')
+var reduced = require('../core/reduced')
 
 // Determine if at least one element in the object matches a truth test.
 // Aliased as `any`.

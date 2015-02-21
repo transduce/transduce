@@ -1,6 +1,6 @@
 'use strict'
-var isReduced = require('../base/isReduced'),
-    unreduced = require('../base/unreduced')
+var isReduced = require('../core/isReduced'),
+    unreduced = require('../core/unreduced')
 
 // Returns everything but the last entry. Passing **n** will return all the values
 // excluding the last N.

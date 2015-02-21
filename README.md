@@ -116,13 +116,19 @@ A process that begins with an initial value accumulator, steps through items of 
 Supports the following functions:
 
 ```javascript
-// base functions
+// core
 reduce: function(xf, init?, coll)
 transduce: function(t, xf, init?, coll)
 eduction: function(t, coll)
 into: function(init, t?, coll?)
+sequence: function(t, value)
 
-// base transducers
+compose: function(/*fns*/)
+isReduced: function(value)
+reduced: function(value, force?)
+unreduced: function(value)
+
+// common
 map: function(f)
 filter: function(predicate)
 remove: function(predicate)
@@ -134,12 +140,6 @@ cat: transducer
 mapcat: function(f)
 partitionAll: function(n)
 partitionBy: function(f)
-
-// base utils
-compose: function(/*fns*/)
-isReduced: function(value)
-reduced: function(value, force?)
-unreduced: function(value)
 
 array {
   forEach: function(callback)
@@ -186,7 +186,6 @@ iterator {
   iterable: function(value)
   iterator: function(value)
   toArray: function(value)
-  sequence: function(t, value)
   range: function(start?, stop, step?)
   count: function(start?, step?)
   cycle: function(iter)
@@ -218,6 +217,9 @@ util {
   stringAppend: function(str, item)
 }
 ```
+#### Core
+
+Core functionality mixed into `transduce` directly or available by explictly requiring from `transduce/core`, e.g. `require('transduce').reduce` or `require('transduce/core/reduce')`.
 
 ##### reduce(xf, init?, coll)
 Reduces over a transformation. If `xf` is not a `transformer`, it is converted to one using `completing`. Arrays are special cased to reduce using for loop and to allow transducers using `reduced`.  If `coll` has a `reduce` method, it is called with `xf.step` and `init`. Otherwise,`coll` is converted to an `iterator`.  If the function is called with arity-2, the `xf.init()` is used as the `init` value.
@@ -231,8 +233,23 @@ Creates an iterable and reducible application of the collection `coll` transform
 ##### into(init, t?, coll?)
 Returns a new collection appending all items into `init` by passing all items from source collection `coll` through the optional transducer `t`.  Chooses transformer, `xf` from type of `init`.  Can be array, object, string or have `@@transformer`. `coll` is converted to an `iterator`.  If `coll` is not provided, returns a curried function using `transformer` from `init` and the same transformation can be used for multiple collections.
 
+##### sequence(t, value)
+Create an ES6 Iterable by transforming an input source using transducer `t`.
 
-#### Transducers
+##### compose(/\*fns\*/)
+Simple function composition of arguments. Useful for composing (combining) transducers.
+
+##### isReduced(value)
+Is the value reduced? (signal for early termination)
+
+##### reduced(value, force?)
+Ensures the value is reduced (useful for early termination). If `force` is not provided or `false`, only wraps with Reduced value if not already `isReduced`.  If `force` is `true`, always wraps value with Reduced value.
+
+##### unreduced(value)
+Ensure the value is not reduced (unwraps reduced values if necessary)
+
+#### Common
+Common transducers mixed into `transduce` directly or available by explictly requiring from `transduce/common`, e.g. `require('transduce').map` or `require('transduce/common/map')`.
 
 ##### map(f)
 Transducer that steps all items after applying a mapping function `f` to each item.
@@ -266,20 +283,6 @@ Partitions the source into arrays of size `n`. When transformer completes, the t
 
 ##### partitionBy(f)
 Partitions the source into sub arrays when the value of the function `f` changes equality.  When transformer completes, the transformer will be stepped with any remaining items.
-
-#### Base Utils
-
-##### compose(/\*fns\*/)
-Simple function composition of arguments. Useful for composing (combining) transducers.
-
-##### isReduced(value)
-Is the value reduced? (signal for early termination)
-
-##### reduced(value, force?)
-Ensures the value is reduced (useful for early termination). If `force` is not provided or `false`, only wraps with Reduced value if not already `isReduced`.  If `force` is `true`, always wraps value with Reduced value.
-
-##### unreduced(value)
-Ensure the value is not reduced (unwraps reduced values if necessary)
 
 #### Array
 Use Array methods as Transducers.  Treats each stepped item as an item in the array, and defines transducers that step items with the same contract as array methods.
@@ -392,9 +395,6 @@ Supports anything that returns true for `isIterator` and converts arrays to iter
 
 ##### iterator.toArray(value)
 Converts the value to an iterator and iterates into an array.
-
-##### iterator.sequence(t, value)
-Create an ES6 Iterable by transforming an input source using transducer `t`.
 
 ##### range(start?, stop, step?)
 Create a range of integers.  From start (default 0, inclusive) to stop (exclusive) incremented by step (default 1).

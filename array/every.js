@@ -1,5 +1,5 @@
 'use strict'
-var reduced = require('../base/reduced')
+var reduced = require('../core/reduced')
 
 // Determine whether all of the elements match a truth test.
 // Early termination if item does not match predicate.

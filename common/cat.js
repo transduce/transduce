@@ -1,8 +1,8 @@
 'use strict'
 
-var reduced = require('./reduced'),
-    isReduced = require('./isReduced'),
-    reduce = require('./reduce')
+var reduced = require('../core/reduced'),
+    isReduced = require('../core/isReduced'),
+    reduce = require('../core/reduce')
 
 module.exports =
 function cat(xf){

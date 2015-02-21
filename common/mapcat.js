@@ -1,5 +1,5 @@
 'use strict'
-var compose = require('./compose'),
+var compose = require('../core/compose'),
     map = require('./map'),
     cat = require('./cat')
 module.exports =

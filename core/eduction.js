@@ -1,6 +1,6 @@
 'use strict'
 var transduce = require('./transduce'),
-    sequence = require('../iterator/sequence'),
+    sequence = require('./sequence'),
     symbol = require('../iterator/symbol')
 
 module.exports =
