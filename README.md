@@ -131,8 +131,7 @@ unreduced: function(value)
 
 completing: function(rf, result?)
 transformer: function(value)
-
-iterator: function(value)
+iterable: function(value)
 
 protocols: {
   iterator: Symbol.iterator || '@@iterator'
@@ -277,12 +276,12 @@ Objects support pairs or objects. If `item` is an array of length 2, uses first 
 
 If `value` is `undefined`, returns a transformer that maintains the last value and does not buffer results. Ignores the accumulator and returns the input on every `step`. The `init` value will be `undefined`.
 
-##### iterator(value)
-Returns the iterator for the parameter, invoking if has an iterator protocol or returning if has a next method. Returns `undefined` if cannot create an iterator.
+##### iterable(value)
+Returns the iterable for the parameter, returning if has an iterator protocol or wrapping in proper iterable if has a next method. Returns `undefined` if cannot create an iterator.
 
-The return value will either have a `next` function that can be invoked for iteration or will be undefined.
+Converts arrays to iterables over each indexed item. Converts to functions to infinite iterables that always call function on next. Converts objects to iterables of key, value pairs.
 
-Converts arrays to iterators over each indexed item. Converts to functions to infinite iterators that always call function on next.
+The iterable is an object that has a function identified by `protocols.iterator` that should be called with no args and returns an iterator object that has a `next` method to cycle through the iterator.
 
 ##### protocols.iterator
 Symbol (or a string that acts as symbols) for `@@iterator` you can use to configure your custom objects.

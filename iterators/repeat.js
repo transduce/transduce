@@ -1,6 +1,5 @@
 'use strict'
-var iterator = require('../core/iterator'),
-    iterable = iterator.iterable,
+var iterable = require('../core/iterable'),
     symbol = require('../core/protocols').iterator
 
 module.exports =

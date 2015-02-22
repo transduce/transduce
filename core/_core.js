@@ -2,7 +2,8 @@
 var isReduced = require('./isReduced'),
     unreduced = require('./unreduced'),
     completing = require('./completing'),
-    iterator = require('./iterator'),
+    iterable = require('./iterable'),
+    protocols = require('./protocols'),
     util = require('./util'),
     isArray = util.isArray,
     isFunction = util.isFunction
@@ -77,7 +78,7 @@ function methodReduce(xf, init, coll){
 
 function iteratorReduce(xf, init, iter){
   var value = init, next
-  iter = iterator(iter)
+  iter = iterable(iter)[protocols.iterator]()
   while(true){
     next = iter.next()
     if(next.done){

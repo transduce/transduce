@@ -1,9 +1,10 @@
 'use strict'
-var iterator = require('../core/iterator')
+var iterable = require('../core/iterable'),
+    symbol = require('../core/protocols').iterator
 
 module.exports =
 function toArray(iter){
-  iter = iterator(iter)
+  iter = iterable(iter)[symbol]()
   var next = iter.next(),
       arr = []
   while(!next.done){

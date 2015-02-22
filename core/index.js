@@ -12,7 +12,7 @@ module.exports = {
   unreduced: require('./unreduced'),
   completing: require('./completing'),
   transformer: require('./transformer'),
-  iterator: require('./iterator'),
+  iterable: require('./iterable'),
   protocols: require('./protocols'),
   util: require('./util')
 }

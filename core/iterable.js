@@ -7,35 +7,27 @@ var symbol = require('./protocols').iterator,
     has = {}.hasOwnProperty,
     keys = Object.keys || _keys
 
-module.exports = iterator
-function iterator(value){
-  var it = iterable(value)
-  if(it !== void 0){
-    it = it[symbol]()
-  } else if(isFunction(value.next)){
-    // handle non-well-formed iterators that only have a next method
-    it = value
-  }
-  return it
-}
-iterator.iterable = iterable
-
-function isIterable(value){
-  return (value[symbol] !== void 0)
-}
-
+module.exports =
 function iterable(value){
   var it
-  if(isIterable(value)){
+  if(value[symbol] !== void 0){
     it = value
   } else if(isArray(value) || isString(value)){
     it = new ArrayIterable(value)
   } else if(isFunction(value)){
     it = new FunctionIterable(value)
+  } else if(isFunction(value.next)){
+    it = new FunctionIterable(callNext(value))
   } else {
     it = new ObjectIterable(value)
   }
   return it
+}
+
+function callNext(value){
+  return function(){
+    return value.next()
+  }
 }
 
 // Wrap an Array into an iterable

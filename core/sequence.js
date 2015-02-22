@@ -1,6 +1,6 @@
 'use strict'
 var isReduced = require('./isReduced'),
-    iterator = require('./iterator'),
+    iterable = require('./iterable'),
     symbol = require('./protocols').iterator
 
 module.exports =
@@ -13,7 +13,7 @@ function LazyIterable(t, coll){
   this.coll = coll
 }
 LazyIterable.prototype[symbol] = function(){
-  var iter = iterator(this.coll)
+  var iter = iterable(this.coll)[symbol]()
   return new LazyIterator(new Stepper(this.t, iter))
 }
 

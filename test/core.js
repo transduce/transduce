@@ -309,11 +309,11 @@ test('transform function', function(t){
 })
 
 test('iterate array', function(t){
-  var arr, iterator, idx
+  var arr, iterator, idx, symbol = tr.protocols.iterator
 
   idx = 0
   arr = [1,2,3]
-  iterator = tr.iterator(arr)
+  iterator = tr.iterable(arr)[symbol]()
   t.deepEquals({value: arr[idx++], done: false}, iterator.next())
   t.deepEquals({value: arr[idx++], done: false}, iterator.next())
   t.deepEquals({value: arr[idx++], done: false}, iterator.next())
@@ -322,14 +322,14 @@ test('iterate array', function(t){
 
   idx = 0
   arr = [2]
-  iterator = tr.iterator(arr)
+  iterator = tr.iterable(arr)[symbol]()
   t.deepEquals({value: arr[idx++], done: false}, iterator.next())
   t.ok(iterator.next().done)
   t.ok(iterator.next().done)
 
   idx = 0
   arr = []
-  iterator = tr.iterator(arr)
+  iterator = tr.iterable(arr)[symbol]()
   t.ok(iterator.next().done)
   t.ok(iterator.next().done)
 
@@ -337,11 +337,11 @@ test('iterate array', function(t){
 })
 
 test('iterate string', function(t){
-  var arr, iterator, idx
+  var arr, iterator, idx, symbol = tr.protocols.iterator
 
   idx = 0
   arr = ['1','2','3']
-  iterator = tr.iterator('123')
+  iterator = tr.iterable('123')[symbol]()
   t.deepEquals({value: arr[idx++], done: false}, iterator.next())
   t.deepEquals({value: arr[idx++], done: false}, iterator.next())
   t.deepEquals({value: arr[idx++], done: false}, iterator.next())
@@ -350,13 +350,13 @@ test('iterate string', function(t){
 
   idx = 0
   arr = ['2']
-  iterator = tr.iterator('2')
+  iterator = tr.iterable('2')[symbol]()
   t.deepEquals({value: arr[idx++], done: false}, iterator.next())
   t.ok(iterator.next().done)
   t.ok(iterator.next().done)
 
   idx = 0
-  iterator = tr.iterator('')
+  iterator = tr.iterable('')[symbol]()
   t.ok(iterator.next().done)
   t.ok(iterator.next().done)
 
@@ -377,7 +377,7 @@ test('iterate object', function(t){
 })
 
 test('iterate fn', function(t){
-  var fn, iterator, start
+  var fn, iterator, start, symbol = tr.protocols.iterator
 
   function count(init){
     var cnt = init
@@ -387,14 +387,14 @@ test('iterate fn', function(t){
   }
 
   start = 0
-  iterator = tr.iterator(count(start))
+  iterator = tr.iterable(count(start))[symbol]()
   t.deepEquals({value: start++, done: false}, iterator.next())
   t.deepEquals({value: start++, done: false}, iterator.next())
   t.deepEquals({value: start++, done: false}, iterator.next())
   t.deepEquals({value: start++, done: false}, iterator.next())
 
   start = 10
-  iterator = tr.iterator(count(start))
+  iterator = tr.iterable(count(start))[symbol]()
   t.deepEquals({value: start++, done: false}, iterator.next())
   t.deepEquals({value: start++, done: false}, iterator.next())
   t.deepEquals({value: start++, done: false}, iterator.next())

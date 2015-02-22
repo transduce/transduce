@@ -1,5 +1,5 @@
 'use strict'
-var iterator = require('../core/iterator'),
+var iterable = require('../core/iterable'),
     symbol = require('../core/protocols').iterator,
     slice = [].slice,
     EMPTY = { next: function(){ return {done:true} } }
@@ -35,6 +35,6 @@ Chain.prototype[symbol] = function(){
 
   function shift(){
     var itb = iters.shift()
-    return itb && iterator(itb)
+    return itb && iterable(itb)[symbol]()
   }
 }

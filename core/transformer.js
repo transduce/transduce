@@ -21,11 +21,10 @@ function transformer(value){
   var xf
   if(value === void 0){
     xf = lastValue
-  } else if(isTransformer(value)){
+  } else if(value[symbol] !== void 0){
     xf = value[symbol]
-    if(xf === void 0){
-      xf = value
-    }
+  } else if(isFunction(value.step) && isFunction(value.result)){
+    xf = value
   } else if(isFunction(value)){
     xf = completing(value)
   } else if(isArray(value)){
@@ -36,11 +35,6 @@ function transformer(value){
     xf = new ObjectTransformer(value)
   }
   return xf
-}
-
-function isTransformer(value){
-  return (value[symbol] !== void 0) ||
-    (isFunction(value.step) && isFunction(value.result))
 }
 
 // Pushes value on array, using optional constructor arg as default, or [] if not provided
