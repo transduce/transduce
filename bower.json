@@ -1,7 +1,7 @@
 {
   "name": "transduce",
   "main": "build/transduce.min.js",
-  "version": "0.5.2",
+  "version": "0.6.0",
   "homepage": "https://github.com/transduce/transduce",
   "authors": [
     "Kevin Beaty <kevin@simplectic.com>"
