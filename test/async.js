@@ -91,40 +91,42 @@ test('transduce', function(t) {
   })
 })
 
-test('toArray', function(t) {
+test('into array', function(t) {
   t.plan(7)
 
-  var arr = async.toArray([1,2,3])
+  var toArray = tr.async.into([])
+
+  var arr = toArray([1,2,3])
   arr.then(function(value){
     t.deepEqual(value, [1,2,3])
   })
 
-  var add1 = async.toArray(tr.map(add(1)), [1,2,3])
+  var add1 = toArray(tr.map(add(1)), [1,2,3])
   add1.then(function(value){
     t.deepEqual(value, [2,3,4])
   })
 
-  var add3 = async.toArray(tr.compose(tr.map(add(1)), tr.map(add(2))), [1,2,3])
+  var add3 = toArray(tr.compose(tr.map(add(1)), tr.map(add(2))), [1,2,3])
   add3.then(function(value){
     t.deepEqual(value, [4,5,6])
   })
 
-  add3 = async.toArray(tr.compose(tr.map(deferAdd(1)), async.defer(), tr.map(add(2))), [1,2,3])
+  add3 = toArray(tr.compose(tr.map(deferAdd(1)), async.defer(), tr.map(add(2))), [1,2,3])
   add3.then(function(value){
     t.deepEqual(value, [4,5,6])
   })
 
-  add3 = async.toArray(async.compose(tr.map(deferAdd(1)), tr.map(deferAdd(2))), [1,2,3])
+  add3 = toArray(async.compose(tr.map(deferAdd(1)), tr.map(deferAdd(2))), [1,2,3])
   add3.then(function(value){
     t.deepEqual(value, [4,5,6])
   })
 
-  add1 = async.toArray(tr.map(add(1)), [1,resolve(2),3])
+  add1 = toArray(tr.map(add(1)), [1,resolve(2),3])
   add1.then(function(value){
     t.deepEqual(value, [2,3,4])
   })
 
-  add1 = async.toArray(tr.map(add(1)), resolve([1,resolve(2),3]))
+  add1 = toArray(tr.map(add(1)), resolve([1,resolve(2),3]))
   add1.then(function(value){
     t.deepEqual(value, [2,3,4])
   })
@@ -135,7 +137,7 @@ test('delay', function(t) {
   var items, trans
   trans = async.compose(tr.map(deferAdd(1)), async.delay(10), tr.async.tap(checkItem))
 
-  async.toArray(trans, [1,2,3])
+  async.into([], trans, [1,2,3])
     .then(function(result){
       t.deepEqual(result, [2,3,4])
     })

@@ -10,16 +10,8 @@ var Prom = require('any-promise'),
 module.exports = {
   transduce: transduce,
   reduce: reduce,
-  toArray: toArray,
-}
-
-function toArray(xf, coll){
-  var init = [],
-      push = arrayPush
-  if(coll === void 0){
-    return reduce(push, init, xf)
-  }
-  return transduce(xf, push, init, coll)
+  _transduce: transduce,
+  _reduce: reduce
 }
 
 var _transduce = spread(__transduce),

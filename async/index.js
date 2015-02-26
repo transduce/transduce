@@ -5,7 +5,7 @@ module.exports = {
   compose: require('./compose'),
   transduce: core.transduce,
   reduce: core.reduce,
-  toArray: core.toArray,
+  into: require('./into'),
   defer: require('./defer'),
   delay: require('./delay'),
   tap: require('./tap'),

@@ -187,9 +187,9 @@ async {
   defer: function()
   delay: function(wait)
   compose: function(/*args*/)
+  into: function(init, t?, coll?)
   transduce: function(xf, f, init, coll)
   reduce: function(f, init, coll)
-  toArray: function(xf?, coll)
   tap: function(interceptor)
   asCallback: function(t, xf?)
   asyncCallback: function(t, continuation, xf?)
@@ -451,7 +451,7 @@ Create a deferred transducer that allows wrapped transformer to `step` or `resul
 ##### async.delay(wait)
 Create a deferred transducer that delays step of wrapped transformer by `wait` milliseconds. All items will be queued and delayed and `step` will return a promise that will resolve after `wait` milliseconds for each item.
 
-##### async.compose(/\*fns\*/
+##### async.compose(/\*fns\*/)
 Like a normal compose, except all arguments are interleaved with `defer`.  This allows any transducer in composed pipeline to `step` or `result` a Promise in addition to a value.  The wrapped transformer is called with value of resolved Promise.
 
 ##### async.transduce(t, xf, init, coll)
@@ -460,8 +460,10 @@ Like a normal transduce, except `init` and `coll` can be a Promise and `xf` can 
 ##### async.reduce(xf, init, coll)
 Like a normal reduce, except `init` and `coll` can be a Promise and `xf` can be a deferred transducer. The value of `coll` can be anything that can be converted to an iterator. The return value is a Promise for the result of the reduction.
 
-### async.toArray(xf?, coll)
-Convenience function to transduce into an array with an optional transformation. The return value is a Promise for an array.
+##### async.into(init, t?, coll?)
+Async version of into. Returns a Promise for a new collection appending all items into `init` by passing all items from source collection `coll` through the optional transducer `t`.  Chooses transformer, `xf` from type of `init`.  Can be array, object, string or have `@@transformer`. `coll` is converted to an `iterator`.
+
+The function is automatically curried. If `coll` is not provided, returns a curried function using `transformer` from `init` and the same transformation can be used for multiple collections.
 
 ##### async.tap(interceptor)
 Transducer that invokes interceptor with each result and input, and then passes through input. The primary purpose of this method is to "tap into" a method chain, in order to perform operations on intermediate results within the chain.  Executes interceptor with current result and input.
