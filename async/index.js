@@ -1,10 +1,9 @@
 'use strict'
-var core = require('./_core')
 
 module.exports = {
   compose: require('./compose'),
-  transduce: core.transduce,
-  reduce: core.reduce,
+  transduce: require('./transduce'),
+  reduce: require('./reduce'),
   into: require('./into'),
   defer: require('./defer'),
   delay: require('./delay'),

@@ -9,9 +9,7 @@ var Prom = require('any-promise'),
 
 module.exports = {
   transduce: transduce,
-  reduce: reduce,
-  _transduce: transduce,
-  _reduce: reduce
+  reduce: reduce
 }
 
 var _transduce = spread(__transduce),

@@ -10,40 +10,14 @@ var isReduced = require('./isReduced'),
 
 module.exports = {
   transduce: transduce,
-  reduce: reduce,
-  _transduce: _transduce,
-  _reduce: _reduce
+  reduce: reduce
 }
 
 function transduce(t, xf, init, coll) {
-  if(isFunction(xf)){
-    xf = completing(xf)
-  }
-  xf = t(xf)
-  if (arguments.length === 3) {
-    coll = init;
-    init = xf.init();
-  }
-  return _reduce(xf, init, coll)
-}
-
-function _transduce(t, xf, init, coll) {
-  return _reduce(t(xf), init, coll)
+  return reduce(t(xf), init, coll)
 }
 
 function reduce(xf, init, coll){
-  if(isFunction(xf)){
-    xf = completing(xf)
-  }
-
-  if (arguments.length === 2) {
-    coll = init
-    init = xf.init()
-  }
-  return _reduce(xf, init, coll)
-}
-
-function _reduce(xf, init, coll){
   if(isArray(coll)){
     return arrayReduce(xf, init, coll)
   }

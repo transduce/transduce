@@ -188,8 +188,8 @@ async {
   delay: function(wait)
   compose: function(/*args*/)
   into: function(init, t?, coll?)
-  transduce: function(xf, f, init, coll)
-  reduce: function(f, init, coll)
+  transduce: function(t, xf, init?, coll)
+  reduce: function(xf, init?, coll)
   tap: function(interceptor)
   asCallback: function(t, xf?)
   asyncCallback: function(t, continuation, xf?)
@@ -454,10 +454,10 @@ Create a deferred transducer that delays step of wrapped transformer by `wait` m
 ##### async.compose(/\*fns\*/)
 Like a normal compose, except all arguments are interleaved with `defer`.  This allows any transducer in composed pipeline to `step` or `result` a Promise in addition to a value.  The wrapped transformer is called with value of resolved Promise.
 
-##### async.transduce(t, xf, init, coll)
+##### async.transduce(t, xf, init?, coll)
 Like a normal transduce, except `init` and `coll` can be a Promise and `xf` can be a deferred transducer. The value of `coll` can be anything that can be converted to an iterator. The return value is a Promise for the result of the transformation.
 
-##### async.reduce(xf, init, coll)
+##### async.reduce(xf, init?, coll)
 Like a normal reduce, except `init` and `coll` can be a Promise and `xf` can be a deferred transducer. The value of `coll` can be anything that can be converted to an iterator. The return value is a Promise for the result of the reduction.
 
 ##### async.into(init, t?, coll?)

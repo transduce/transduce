@@ -1,8 +1,8 @@
 'use strict'
 module.exports = function(core){
 
-var transduce = core._transduce,
-    reduce = core._reduce,
+var transduce = core.transduce,
+    reduce = core.reduce,
     transformer = require('./transformer'),
     isFunction = require('./util').isFunction
 
