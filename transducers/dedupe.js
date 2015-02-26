@@ -1,5 +1,5 @@
 'use strict'
-var _unique = require('./_unique')
+var _unique = require('./_internal/unique')
 
 module.exports =
 function dedupe(){

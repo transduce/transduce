@@ -1,11 +1,11 @@
 'use strict'
 var Prom = require('any-promise'),
-    arrayPush = require('../core/util').arrayPush,
-    isReduced = require('../core/isReduced'),
-    unreduced = require('../core/unreduced'),
-    transformer = require('../core/transformer'),
-    iterable = require('../core/iterable'),
-    protocols = require('../core/protocols')
+    arrayPush = require('../../core/util').arrayPush,
+    isReduced = require('../../core/isReduced'),
+    unreduced = require('../../core/unreduced'),
+    transformer = require('../../core/transformer'),
+    iterable = require('../../core/iterable'),
+    protocols = require('../../core/protocols')
 
 module.exports = {
   transduce: transduce,

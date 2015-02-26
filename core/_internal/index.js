@@ -1,10 +1,9 @@
 'use strict'
-var isReduced = require('./isReduced'),
-    unreduced = require('./unreduced'),
-    completing = require('./completing'),
-    iterable = require('./iterable'),
-    protocols = require('./protocols'),
-    util = require('./util'),
+var isReduced = require('../isReduced'),
+    unreduced = require('../unreduced'),
+    iterable = require('../iterable'),
+    protocols = require('../protocols'),
+    util = require('../util'),
     isArray = util.isArray,
     isFunction = util.isFunction
 

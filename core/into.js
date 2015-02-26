@@ -1,2 +1,2 @@
 'use strict'
-module.exports = require('./_coreInto')(require('./_core'))
+module.exports = require('./_internal/into')(require('./_internal'))
