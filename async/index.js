@@ -7,5 +7,8 @@ module.exports = {
   reduce: core.reduce,
   toArray: core.toArray,
   defer: require('./defer'),
-  delay: require('./delay')
+  delay: require('./delay'),
+  tap: require('./tap'),
+  asCallback: require('./asCallback'),
+  asyncCallback: require('./asyncCallback')
 }

@@ -5,7 +5,6 @@ module.exports = merge(merge({
     array: require('./array'),
     string: require('./string'),
     math: require('./math'),
-    push: require('./push'),
     iterators: require('./iterators'),
     async: require('./async')
   }, core), require('./transducers'))

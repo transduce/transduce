@@ -15,6 +15,8 @@ If you are not familiar with transducers, check out [Transducers Explained][3].
 $ npm install transduce
 ```
 
+If using async package, also install a Promise library of your choice.  Works with [any-promise](https://github.com/kevinbeaty/any-promise) library (a pollyfill, es6-promise, promise, native-promise-only, bluebird, rsvp, when, q).  Just install the Promise library preference and it will be auto detected and used.
+
 #### Browser
 
 ```bash
@@ -86,7 +88,7 @@ Too explicit? Require the packages:
 ### Definitions
 
 ##### Input Source
-A source of values, normally a collection, `coll`.  This library supports arrays, plain objects, strings, and anything that can be converted to iterators (see `iterator` function below).  Input sources can also be push based, see `push` package below.
+A source of values, normally a collection, `coll`.  This library supports arrays, plain objects, strings, and anything that can be converted to iterators (see `iterator` function below).  Input sources can also be push based, see `async` package below.
 
 ##### Reducing Function
 A two arity function, `rf`, appropriate for passing to `reduce`. The first argument is the accumulator and the second argument is the iteration value.  When using transducers, the accumulator is normally a collection, but it is not required.
@@ -110,7 +112,7 @@ Reduce defines a Transducible Process.
 A function, `t`, that accepts a transformer, `xf`, and returns a transformer. All transformations are defined in terms of transducers, independent of the Transducible Process. Can be composed directly to create new transducers.
 
 ##### Transducible Process
-A process that begins with an initial value accumulator, steps through items of an input source and optionally transforming with transducer, `t`, and optionally completes with a result.  Transduce is one transducible process. Transducible Processes can also be push based. See `push` package below or [transduce-stream][2] for a few examples.  The same transducer can be used with any transducible process.
+A process that begins with an initial value accumulator, steps through items of an input source and optionally transforming with transducer, `t`, and optionally completes with a result.  Transduce is one transducible process. Transducible Processes can also be push based. See `async` package below or [transduce-stream][2] for a few examples.  The same transducer can be used with any transducible process.
 
 ### API
 
@@ -172,12 +174,6 @@ math {
   max: function(f?)
 }
 
-push {
-  tap: function(interceptor)
-  asCallback: function(t, xf?)
-  asyncCallback: function(t, continuation, xf?)
-}
-
 string {
   split: function(separator, limit?)
   join: function(separator)
@@ -185,6 +181,18 @@ string {
   lines: function(limit?)
   chars: function(limit?)
   words: function(delimiter?, limit?)
+}
+
+async {
+  defer: function()
+  delay: function(wait)
+  compose: function(/*args*/)
+  transduce: function(xf, f, init, coll)
+  reduce: function(f, init, coll)
+  toArray: function(xf?, coll)
+  tap: function(interceptor)
+  asCallback: function(t, xf?)
+  asyncCallback: function(t, continuation, xf?)
 }
 
 iterators {
@@ -411,24 +419,6 @@ Steps the minimum value on the result of the transformation. if `f` is provided,
 #####  math.max(f?)
 Steps the maximum value on the result of the transformation. if `f` is provided, it is called with each item and the return value is used to compare values. Otherwise, the items are compared as numbers
 
-#### Push
-Normally transducers are used with pull streams: reduce "pulls" values out of an array, iterator, etc.  This library adds basic support for using transducers with push streams. See [transduce-stream][2] for using transducers with Node.js streams, or the [underscore-transducer][6] [demo][7] for an example of using transducers as event listeners.
-
-##### push.tap(interceptor)
-Transducer that invokes interceptor with each result and input, and then passes through input. The primary purpose of this method is to "tap into" a method chain, in order to perform operations on intermediate results within the chain.  Executes interceptor with current result and input.
-
-##### push.asCallback(t, init?)
-Creates a callback that starts a transducer process and accepts parameter as a new item in the process. Each item advances the state of the transducer. If the transducer exhausts due to early termination, all subsequent calls to the callback will no-op and return the computed result. If the callback is called with no argument, the transducer terminates, and all subsequent calls will no-op and return the computed result. The callback returns undefined until completion. Once completed, the result is always returned.
-
-Like `into`, chooses transformer, `xf`, based on the type of `init` using `transformer`.  If `init` is not defined, maintains last value and does not buffer results. This can be used with `tap` or other methods to process items incrementally instead of waiting and buffering results.
-
-##### push.asyncCallback(t, continuation?, init?)
-Creates an async callback that starts a transducer process and accepts parameter `cb(err, item)` as a new item in the process. The returned callback and the optional continuation follow Node.js conventions with  `fn(err, item)`. Each item advances the state  of the transducer, if the continuation is provided, it will be called on completion or error. An error will terminate the transducer and be propagated to the continuation.
-
-If the transducer exhausts due to early termination, any further call will be a no-op. If the callback is called with no item, it will terminate the transducer process.
-
-Like `into`, chooses transformer, `xf`, based on the type of `init` using `transformer`.  If `init` is not defined, maintains last value and does not buffer results. This can be used with `tap` or other methods to process items incrementally instead of waiting and buffering results.
-
 #### String
 Transduce over sequences of strings. Particularly useful with [transduce-stream][2].
 
@@ -451,6 +441,42 @@ Split chunks into characters and steps each char with optional limit (number of 
 
 ##### string.words(delimiter?, limit?)
 Split chunks into words using `delimiter` (default `/\s+/`) and steps each word with optional limit (number of words).
+
+#### Async
+Use Transducers with async iterators and observables by supporting Promises in iterators and transformers. Inspired by [this talk](http://channel9.msdn.com/Events/Lang-NEXT/Lang-NEXT-2014/Keynote-Duality) from Erik Meijer.
+
+##### async.defer()
+Create a deferred transducer that allows wrapped transformer to `step` or `result` a Promise in addition to a value. All items will be queued and processed in order. The wrapped transformer is called with value of resolved Promise.
+
+##### async.delay(wait)
+Create a deferred transducer that delays step of wrapped transformer by `wait` milliseconds. All items will be queued and delayed and `step` will return a promise that will resolve after `wait` milliseconds for each item.
+
+##### async.compose(/\*fns\*/
+Like a normal compose, except all arguments are interleaved with `defer`.  This allows any transducer in composed pipeline to `step` or `result` a Promise in addition to a value.  The wrapped transformer is called with value of resolved Promise.
+
+##### async.transduce(t, xf, init, coll)
+Like a normal transduce, except `init` and `coll` can be a Promise and `xf` can be a deferred transducer. The value of `coll` can be anything that can be converted to an iterator. The return value is a Promise for the result of the transformation.
+
+##### async.reduce(xf, init, coll)
+Like a normal reduce, except `init` and `coll` can be a Promise and `xf` can be a deferred transducer. The value of `coll` can be anything that can be converted to an iterator. The return value is a Promise for the result of the reduction.
+
+### async.toArray(xf?, coll)
+Convenience function to transduce into an array with an optional transformation. The return value is a Promise for an array.
+
+##### async.tap(interceptor)
+Transducer that invokes interceptor with each result and input, and then passes through input. The primary purpose of this method is to "tap into" a method chain, in order to perform operations on intermediate results within the chain.  Executes interceptor with current result and input.
+
+##### async.asCallback(t, init?)
+Creates a callback that starts a transducer process and accepts parameter as a new item in the process. Each item advances the state of the transducer. If the transducer exhausts due to early termination, all subsequent calls to the callback will no-op and return the computed result. If the callback is called with no argument, the transducer terminates, and all subsequent calls will no-op and return the computed result. The callback returns undefined until completion. Once completed, the result is always returned.
+
+Like `into`, chooses transformer, `xf`, based on the type of `init` using `transformer`.  If `init` is not defined, maintains last value and does not buffer results. This can be used with `tap` or other methods to process items incrementally instead of waiting and buffering results.
+
+##### async.asyncCallback(t, continuation?, init?)
+Creates an async callback that starts a transducer process and accepts parameter `cb(err, item)` as a new item in the process. The returned callback and the optional continuation follow Node.js conventions with  `fn(err, item)`. Each item advances the state  of the transducer, if the continuation is provided, it will be called on completion or error. An error will terminate the transducer and be propagated to the continuation.
+
+If the transducer exhausts due to early termination, any further call will be a no-op. If the callback is called with no item, it will terminate the transducer process.
+
+Like `into`, chooses transformer, `xf`, based on the type of `init` using `transformer`.  If `init` is not defined, maintains last value and does not buffer results. This can be used with `tap` or other methods to process items incrementally instead of waiting and buffering results.
 
 #### Iterators
 
