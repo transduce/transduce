@@ -1,2 +1,2 @@
 'use strict'
-module.exports = require('./_core').reduce
+module.exports = require('./_internal/reduce')(require('./_internal'))

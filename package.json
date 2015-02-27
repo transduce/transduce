@@ -1,6 +1,6 @@
 {
   "name": "transduce",
-  "version": "0.6.0",
+  "version": "0.7.0-dev",
   "description": "JavaScript transducers and iterators",
   "main": "index.js",
   "scripts": {
@@ -21,13 +21,16 @@
     "url": "https://github.com/transduce/transduce/issues"
   },
   "homepage": "http://github.com/transduce/transduce",
-  "dependencies": {},
+  "dependencies": {
+    "any-promise": "~0.1.0"
+  },
   "devDependencies": {
     "browserify": "~9.0.3",
     "jshint": "~2.6.0",
     "tape": "~3.5.0",
     "uglify-js": "~2.4.16",
     "bundle-collapser": "~1.1.4",
-    "tap-bail": "0.0.0"
+    "tap-bail": "0.0.0",
+    "promise": "~6.1.0"
   }
 }
