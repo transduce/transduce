@@ -286,7 +286,7 @@ test('callback continuation', function(t){
 })
 
 test('when', function(t) {
-  t.plan(3)
+  t.plan(5)
   tr.async.when(1, tr.map(add(1)))
     .then(function(value){
       t.equals(2, value)
@@ -295,9 +295,17 @@ test('when', function(t) {
     .then(function(value){
       t.equals(2, value)
     })
-  tr.async.when(resolve(1), tr.compose(tr.map(add(2)), tr.map(add(1))))
+  tr.async.when(resolve(1), tr.compose(tr.map(deferAdd(1)), tr.async.defer()))
     .then(function(value){
-      t.equals(4, value)
+      t.equals(2, value)
+    })
+  tr.async.when(deferAdd(2)(3), tr.compose(tr.map(add(2)), tr.map(add(1))))
+    .then(function(value){
+      t.equals(8, value)
+    })
+  tr.async.when(deferAdd(2)(3), tr.async.compose(tr.map(deferAdd(2)), tr.map(deferAdd(1))))
+    .then(function(value){
+      t.equals(8, value)
     })
 })
 

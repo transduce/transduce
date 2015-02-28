@@ -1,9 +1,10 @@
 'use strict'
-var resolve = require('./_internal/resolve'),
+var Prom = require('any-promise'),
     promiseTransform = require('./promiseTransform')
 
 module.exports =
 function when(promiseOrValue, t){
-  return resolve(promiseOrValue)
-    .then(promiseTransform(t))
+  return new Prom(function(resolve){
+    resolve(promiseOrValue)
+  }).then(promiseTransform(t))
 }
