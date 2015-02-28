@@ -7,6 +7,5 @@ module.exports = {
   into: require('./into'),
   defer: require('./defer'),
   delay: require('./delay'),
-  asCallback: require('./asCallback'),
-  asyncCallback: require('./asyncCallback')
+  callback: require('./callback'),
 }

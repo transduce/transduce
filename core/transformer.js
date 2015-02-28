@@ -19,7 +19,7 @@ var symbol = require('./protocols').transformer,
 module.exports =
 function transformer(value){
   var xf
-  if(value === void 0){
+  if(value === void 0 || value === null){
     xf = lastValue
   } else if(value[symbol] !== void 0){
     xf = value[symbol]

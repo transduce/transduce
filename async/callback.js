@@ -3,20 +3,8 @@ var isReduced = require('../core/isReduced'),
     unreduced = require('../core/unreduced'),
     transformer = require('../core/transformer')
 
-// Creates an async callback that starts a transducer process and accepts
-// parameter cb(err, item) as a new item in the process. The returned callback
-// and the optional continuation follow node conventions with  fn(err, item).
-//
-// Each item advances the state  of the transducer, if the continuation
-// is provided, it will be called on completion or error. An error will terminate
-// the transducer and be propagated to the continuation.  If the transducer
-// exhausts due to early termination, any further call will be a no-op.
-//
-// If the callback is called with no item, it will terminate the transducer process.
-//
-// If init is not defined, maintains last value and does not buffer results.
 module.exports =
-function asyncCallback(t, continuation, init){
+function callback(t, init, continuation){
   var done = false, stepper, result,
       xf = transformer(init)
 
@@ -46,10 +34,11 @@ function asyncCallback(t, continuation, init){
       if(continuation){
         continuation(err, result)
         continuation = null
+        result = null
       } else if(err){
+        result = null
         throw err
       }
-      result = null
     }
 
     return done
@@ -65,5 +54,6 @@ function asyncCallback(t, continuation, init){
         checkDone(err2, item)
       }
     }
+    if(done) return result
   }
 }

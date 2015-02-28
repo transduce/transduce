@@ -204,19 +204,19 @@ test('deferred transformer', function(t) {
   })
 })
 
-test('asCallback', function(t){
+test('callback result', function(t){
   var results = [],
       trans = tr.compose(tr.filter(isEven), tr.map(inc), tr.take(2), tr.tap(appendEach)),
-      cb = tr.async.asCallback(trans)
+      cb = tr.async.callback(trans)
 
-  ;[1,1,2,3,4,4,5].forEach(cb)
+  ;[1,1,2,3,4,4,5].forEach(cb.bind(null, null))
   t.deepEqual(results, [3,5])
   t.equal(5, cb())
 
   trans = tr.compose(tr.filter(isEven), tr.map(inc), tr.tap(appendEach))
-  cb = tr.async.asCallback(trans)
+  cb = tr.async.callback(trans)
   results = []
-  ;[1,2,3,4,5,6,7,8,9].forEach(cb)
+  ;[1,2,3,4,5,6,7,8,9].forEach(cb.bind(null, null))
   t.deepEqual(results, [3,5,7,9])
 
   function appendEach(result, item){
@@ -226,13 +226,13 @@ test('asCallback', function(t){
   t.end()
 })
 
-test('asyncCallback', function(t){
+test('callback continuation', function(t){
   t.plan(9)
 
   var results, result, trans, cb, abort = new Error('abort')
 
   trans = tr.compose(tr.filter(isEven), tr.map(inc), tr.take(2), tr.tap(appendEach))
-  cb = tr.async.asyncCallback(trans, continuation)
+  cb = tr.async.callback(trans, null, continuation)
 
   results = []
   result = {done: false, error: false}
@@ -242,7 +242,7 @@ test('asyncCallback', function(t){
   t.deepEqual(result, {done:true, error:null})
 
   cb = tr.compose(tr.filter(isEven), tr.map(inc), tr.tap(appendEach), tr.take(2))
-  cb = tr.async.asyncCallback(trans, continuation)
+  cb = tr.async.callback(trans, null, continuation)
 
   results = []
   result = {done: false, error: false}
@@ -255,7 +255,7 @@ test('asyncCallback', function(t){
   result = {done: false, error: false}
 
   trans = tr.compose(tr.filter(isEven), tr.map(inc), tr.tap(appendEach))
-  cb = tr.async.asyncCallback(trans, continuation)
+  cb = tr.async.callback(trans, null, continuation)
   ;[1,2,3,4,5,6,7,8,9].forEach(function(item){cb(null, item)})
   t.deepEqual(results, [3,5,7,9])
   t.deepEqual(result, {done:false, error:false})
@@ -270,7 +270,7 @@ test('asyncCallback', function(t){
     tr.map(inc),
     tr.tap(appendEach),
     tr.tap(function(result, i){if(i===7){throw abort}}))
-  cb = tr.async.asyncCallback(trans, continuation)
+  cb = tr.async.callback(trans, null, continuation)
   ;[1,2,3,4,5,6,7,8,9].forEach(function(item){cb(null, item)})
   t.deepEqual(results, [3,5,7])
   t.deepEqual(result, {done:true, error:abort})

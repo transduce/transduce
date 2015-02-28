@@ -191,8 +191,7 @@ async {
   into: function(init, t?, coll?)
   transduce: function(t, xf, init?, coll)
   reduce: function(xf, init?, coll)
-  asCallback: function(t, xf?)
-  asyncCallback: function(t, continuation, xf?)
+  callback: function(t, init?, continuation?)
 }
 
 iterators {
@@ -492,15 +491,10 @@ Async version of into. Returns a Promise for a new collection appending all item
 
 The function is automatically curried. If `coll` is not provided, returns a curried function using `transformer` from `init` and the same transformation can be used for multiple collections.
 
-##### async.asCallback(t, init?)
-Creates a callback that starts a transducer process and accepts parameter as a new item in the process. Each item advances the state of the transducer. If the transducer exhausts due to early termination, all subsequent calls to the callback will no-op and return the computed result. If the callback is called with no argument, the transducer terminates, and all subsequent calls will no-op and return the computed result. The callback returns undefined until completion. Once completed, the result is always returned.
-
-Like `into`, chooses transformer, `xf`, based on the type of `init` using `transformer`.  If `init` is not defined, maintains last value and does not buffer results. This can be used with `tap` or other methods to process items incrementally instead of waiting and buffering results.
-
-##### async.asyncCallback(t, continuation?, init?)
+##### async.callback(t, init?, continuation?)
 Creates an async callback that starts a transducer process and accepts parameter `cb(err, item)` as a new item in the process. The returned callback and the optional continuation follow Node.js conventions with  `fn(err, item)`. Each item advances the state  of the transducer, if the continuation is provided, it will be called on completion or error. An error will terminate the transducer and be propagated to the continuation.
 
-If the transducer exhausts due to early termination, any further call will be a no-op. If the callback is called with no item, it will terminate the transducer process.
+If the transducer exhausts due to early termination, all subsequent calls to the callback will no-op and return the computed result. If the callback is called with no item, the transducer terminates, and all subsequent calls will no-op and return the computed result. The callback returns `undefined` until completion. Once completed, the final `result` is always returned.
 
 Like `into`, chooses transformer, `xf`, based on the type of `init` using `transformer`.  If `init` is not defined, maintains last value and does not buffer results. This can be used with `tap` or other methods to process items incrementally instead of waiting and buffering results.
 
