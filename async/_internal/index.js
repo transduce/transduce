@@ -1,6 +1,5 @@
 'use strict'
 var Prom = require('any-promise'),
-    arrayPush = require('../../core/util').arrayPush,
     isReduced = require('../../core/isReduced'),
     unreduced = require('../../core/unreduced'),
     transformer = require('../../core/transformer'),

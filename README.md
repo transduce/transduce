@@ -154,6 +154,7 @@ partitionAll: function(n)
 partitionBy: function(f)
 dedupe: function()
 unique: function(f?)
+tap: function(interceptor)
 transformStep: function(xfStep)
 
 array {
@@ -190,7 +191,6 @@ async {
   into: function(init, t?, coll?)
   transduce: function(t, xf, init?, coll)
   reduce: function(xf, init?, coll)
-  tap: function(interceptor)
   asCallback: function(t, xf?)
   asyncCallback: function(t, continuation, xf?)
 }
@@ -342,6 +342,9 @@ Removes consecutive duplicates from the transformation. Subsequent stepped value
 ##### unique(f?)
 Produce a duplicate-free version of the transformation. If `f` is passed, it will be called with each item and the return value for uniqueness check.  Uniqueness is checked across all values already seen, and as such, the items (or computed checks) are buffered.
 
+##### tap(interceptor)
+Transducer that invokes interceptor with each result and input, and then passes through input. The primary purpose of this method is to "tap into" a method chain, in order to perform operations on intermediate results within the chain.  Executes interceptor with current result and input.
+
 ##### transformStep(xfStep)
 Creates a transducer from a function called on every `step`.  The `step` function of the transducer delegates to `xfStep(xf, result, input)` bound to an empty context.  This is useful for creating custom transducers defined by a step function.  `init` returns `xf.init()` and `result` returns `xf.result(result)`.
 
@@ -374,6 +377,12 @@ function drop(n){
 
 #### Array
 Use Array methods as Transducers.  Treats each stepped item as an item in the array, and defines transducers that step items with the same contract as array methods.
+
+Mixed into `transduce.array` or available by explictly requiring from `transduce/array`.  The following are equivalent:
+
+- `require('transduce').array.forEach`
+- `require('transduce/array/forEach')`
+- `require('transduce/array').forEach`
 
 ##### array.forEach(callback)
 Passes every item through unchanged, but after executing `callback(item, idx)`.  Can be useful for "tapping into" composed transducer pipelines.   The return value of the callback is ignored, item is passed unchanged.
@@ -413,6 +422,12 @@ Note that no items will be sent until completion.
 
 #### Math
 
+Mixed into `transduce.math` or available by explictly requiring from `transduce/math`.  The following are equivalent:
+
+- `require('transduce').math.min`
+- `require('transduce/math/min')`
+- `require('transduce/math').min`
+
 ##### math.min(f?)
 Steps the minimum value on the result of the transformation. if `f` is provided, it is called with each item and the return value is used to compare values. Otherwise, the items are compared as numbers
 
@@ -423,6 +438,12 @@ Steps the maximum value on the result of the transformation. if `f` is provided,
 Transduce over sequences of strings. Particularly useful with [transduce-stream][2].
 
 Treats every item as a substring, and splits across the entire transducer sequence.  This allows functions to work with chunks sent through streams.  When using transducers with streams, it is helpful to compose the transformation that you want with one of these functions to operate against a given line/word/etc.
+
+Mixed into `transduce.string` or available by explictly requiring from `transduce/string`.  The following are equivalent:
+
+- `require('transduce').string.split`
+- `require('transduce/string/split')`
+- `require('transduce/string').split`
 
 ##### string.split(separator, limit?)
 Works like `''.split` but splits across entire sequence of items. Accepts separator (String or RegExp) and optional limit of words to send.
@@ -445,6 +466,12 @@ Split chunks into words using `delimiter` (default `/\s+/`) and steps each word 
 #### Async
 Use Transducers with async iterators and observables by supporting Promises in iterators and transformers. Inspired by [this talk](http://channel9.msdn.com/Events/Lang-NEXT/Lang-NEXT-2014/Keynote-Duality) from Erik Meijer.
 
+Mixed into `transduce.async` or available by explictly requiring from `transduce/async`.  The following are equivalent:
+
+- `require('transduce').async.defer`
+- `require('transduce/async/defer')`
+- `require('transduce/async').defer`
+
 ##### async.defer()
 Create a deferred transducer that allows wrapped transformer to `step` or `result` a Promise in addition to a value. All items will be queued and processed in order. The wrapped transformer is called with value of resolved Promise.
 
@@ -465,9 +492,6 @@ Async version of into. Returns a Promise for a new collection appending all item
 
 The function is automatically curried. If `coll` is not provided, returns a curried function using `transformer` from `init` and the same transformation can be used for multiple collections.
 
-##### async.tap(interceptor)
-Transducer that invokes interceptor with each result and input, and then passes through input. The primary purpose of this method is to "tap into" a method chain, in order to perform operations on intermediate results within the chain.  Executes interceptor with current result and input.
-
 ##### async.asCallback(t, init?)
 Creates a callback that starts a transducer process and accepts parameter as a new item in the process. Each item advances the state of the transducer. If the transducer exhausts due to early termination, all subsequent calls to the callback will no-op and return the computed result. If the callback is called with no argument, the transducer terminates, and all subsequent calls will no-op and return the computed result. The callback returns undefined until completion. Once completed, the result is always returned.
 
@@ -481,6 +505,13 @@ If the transducer exhausts due to early termination, any further call will be a 
 Like `into`, chooses transformer, `xf`, based on the type of `init` using `transformer`.  If `init` is not defined, maintains last value and does not buffer results. This can be used with `tap` or other methods to process items incrementally instead of waiting and buffering results.
 
 #### Iterators
+
+Mixed into `transduce.iterators` or available by explictly requiring from `transduce/iterators`.  The following are equivalent:
+
+- `require('transduce').iterators.toArray`
+- `require('transduce/iterators/toArray')`
+- `require('transduce/iterators').toArray`
+
 
 ##### iterators.toArray(value)
 Converts the value to an iterator and iterates into an array.
@@ -502,7 +533,7 @@ Combine multiple iterables into a chained iterable.  Once the first argument is 
 
 ### Credits
 
-Extracted from [underscore-transducer][6], which was created initially as a translation from [Clojure][8]. Now compatible with and inspired by protocols defined by [transducers-js][4] and [transducers.js][5].
+Extracted from [underarm][6], which was created initially as a translation from [Clojure][8]. Now compatible with and inspired by protocols defined by [transducers-js][4] and [transducers.js][5].
 
 ### License
 MIT
@@ -512,7 +543,7 @@ MIT
 [3]: http://simplectic.com/blog/2014/transducers-explained-1/
 [4]: https://github.com/cognitect-labs/transducers-js
 [5]: https://github.com/jlongster/transducers.js
-[6]: https://github.com/kevinbeaty/underscore-transducer
-[7]: http://simplectic.com/projects/underscore-transducer/
+[6]: https://github.com/kevinbeaty/underarm
+[7]: http://simplectic.com/projects/underarm
 [8]: http://clojure.org/transducers
 [10]: https://github.com/jlongster/transducers.js#the-transformer-protocol

@@ -135,7 +135,7 @@ test('into array', function(t) {
 test('delay', function(t) {
   t.plan(7)
   var items, trans
-  trans = async.compose(tr.map(deferAdd(1)), async.delay(10), tr.async.tap(checkItem))
+  trans = async.compose(tr.map(deferAdd(1)), async.delay(10), tr.tap(checkItem))
 
   async.into([], trans, [1,2,3])
     .then(function(result){
@@ -204,30 +204,16 @@ test('deferred transformer', function(t) {
   })
 })
 
-test('tap', function(t){
-  t.plan(3)
-
-  var results = [], items = []
-  var trans = tr.compose(
-    tr.filter(function(num) { return num % 2 === 0 }),
-    tr.async.tap(function(result, item){results.push([].slice.call(result)); items.push(item)}),
-    tr.map(function(num) { return num * num }))
-  var result = tr.into([], trans, [1,2,3,200])
-  t.deepEqual(result, [4, 40000], 'filter and map chained with tap')
-  t.deepEqual(results, [[], [4]], 'filter and map chained with tap results')
-  t.deepEqual(items, [2, 200], 'filter and map chained with tap items')
-})
-
 test('asCallback', function(t){
   var results = [],
-      trans = tr.compose(tr.filter(isEven), tr.map(inc), tr.take(2), tr.async.tap(appendEach)),
+      trans = tr.compose(tr.filter(isEven), tr.map(inc), tr.take(2), tr.tap(appendEach)),
       cb = tr.async.asCallback(trans)
 
   ;[1,1,2,3,4,4,5].forEach(cb)
   t.deepEqual(results, [3,5])
   t.equal(5, cb())
 
-  trans = tr.compose(tr.filter(isEven), tr.map(inc), tr.async.tap(appendEach))
+  trans = tr.compose(tr.filter(isEven), tr.map(inc), tr.tap(appendEach))
   cb = tr.async.asCallback(trans)
   results = []
   ;[1,2,3,4,5,6,7,8,9].forEach(cb)
@@ -245,7 +231,7 @@ test('asyncCallback', function(t){
 
   var results, result, trans, cb, abort = new Error('abort')
 
-  trans = tr.compose(tr.filter(isEven), tr.map(inc), tr.take(2), tr.async.tap(appendEach))
+  trans = tr.compose(tr.filter(isEven), tr.map(inc), tr.take(2), tr.tap(appendEach))
   cb = tr.async.asyncCallback(trans, continuation)
 
   results = []
@@ -255,7 +241,7 @@ test('asyncCallback', function(t){
   t.deepEqual(results, [3,5])
   t.deepEqual(result, {done:true, error:null})
 
-  cb = tr.compose(tr.filter(isEven), tr.map(inc), tr.async.tap(appendEach), tr.take(2))
+  cb = tr.compose(tr.filter(isEven), tr.map(inc), tr.tap(appendEach), tr.take(2))
   cb = tr.async.asyncCallback(trans, continuation)
 
   results = []
@@ -268,7 +254,7 @@ test('asyncCallback', function(t){
   results = []
   result = {done: false, error: false}
 
-  trans = tr.compose(tr.filter(isEven), tr.map(inc), tr.async.tap(appendEach))
+  trans = tr.compose(tr.filter(isEven), tr.map(inc), tr.tap(appendEach))
   cb = tr.async.asyncCallback(trans, continuation)
   ;[1,2,3,4,5,6,7,8,9].forEach(function(item){cb(null, item)})
   t.deepEqual(results, [3,5,7,9])
@@ -282,8 +268,8 @@ test('asyncCallback', function(t){
   trans = tr.compose(
     tr.filter(isEven),
     tr.map(inc),
-    tr.async.tap(appendEach),
-    tr.async.tap(function(result, i){if(i===7){throw abort}}))
+    tr.tap(appendEach),
+    tr.tap(function(result, i){if(i===7){throw abort}}))
   cb = tr.async.asyncCallback(trans, continuation)
   ;[1,2,3,4,5,6,7,8,9].forEach(function(item){cb(null, item)})
   t.deepEqual(results, [3,5,7])

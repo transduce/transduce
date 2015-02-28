@@ -135,6 +135,20 @@ test('unique', function(t) {
   t.end()
 })
 
+test('tap', function(t){
+  t.plan(3)
+
+  var results = [], items = []
+  var trans = tr.compose(
+    tr.filter(function(num) { return num % 2 === 0 }),
+    tr.tap(function(result, item){results.push([].slice.call(result)); items.push(item)}),
+    tr.map(function(num) { return num * num }))
+  var result = tr.into([], trans, [1,2,3,200])
+  t.deepEqual(result, [4, 40000], 'filter and map chained with tap')
+  t.deepEqual(results, [[], [4]], 'filter and map chained with tap results')
+  t.deepEqual(items, [2, 200], 'filter and map chained with tap items')
+})
+
 test('transformStep', function(t) {
   function map(f) {
     return tr.transformStep(function(xf, result, input){
