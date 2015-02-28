@@ -284,3 +284,33 @@ test('callback continuation', function(t){
     result.error = err
   }
 })
+
+test('when', function(t) {
+  t.plan(3)
+  tr.async.when(1, tr.map(add(1)))
+    .then(function(value){
+      t.equals(2, value)
+    })
+  tr.async.when(resolve(1), tr.map(add(1)))
+    .then(function(value){
+      t.equals(2, value)
+    })
+  tr.async.when(resolve(1), tr.compose(tr.map(add(2)), tr.map(add(1))))
+    .then(function(value){
+      t.equals(4, value)
+    })
+})
+
+test('promiseTransform', function(t) {
+  t.plan(2)
+  resolve(1)
+    .then(tr.async.promiseTransform(tr.map(add(1))))
+    .then(function(value){
+      t.equals(2, value)
+    })
+  resolve(1)
+    .then(tr.async.promiseTransform(tr.compose(tr.map(add(2)), tr.map(add(1)))))
+    .then(function(value){
+      t.equals(4, value)
+    })
+})

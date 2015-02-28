@@ -191,6 +191,8 @@ async {
   into: function(init, t?, coll?)
   transduce: function(t, xf, init?, coll)
   reduce: function(xf, init?, coll)
+  when: function(promiseOrValue, t)
+  promiseTransform: function(t)
   callback: function(t, init?, continuation?)
 }
 
@@ -490,6 +492,12 @@ Like a normal reduce, except `init` and `coll` can be a Promise and `xf` can be 
 Async version of into. Returns a Promise for a new collection appending all items into `init` by passing all items from source collection `coll` through the optional transducer `t`.  Chooses transformer, `xf` from type of `init`.  Can be array, object, string or have `@@transformer`. `coll` is converted to an `iterator`.
 
 The function is automatically curried. If `coll` is not provided, returns a curried function using `transformer` from `init` and the same transformation can be used for multiple collections.
+
+##### async.when(promiseOrValue, t)
+Resolves promise or value as a promise, then transforms promise result with the transducer `t` as a single item.
+
+##### async.promiseTransform(t)
+Creates a callback useable for promise sucess that transforms the result with the transducer `t`as a single item.
 
 ##### async.callback(t, init?, continuation?)
 Creates an async callback that starts a transducer process and accepts parameter `cb(err, item)` as a new item in the process. The returned callback and the optional continuation follow Node.js conventions with  `fn(err, item)`. Each item advances the state  of the transducer, if the continuation is provided, it will be called on completion or error. An error will terminate the transducer and be propagated to the continuation.

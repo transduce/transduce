@@ -8,4 +8,6 @@ module.exports = {
   defer: require('./defer'),
   delay: require('./delay'),
   callback: require('./callback'),
+  when: require('./when'),
+  promiseTransform: require('./promiseTransform')
 }
