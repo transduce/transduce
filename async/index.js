@@ -9,5 +9,6 @@ module.exports = {
   delay: require('./delay'),
   callback: require('./callback'),
   when: require('./when'),
-  promiseTransform: require('./promiseTransform')
+  promiseTransform: require('./promiseTransform'),
+  emitInto: require('./emitInto')
 }

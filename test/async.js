@@ -322,3 +322,52 @@ test('promiseTransform', function(t) {
       t.equals(4, value)
     })
 })
+
+test('emitInto', function(t){
+  var EventEmitter = require('events').EventEmitter,
+      from = new EventEmitter(),
+      items = [],
+      error = null,
+      end = false,
+      trans = tr.compose(tr.filter(isEven), tr.map(inc), tr.take(2)),
+      to = tr.async.emitInto(new EventEmitter(), trans, from),
+      cb = function(item){
+        from.emit('data', item);
+      }
+
+  to.on('data', pushItem)
+  to.on('error', storeError)
+  to.on('end', storeEnd)
+
+  ;[1,1,2,3,4,4,5].forEach(cb)
+  t.deepEqual(items, [3,5])
+  t.equal(end, true)
+  t.equal(error, null)
+
+  from = new EventEmitter()
+  end = false
+
+  to = tr.async.emitInto(new EventEmitter(), trans, from)
+  to.on('data', pushItem)
+  to.on('error', storeError)
+  to.on('end', storeEnd)
+
+  var err = new Error()
+  from.emit('error', err)
+  t.equal(end, true)
+  t.equal(error, err)
+
+  function pushItem(item){
+    items.push(item)
+  }
+
+  function storeError(err){
+    error = err
+  }
+
+  function storeEnd(){
+    end = true
+  }
+
+  t.end()
+})

@@ -193,6 +193,7 @@ async {
   reduce: function(xf, init?, coll)
   when: function(promiseOrValue, t)
   promiseTransform: function(t)
+  emitInto: function(to, t, from)
   callback: function(t, init?, continuation?)
 }
 
@@ -498,6 +499,15 @@ Resolves promise or value as a promise, then transforms promise result with the 
 
 ##### async.promiseTransform(t)
 Creates a callback useable for promise sucess that transforms the result with the transducer `t`as a single item.
+
+##### emitInto(to, t, from)
+Registers listener for events on `from` emitter and emits events on `to` emitter after transforming data events through the transducer, `t`. Assumes both `to` and `from` support the `EventEmitter` API from Node.js.
+
+Supports following events:
+
+- `emit('data', item)`: Listened and emitted for each item in transformation.
+- `emit('error', error)`: Listened and emitted on error in transformation
+- `emit('end')`: Emitted when transformer completes, regardless of error or result.
 
 ##### async.callback(t, init?, continuation?)
 Creates an async callback that starts a transducer process and accepts parameter `cb(err, item)` as a new item in the process. The returned callback and the optional continuation follow Node.js conventions with  `fn(err, item)`. Each item advances the state  of the transducer, if the continuation is provided, it will be called on completion or error. An error will terminate the transducer and be propagated to the continuation.
