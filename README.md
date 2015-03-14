@@ -196,15 +196,6 @@ async {
   emitInto: function(to, t, from)
   callback: function(t, init?, continuation?)
 }
-
-iterators {
-  toArray: function(value)
-  range: function(start?, stop, step?)
-  count: function(start?, step?)
-  cycle: function(iter)
-  repeat: function(elem, n?)
-  chain: function(/*args*/)
-}
 ```
 
 #### Core
@@ -500,7 +491,7 @@ Resolves promise or value as a promise, then transforms promise result with the 
 ##### async.promiseTransform(t)
 Creates a callback useable for promise sucess that transforms the result with the transducer `t`as a single item.
 
-##### emitInto(to, t, from)
+##### async.emitInto(to, t, from)
 Registers listener for events on `from` emitter and emits events on `to` emitter after transforming data events through the transducer, `t`. Assumes both `to` and `from` support the `EventEmitter` API from Node.js.
 
 Supports following events:
@@ -516,32 +507,6 @@ If the transducer exhausts due to early termination, all subsequent calls to the
 
 Like `into`, chooses transformer, `xf`, based on the type of `init` using `transformer`.  If `init` is not defined, maintains last value and does not buffer results. This can be used with `tap` or other methods to process items incrementally instead of waiting and buffering results.
 
-#### Iterators
-
-Mixed into `transduce.iterators` or available by explictly requiring from `transduce/iterators`.  The following are equivalent:
-
-- `require('transduce').iterators.toArray`
-- `require('transduce/iterators/toArray')`
-- `require('transduce/iterators').toArray`
-
-
-##### iterators.toArray(value)
-Converts the value to an iterator and iterates into an array.
-
-##### iterators.range(start?, stop, step?)
-Create a range of integers.  From start (default 0, inclusive) to stop (exclusive) incremented by step (default 1).
-
-##### iterators.count(start?, step?)
-Creates an infinite counting iterator from start (default 0) and incremented by step (default 1)
-
-##### iterators.cycle(iter)
-Creates an infinite iterator that accepts an iterable and repeatedly steps through every item of iterator. Once iterator completes, a new iterator is created from the iterable and steps through again.
-
-##### iterators.repeat(elem, n?)
-Repeats an elem up to n times.  If n is undefined, creates an infinite iterator that steps the element.
-
-##### iterators.chain(/\*args\*/)
-Combine multiple iterables into a chained iterable.  Once the first argument is exhausted, moves onto the next, until all argument iterables are exhausted.
 
 ### Credits
 

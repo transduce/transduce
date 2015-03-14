@@ -1,5 +1,6 @@
 'use strict'
 var tr = require('../'),
+    iterdone = require('iterdone'),
     test = require('tape'),
     compose = tr.compose
 
@@ -118,7 +119,7 @@ test('into', function(t) {
   t.deepEqual(toArray(tr.map(add(1)), [1,2,3]), [2,3,4])
   t.deepEqual(toArray(tr.map(add(1)))([1,2,3]), [2,3,4])
 
-  var range = tr.iterators.range
+  var range = iterdone.range
   t.deepEqual(toArray(range(1,4)), [1,2,3])
   t.deepEqual(toArray(tr.map(add(2)), range(3)), [2,3,4])
   t.deepEqual(toArray(tr.map(add(2)))(range(3)), [2,3,4])
@@ -143,7 +144,7 @@ test('into', function(t) {
 test('eduction', function(t){
   var xf,
       eduction = tr.eduction,
-      iterToArray = tr.iterators.toArray,
+      iterToArray = iterdone.toArray,
       into = tr.into
 
   var divisibleBy2 = eduction(
@@ -365,7 +366,7 @@ test('iterate string', function(t){
 
 test('iterate object', function(t){
   var obj, arr
-  var toArray = tr.iterators.toArray
+  var toArray = iterdone.toArray
 
   obj = {a:1, b:2, c:3}
   arr = [['a', 1],['b', 2],['c', 3]]
@@ -406,7 +407,7 @@ test('iterate fn', function(t){
 
 test('sequence array', function(t){
   var xf,
-      toArray = tr.iterators.toArray,
+      toArray = iterdone.toArray,
       sequence = tr.sequence
 
   xf = tr.map(add(1))
@@ -427,7 +428,7 @@ test('sequence array', function(t){
 
 test('sequence fn', function(t){
   var xf,
-      toArray = tr.iterators.toArray,
+      toArray = iterdone.toArray,
       sequence = tr.sequence
 
   xf = compose(tr.filter(isOdd), tr.take(3))
