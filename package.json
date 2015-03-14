@@ -31,6 +31,7 @@
     "uglify-js": "~2.4.16",
     "bundle-collapser": "~1.1.4",
     "tap-bail": "0.0.0",
-    "promise": "~6.1.0"
+    "promise": "~6.1.0",
+    "iterdone": "~0.1.0"
   }
 }
