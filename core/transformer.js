@@ -23,6 +23,9 @@ function transformer(value){
     xf = lastValue
   } else if(value[symbol] !== void 0){
     xf = value[symbol]
+    if(isFunction(xf)){
+      xf = xf()
+    }
   } else if(isFunction(value.step) && isFunction(value.result)){
     xf = value
   } else if(isFunction(value)){
