@@ -3,6 +3,7 @@ var isReduced = require('../isReduced'),
     unreduced = require('../unreduced'),
     iterable = require('../iterable'),
     protocols = require('../protocols'),
+    tp = protocols.transducer,
     util = require('../util'),
     isArray = util.isArray,
     isFunction = util.isFunction
@@ -33,20 +34,20 @@ function arrayReduce(xf, init, arr){
       i = 0,
       len = arr.length
   for(; i < len; i++){
-    value = xf.step(value, arr[i])
+    value = xf[tp.step](value, arr[i])
     if(isReduced(value)){
       value = unreduced(value)
       break
     }
   }
-  return xf.result(value)
+  return xf[tp.result](value)
 }
 
 function methodReduce(xf, init, coll){
   var result = coll.reduce(function(result, value){
-    return xf.step(result, value)
+    return xf[tp.step](result, value)
   }, init)
-  return xf.result(result)
+  return xf[tp.result](result)
 }
 
 function iteratorReduce(xf, init, iter){
@@ -58,11 +59,11 @@ function iteratorReduce(xf, init, iter){
       break
     }
 
-    value = xf.step(value, next.value)
+    value = xf[tp.step](value, next.value)
     if(isReduced(value)){
       value = unreduced(value)
       break
     }
   }
-  return xf.result(value)
+  return xf[tp.result](value)
 }

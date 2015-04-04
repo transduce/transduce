@@ -1,6 +1,7 @@
 'use strict'
 var reduced = require('../core/reduced'),
-    isRegExp = require('../core/util').isRegExp
+    isRegExp = require('../core/util').isRegExp,
+    tp = require('../core/protocols').transducer
 
 module.exports =
 function split(separator, limit){
@@ -31,8 +32,8 @@ function Split(separator, limit, xf){
     this.spliterate = spliterateChars
   }
 }
-Split.prototype.init = function(){return this.xf.init()}
-Split.prototype.step = function(result, input){
+Split.prototype[tp.init] = function(){return this.xf.init()}
+Split.prototype[tp.step] = function(result, input){
   if(input === null || input === void 0){
     return result
   }
@@ -47,7 +48,7 @@ Split.prototype.step = function(result, input){
       break
     }
 
-    result = this.xf.step(result, next.value)
+    result = this.xf[tp.step](result, next.value)
 
     if(++this.idx >= this.limit){
       this.next = null
@@ -57,12 +58,12 @@ Split.prototype.step = function(result, input){
   }
   return result
 }
-Split.prototype.result = function(result){
+Split.prototype[tp.result] = function(result){
   var next = this.next
   if(next && next.value !== null && next.value !== void 0){
-    result = this.xf.step(result, next.value)
+    result = this.xf[tp.step](result, next.value)
   }
-  return this.xf.result(result)
+  return this.xf[tp.result](result)
 }
 
 function spliterateChars(str){

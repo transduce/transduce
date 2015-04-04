@@ -1,5 +1,6 @@
 'use strict'
-var isReduced = require('../core/isReduced'),
+var transducer = require('../core/transducer'),
+    isReduced = require('../core/isReduced'),
     unreduced = require('../core/unreduced')
 
 // Returns everything but the last entry. Passing **n** will return all the values
@@ -8,31 +9,25 @@ var isReduced = require('../core/isReduced'),
 module.exports =
 function initial(n) {
   n = (n === void 0) ? 1 : (n > 0) ? n : 0
-  return function(xf){
-    return new Initial(n, xf)
-  }
-}
-function Initial(n, xf) {
-  this.xf = xf
-  this.n = n
-  this.idx = 0
-  this.buffer = []
-}
-Initial.prototype.init = function(){
-  return this.xf.init()
-}
-Initial.prototype.result = function(result){
-  var idx = 0, count = this.idx - this.n, buffer = this.buffer
-  for(idx = 0; idx < count; idx++){
-    result = this.xf.step(result, buffer[idx])
-    if(isReduced(result)){
-      result = unreduced(result)
-      break
-    }
-  }
-  return this.xf.result(result)
-}
-Initial.prototype.step = function(result, input){
-  this.buffer[this.idx++] = input
-  return result
+  return transducer(
+    function(step, value, input){
+      if(this.buffer === void 0){
+        this.n = n
+        this.idx = 0
+        this.buffer = []
+      }
+      this.buffer[this.idx++] = input
+      return value
+    },
+    function(result, value){
+      var idx = 0, count = this.idx - this.n, buffer = this.buffer
+      for(idx = 0; idx < count; idx++){
+        value = this.step(value, buffer[idx])
+        if(isReduced(value)){
+          value = unreduced(value)
+          break
+        }
+      }
+      return result(value)
+    })
 }

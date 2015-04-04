@@ -13,6 +13,5 @@ module.exports = {
   partitionBy: require('./partitionBy'),
   unique: require('./unique'),
   dedupe: require('./dedupe'),
-  tap: require('./tap'),
-  transformStep: require('./transformStep')
+  tap: require('./tap')
 }

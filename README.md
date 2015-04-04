@@ -97,14 +97,14 @@ A two arity function, `rf`, appropriate for passing to `reduce`. The first argum
 The initial accumulator value, `init` to use with Reduce.
 
 ##### Transformer
-An object that provides a reducing function, `step`, initial value function, `init`, and result extraction function, `result`.  Combines the steps of reduce into a single object.
+An object that provides a reducing function, `@@transducer/step`, initial value function, `@@transducer/init`, and result extraction function, `@@transducer/result`.  Combines the steps of reduce into a single object.
 
 ##### Reduce
 A function that folds over an input source to produce an Output Source.  Accepts a Reducing Function or Transformer, `xf`, as the first argument, an optional initial value, `init`, as the second argument and an Input Source, `coll` as the third argument.
 
 Also known as `foldLeft` or `foldl` in other languages and libraries.
 
-The function begins with calling the Reducing Function of `xf`, `step`, with the initial accumulator, `init`, and the first item of Input Source, `coll`.  The return value from the reducing function is used as the next accumulator with the next item in `coll`. The process repeats until either `coll` is exhausted or `xf` indicates early termination with `reduced`. Finally, the result extraction function of `xf`, `result`, is called with the final accumulator to perform potentially delayed actions and optionally convert the accumulator to the Output Source.
+The function begins with calling the Reducing Function of `xf`, `@@transducer/step`, with the initial accumulator, `init`, and the first item of Input Source, `coll`.  The return value from the reducing function is used as the next accumulator with the next item in `coll`. The process repeats until either `coll` is exhausted or `xf` indicates early termination with `reduced`. Finally, the result extraction function of `xf`, `@@transducer/result`, is called with the final accumulator to perform potentially delayed actions and optionally convert the accumulator to the Output Source.
 
 Reduce defines a Transducible Process.
 
@@ -134,10 +134,17 @@ unreduced: function(value)
 completing: function(rf, result?)
 transformer: function(value)
 iterable: function(value)
+transducer: function(step?, result?, init?)
 
 protocols: {
   iterator: Symbol.iterator || '@@iterator'
-  transformer: Symbol('transformer') || '@@transformer'
+  transducer: {
+    init: '@@transducer/init',
+    step: '@@transducer/step',
+    result: '@@transducer/result',
+    reduced: '@@transducer/reduced',
+    value: '@@transducer/value'
+  }
 }
 
 // transducers
@@ -155,7 +162,6 @@ partitionBy: function(f)
 dedupe: function()
 unique: function(f?)
 tap: function(interceptor)
-transformStep: function(xfStep)
 
 array {
   forEach: function(callback)
@@ -287,8 +293,57 @@ The iterable is an object that has a function identified by `protocols.iterator`
 ##### protocols.iterator
 Symbol (or a string that acts as symbols) for `@@iterator` you can use to configure your custom objects.
 
-##### protocols.transformer
-Symbol (or a string that acts as symbols) for [`@@transformer`][10] you can use to configure your custom objects.
+##### protocols.transducer
+String that acts as symbols for supporting the transducer protocol. Used to define transformers and reduced values.
+
+##### transducer(step?, result?, init?)
+Creates a transducer from a reducing function, `step`, result extraction function `result` and initial value function `init`.  If any function is `null` or `undefined`, default is to forward directly to wrapped transformer.
+
+The `@@transducer/step` function of the resulting transformer calls `step(xfStep, result, input)` bound to an empty context, where `xfStep` calls `step` on the wrapped transformer. The `init` and `result` functions behave similarly.
+
+All functions are called with a bound context (`this` parameter) that contains `init`, `step` and `result` functions that forward to wrapped transformer. The context can be used to implement stateful transducers. 
+
+```javascript
+// Map from a step function
+function map(callback) {
+  return transducer(function(step, value, input) {
+    return step(value, callback(input))
+  })
+}
+
+// using reduced
+function takeWhile(p){
+  return transducer(function(step, value, input){
+    return p(input) ? step(value, input) : reduced(value)
+  })
+}
+
+// using context for stateful transducers
+function drop(n){
+  return transducer(function(step, value, item){
+    if(this.n === void 0) this.n = n
+    return (--this.n < 0) ? step(value, item) : value
+  })
+}
+
+// using custom result
+function some(predicate) {
+  return transducer(
+    function(step, value, input){
+      if(predicate(input)){
+        this.found = true
+        return reduced(step(value, true))
+      }
+      return value
+    },
+    function(result, value){
+      if(!this.found){
+        value = this.step(value, false)
+      }
+      return result(value)
+    })
+}
+```
 
 #### Transducers
 Common transducers mixed into `transduce` directly or available by explictly requiring from `transduce/transducers`. The following are equivalent:
@@ -337,36 +392,6 @@ Produce a duplicate-free version of the transformation. If `f` is passed, it wil
 
 ##### tap(interceptor)
 Transducer that invokes interceptor with each result and input, and then passes through input. The primary purpose of this method is to "tap into" a method chain, in order to perform operations on intermediate results within the chain.  Executes interceptor with current result and input.
-
-##### transformStep(xfStep)
-Creates a transducer from a function called on every `step`.  The `step` function of the transducer delegates to `xfStep(xf, result, input)` bound to an empty context.  This is useful for creating custom transducers defined by a step function.  `init` returns `xf.init()` and `result` returns `xf.result(result)`.
-
-```javascript
-// Map from a step function
-function map(f) {
-  return tr.transformStep(function(xf, result, input){
-    return xf.step(result, f(input))
-  })
-}
-
-// using reduced
-function takeWhile(p){
-  return tr.transformStep(function(xf, result, item){
-    return p(item) ? xf.step(result, item) : tr.reduced(result)
-  })
-}
-
-// using context for stateful transducers
-function drop(n){
-  return tr.transformStep(function(xf, result, item){
-    if(this.n === void 0) this.n = n
-    if(--this.n < 0){
-      result = xf.step(result, item)
-    }
-    return result
-  })
-}
-```
 
 #### Array
 Use Array methods as Transducers.  Treats each stepped item as an item in the array, and defines transducers that step items with the same contract as array methods.

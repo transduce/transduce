@@ -1,5 +1,6 @@
 'use strict'
-var identity = require('./util').identity
+var identity = require('./util').identity,
+    tp = require('./protocols').transducer
 
 module.exports =
 // Turns a step function into a transfomer with init, step, result
@@ -8,9 +9,7 @@ function completing(rf, result){
   return new Completing(rf, result)
 }
 function Completing(rf, result){
-  this.step = rf
-  this.result = result || identity
-}
-Completing.prototype.init = function(){
-  return this.step()
+  this[tp.init] = rf
+  this[tp.step] = rf
+  this[tp.result] = result || identity
 }

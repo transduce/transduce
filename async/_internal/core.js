@@ -4,7 +4,8 @@ var Prom = require('any-promise'),
     unreduced = require('../../core/unreduced'),
     transformer = require('../../core/transformer'),
     iterable = require('../../core/iterable'),
-    protocols = require('../../core/protocols')
+    protocols = require('../../core/protocols'),
+    tp = protocols.transducer
 
 module.exports = {
   transduce: transduce,
@@ -19,15 +20,15 @@ function spread(fn, ctx){
   }
 }
 
-function transduce(xf, f, init, coll){
+function transduce(t, xf, init, coll){
   return Prom
-    .all([xf, f, init, coll])
+    .all([t, xf, init, coll])
     .then(_transduce)
 }
 
-function __transduce(xf, f, init, coll){
-  f = transformer(f)
-  xf = xf(f)
+function __transduce(t, xf, init, coll){
+  xf = transformer(xf)
+  xf = t(xf)
   return reduce(xf, init, coll)
 }
 
@@ -82,10 +83,10 @@ Reduce.prototype.__step = function(item){
     try {
       var result
       if(item.done){
-        result = self.xf.result(self.value)
+        result = self.xf[tp.result](self.value)
       } else {
         result = Prom
-          .all([self.xf.step(self.value, item.value)])
+          .all([self.xf[tp.step](self.value, item.value)])
           .then(self._loop)
       }
       resolve(result)
@@ -101,7 +102,7 @@ Reduce.prototype.__loop = function(value){
     try {
       var result
       if(isReduced(value)){
-        result = self.xf.result(unreduced(value))
+        result = self.xf[tp.result](unreduced(value))
       } else {
         result = self.iterate()
       }
