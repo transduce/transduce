@@ -7,10 +7,11 @@ module.exports = merge(merge({}, core), require(27))
 },{"27":27,"9":9}],2:[function(require,module,exports){
 'use strict'
 var isReduced = require(11),
-    unreduced = require(19),
+    unreduced = require(20),
     iterable = require(12),
     protocols = require(13),
-    util = require(20),
+    tp = protocols.transducer,
+    util = require(21),
     isArray = util.isArray,
     isFunction = util.isFunction
 
@@ -40,20 +41,20 @@ function arrayReduce(xf, init, arr){
       i = 0,
       len = arr.length
   for(; i < len; i++){
-    value = xf.step(value, arr[i])
+    value = xf[tp.step](value, arr[i])
     if(isReduced(value)){
       value = unreduced(value)
       break
     }
   }
-  return xf.result(value)
+  return xf[tp.result](value)
 }
 
 function methodReduce(xf, init, coll){
   var result = coll.reduce(function(result, value){
-    return xf.step(result, value)
+    return xf[tp.step](result, value)
   }, init)
-  return xf.result(result)
+  return xf[tp.result](result)
 }
 
 function iteratorReduce(xf, init, iter){
@@ -65,19 +66,20 @@ function iteratorReduce(xf, init, iter){
       break
     }
 
-    value = xf.step(value, next.value)
+    value = xf[tp.step](value, next.value)
     if(isReduced(value)){
       value = unreduced(value)
       break
     }
   }
-  return xf.result(value)
+  return xf[tp.result](value)
 }
 
-},{"11":11,"12":12,"13":13,"19":19,"20":20}],3:[function(require,module,exports){
+},{"11":11,"12":12,"13":13,"20":20,"21":21}],3:[function(require,module,exports){
 'use strict'
-var transformer = require(18),
-    isFunction = require(20).isFunction
+var transformer = require(19),
+    isFunction = require(21).isFunction,
+    tp = require(13).transducer
 
 module.exports = function(core){
   var reduce = core.reduce,
@@ -108,24 +110,25 @@ module.exports = function(core){
           return intoCurryXfT(xf, t)
         }
         coll = t
-        return reduce(xf, xf.init(), coll)
+        return reduce(xf, xf[tp.init](), coll)
       }
-      return transduce(t, xf, xf.init(), coll)
+      return transduce(t, xf, xf[tp.init](), coll)
     }
   }
 
   function intoCurryXfT(xf, t){
     return function intoXfT(coll){
-      return transduce(t, xf, xf.init(), coll)
+      return transduce(t, xf, xf[tp.init](), coll)
     }
   }
 }
 
-},{"18":18,"20":20}],4:[function(require,module,exports){
+},{"13":13,"19":19,"21":21}],4:[function(require,module,exports){
 'use strict'
 var completing = require(6),
-    util = require(20),
-    isFunction = util.isFunction
+    util = require(21),
+    isFunction = util.isFunction,
+    tp = require(13).transducer
 
 module.exports = function(core){
   return function reduce(xf, init, coll){
@@ -135,17 +138,18 @@ module.exports = function(core){
 
     if (arguments.length === 2) {
       coll = init
-      init = xf.init()
+      init = xf[tp.init]()
     }
     return core.reduce(xf, init, coll)
   }
 }
 
-},{"20":20,"6":6}],5:[function(require,module,exports){
+},{"13":13,"21":21,"6":6}],5:[function(require,module,exports){
 'use strict'
 var completing = require(6),
-    util = require(20),
-    isFunction = util.isFunction
+    util = require(21),
+    isFunction = util.isFunction,
+    tp = require(13).transducer
 
 module.exports = function(core){
   return function transduce(t, xf, init, coll) {
@@ -155,15 +159,16 @@ module.exports = function(core){
     xf = t(xf)
     if (arguments.length === 3) {
       coll = init
-      init = xf.init()
+      init = xf[tp.init]()
     }
     return core.reduce(xf, init, coll)
   }
 }
 
-},{"20":20,"6":6}],6:[function(require,module,exports){
+},{"13":13,"21":21,"6":6}],6:[function(require,module,exports){
 'use strict'
-var identity = require(20).identity
+var identity = require(21).identity,
+    tp = require(13).transducer
 
 module.exports =
 // Turns a step function into a transfomer with init, step, result
@@ -172,14 +177,12 @@ function completing(rf, result){
   return new Completing(rf, result)
 }
 function Completing(rf, result){
-  this.step = rf
-  this.result = result || identity
-}
-Completing.prototype.init = function(){
-  return this.step()
+  this[tp.init] = rf
+  this[tp.step] = rf
+  this[tp.result] = result || identity
 }
 
-},{"20":20}],7:[function(require,module,exports){
+},{"13":13,"21":21}],7:[function(require,module,exports){
 'use strict'
 
 module.exports =
@@ -227,30 +230,32 @@ module.exports = {
   compose: require(7),
   isReduced: require(11),
   reduced: require(15),
-  unreduced: require(19),
+  unreduced: require(20),
   completing: require(6),
-  transformer: require(18),
+  transformer: require(19),
   iterable: require(12),
   protocols: require(13),
-  util: require(20)
+  util: require(21)
 }
 
-},{"10":10,"11":11,"12":12,"13":13,"14":14,"15":15,"16":16,"17":17,"18":18,"19":19,"20":20,"6":6,"7":7,"8":8}],10:[function(require,module,exports){
+},{"10":10,"11":11,"12":12,"13":13,"14":14,"15":15,"16":16,"17":17,"19":19,"20":20,"21":21,"6":6,"7":7,"8":8}],10:[function(require,module,exports){
 'use strict'
 module.exports = require(3)(require(2))
 
 },{"2":2,"3":3}],11:[function(require,module,exports){
 'use strict'
 
+var tp = require(13).transducer
+
 module.exports =
 function isReduced(value){
-  return !!(value && value.__transducers_reduced__)
+  return !!(value && value[tp.reduced])
 }
 
-},{}],12:[function(require,module,exports){
+},{"13":13}],12:[function(require,module,exports){
 'use strict'
 var symbol = require(13).iterator,
-    util = require(20),
+    util = require(21),
     isArray = util.isArray,
     isFunction = util.isFunction,
     isString = util.isString,
@@ -341,16 +346,21 @@ function _keys(obj){
   return keys
 }
 
-},{"13":13,"20":20}],13:[function(require,module,exports){
+},{"13":13,"21":21}],13:[function(require,module,exports){
 var /* global Symbol */
     /* jshint newcap:false */
     symbolExists = typeof Symbol !== 'undefined',
     iterator = symbolExists ? Symbol.iterator : '@@iterator'
-    transformer = symbolExists ? Symbol('transformer') : '@@transformer'
 
 module.exports = {
   iterator: iterator,
-  transformer: transformer
+  transducer: {
+    init: '@@transducer/init',
+    step: '@@transducer/step',
+    result: '@@transducer/result',
+    reduced: '@@transducer/reduced',
+    value: '@@transducer/value'
+  }
 }
 
 },{}],14:[function(require,module,exports){
@@ -360,7 +370,8 @@ module.exports = require(4)(require(2))
 },{"2":2,"4":4}],15:[function(require,module,exports){
 'use strict'
 
-var isReduced = require(11)
+var isReduced = require(11),
+    tp = require(13).transducer
 
 module.exports =
 function reduced(value, force){
@@ -371,15 +382,16 @@ function reduced(value, force){
 }
 
 function Reduced(value){
-  this.value = value
-  this.__transducers_reduced__ = true
+  this[tp.value] = value
+  this[tp.reduced] = true
 }
 
-},{"11":11}],16:[function(require,module,exports){
+},{"11":11,"13":13}],16:[function(require,module,exports){
 'use strict'
 var isReduced = require(11),
     iterable = require(12),
-    symbol = require(13).iterator
+    protocols = require(13),
+    tp = protocols.transducer
 
 module.exports =
 function sequence(t, coll) {
@@ -390,8 +402,8 @@ function LazyIterable(t, coll){
   this.t = t
   this.coll = coll
 }
-LazyIterable.prototype[symbol] = function(){
-  var iter = iterable(this.coll)[symbol]()
+LazyIterable.prototype[protocols.iterator] = function(){
+  var iter = iterable(this.coll)[protocols.iterator]()
   return new LazyIterator(new Stepper(this.t, iter))
 }
 
@@ -410,16 +422,13 @@ LazyIterator.prototype.next = function(){
 }
 
 var stepTransformer = new StepTransformer()
-function StepTransformer(){
-}
-StepTransformer.prototype.init = function(){
-  throw new Error('Cannot init')
-}
-StepTransformer.prototype.step = function(lt, input){
+function StepTransformer(){}
+StepTransformer.prototype[tp.init] = function(){}
+StepTransformer.prototype[tp.step] = function(lt, input){
   lt.values.push(input)
   return lt
 }
-StepTransformer.prototype.result = function(lt){
+StepTransformer.prototype[tp.result] = function(lt){
   lt.stepper = null
   return lt
 }
@@ -437,13 +446,13 @@ Stepper.prototype.step = function(lt){
   while(prevLen === values.length){
     next = iter.next()
     if(next.done){
-      xf.result(lt)
+      xf[tp.result](lt)
       break
     }
 
-    result = xf.step(lt, next.value)
+    result = xf[tp.step](lt, next.value)
     if(isReduced(result)){
-      xf.result(lt)
+      xf[tp.result](lt)
       break
     }
   }
@@ -456,9 +465,50 @@ module.exports = require(5)(require(2))
 
 },{"2":2,"5":5}],18:[function(require,module,exports){
 'use strict'
-var symbol = require(13).transformer,
+var tp = require(13).transducer
+
+module.exports =
+function transducer(step, result, init) {
+  return function(xf){
+    return new Transducer(xf, step, result, init)
+  }
+}
+function Transducer(xf, step, result, init) {
+  this.xf = xf
+
+  this.init = init
+  this.step = step
+  this.result = result
+
+  this.context = {
+    init: bindXf(xf, tp.init),
+    step: bindXf(xf, tp.step),
+    result: bindXf(xf, tp.result)
+  }
+}
+Transducer.prototype[tp.init] = function(){
+  var that = this.context
+  return this.init ? this.init.call(that, that.init) : that.init()
+}
+Transducer.prototype[tp.step] = function(value, input){
+  var that = this.context
+  return this.step ? this.step.call(that, that.step, value, input) : that.step(value, input)
+}
+Transducer.prototype[tp.result] = function(value){
+  var that = this.context
+  return this.result ? this.result.call(that, that.result, value) : that.result(value)
+}
+function bindXf(xf, p){
+  return function(){
+    return xf[p].apply(xf, arguments)
+  }
+}
+
+},{"13":13}],19:[function(require,module,exports){
+'use strict'
+var tp = require(13).transducer,
     completing = require(6),
-    util = require(20),
+    util = require(21),
     identity = util.identity,
     isArray = util.isArray,
     isFunction = util.isFunction,
@@ -467,20 +517,18 @@ var symbol = require(13).transformer,
     arrayPush = util.arrayPush,
     stringAppend = util.stringAppend,
     slice = Array.prototype.slice,
-    lastValue = {
-      init: function(){},
-      step: function(result, input){return input},
-      result: identity
-    }
+    lastValue = {}
+
+lastValue[tp.init] = function(){}
+lastValue[tp.step] = function(result, input){return input}
+lastValue[tp.result] = identity
 
 module.exports =
 function transformer(value){
   var xf
   if(value === void 0 || value === null){
     xf = lastValue
-  } else if(value[symbol] !== void 0){
-    xf = value[symbol]
-  } else if(isFunction(value.step) && isFunction(value.result)){
+  } else if(isFunction(value[tp.step])){
     xf = value
   } else if(isFunction(value)){
     xf = completing(value)
@@ -501,11 +549,11 @@ function transformer(value){
 function ArrayTransformer(defaultValue){
   this.defaultValue = defaultValue === void 0 ? [] : defaultValue
 }
-ArrayTransformer.prototype.init = function(){
+ArrayTransformer.prototype[tp.init] = function(){
   return slice.call(this.defaultValue)
 }
-ArrayTransformer.prototype.step = arrayPush
-ArrayTransformer.prototype.result = identity
+ArrayTransformer.prototype[tp.step] = arrayPush
+ArrayTransformer.prototype[tp.result] = identity
 
 
 // Appends value onto string, using optional constructor arg as default, or '' if not provided
@@ -515,11 +563,11 @@ ArrayTransformer.prototype.result = identity
 function StringTransformer(str){
   this.strDefault = str === void 0 ? '' : str
 }
-StringTransformer.prototype.init = function(){
+StringTransformer.prototype[tp.init] = function(){
   return this.strDefault
 }
-StringTransformer.prototype.step = stringAppend
-StringTransformer.prototype.result = identity
+StringTransformer.prototype[tp.step] = stringAppend
+StringTransformer.prototype[tp.result] = identity
 
 // Merges value into object, using optional constructor arg as default, or {} if undefined
 // init will clone the default
@@ -528,26 +576,27 @@ StringTransformer.prototype.result = identity
 function ObjectTransformer(obj){
   this.objDefault = obj === void 0 ? {} : objectMerge({}, obj)
 }
-ObjectTransformer.prototype.init = function(){
+ObjectTransformer.prototype[tp.init] = function(){
   return objectMerge({}, this.objDefault)
 }
-ObjectTransformer.prototype.step = objectMerge
-ObjectTransformer.prototype.result = identity
+ObjectTransformer.prototype[tp.step] = objectMerge
+ObjectTransformer.prototype[tp.result] = identity
 
-},{"13":13,"20":20,"6":6}],19:[function(require,module,exports){
+},{"13":13,"21":21,"6":6}],20:[function(require,module,exports){
 'use strict'
 
-var isReduced = require(11)
+var isReduced = require(11),
+    tp = require(13).transducer
 
 module.exports =
 function unreduced(value){
   if(isReduced(value)){
-    value = value.value
+    value = value[tp.value]
   }
   return value
 }
 
-},{"11":11}],20:[function(require,module,exports){
+},{"11":11,"13":13}],21:[function(require,module,exports){
 'use strict'
 var toString = Object.prototype.toString,
     isArray = (Array.isArray || predicateToString('Array')),
@@ -608,180 +657,80 @@ function objectMerge(result, input){
   return result
 }
 
-},{}],21:[function(require,module,exports){
-'use strict'
-module.exports =
-function _unique(f, buffer) {
-   return function(xf){
-     return new Uniq(f, !buffer, xf)
-   }
-}
-function Uniq(f, isSorted, xf) {
-  this.xf = xf
-  this.f = f
-  this.isSorted = isSorted
-  this.seen = []
-  this.i = 0
-}
-Uniq.prototype.init = function(){
-  return this.xf.init()
-}
-Uniq.prototype.result = function(result){
-  return this.xf.result(result)
-}
-Uniq.prototype.step = function(result, input){
-  var seen = this.seen
-  if (this.isSorted) {
-    if (!this.i || seen !== input){
-      result = this.xf.step(result, input)
-    }
-    this.seen = input
-    this.i++
-  } else if (this.f) {
-    var computed = this.f(input)
-    if (seen.indexOf(computed) < 0) {
-      seen.push(computed)
-      result = this.xf.step(result, input)
-    }
-  } else if (seen.indexOf(input) < 0) {
-      seen.push(input)
-      result = this.xf.step(result, input)
-  }
-  return result
-}
-
 },{}],22:[function(require,module,exports){
 'use strict'
-
 var reduced = require(15),
     isReduced = require(11),
-    reduce = require(14)
+    reduce = require(14),
+    transducer = require(18),
+    transducerReduce = transducer(reduce),
+    preserveReduced = transducer(function(step, value, input){
+      value = step(value, input)
+      return isReduced(value) ? reduced(value, true) : value
+    })
 
 module.exports =
 function cat(xf){
-  return new Cat(xf)
-}
-function Cat(xf){
-  this.xf = new PreserveReduced(xf)
-}
-Cat.prototype.init = function(){
-  return this.xf.init()
-}
-Cat.prototype.result = function(value){
-  return this.xf.result(value)
-}
-Cat.prototype.step = function(value, item){
-  return reduce(this.xf, value, item)
+  return transducerReduce(preserveReduced(xf))
 }
 
-function PreserveReduced(xf){
-  this.xf = xf
-}
-PreserveReduced.prototype.init = function(){
-  return this.xf.init()
-}
-PreserveReduced.prototype.result = function(value){
-  return this.xf.result(value)
-}
-PreserveReduced.prototype.step = function(value, item){
-  value = this.xf.step(value, item)
-  if(isReduced(value)){
-    value = reduced(value, true)
-  }
-  return value
-}
-
-},{"11":11,"14":14,"15":15}],23:[function(require,module,exports){
+},{"11":11,"14":14,"15":15,"18":18}],23:[function(require,module,exports){
 'use strict'
-var _unique = require(21)
+var transducer = require(18)
 
 module.exports =
 function dedupe(){
-  return _unique()
+  return transducer(function(step, value, input){
+    if (!this.sawFirst || this.last !== input){
+      value = step(value, input)
+    }
+    this.last = input
+    this.sawFirst = true
+    return value
+  })
 }
 
-},{"21":21}],24:[function(require,module,exports){
+},{"18":18}],24:[function(require,module,exports){
 'use strict'
+var transducer = require(18)
 
 module.exports =
 function drop(n){
-  return function(xf){
-    return new Drop(n, xf)
-  }
-}
-function Drop(n, xf){
-  this.xf = xf
-  this.n = n
-}
-Drop.prototype.init = function(){
-  return this.xf.init()
-}
-Drop.prototype.result = function(value){
-  return this.xf.result(value)
-}
-Drop.prototype.step = function(value, item){
-  if(--this.n < 0){
-    value = this.xf.step(value, item)
-  }
-  return value
+  return transducer(function(step, value, item){
+    if(this.n === void 0) this.n = n
+    return (--this.n < 0) ? step(value, item) : value
+  })
 }
 
-},{}],25:[function(require,module,exports){
+},{"18":18}],25:[function(require,module,exports){
 'use strict'
+var transducer = require(18)
 
 module.exports =
 function dropWhile(p){
-  return function(xf){
-    return new DropWhile(p, xf)
-  }
-}
-function DropWhile(p, xf){
-  this.xf = xf
-  this.p = p
-}
-DropWhile.prototype.init = function(){
-  return this.xf.init()
-}
-DropWhile.prototype.result = function(value){
-  return this.xf.result(value)
-}
-DropWhile.prototype.step = function(value, item){
-  if(this.p){
-    if(this.p(item)){
-      return value
+  return transducer(function(step, value, input){
+    if(!this.found){
+      if(p(input)){
+        return value
+      }
+      this.found = true
     }
-    this.p = null
-  }
-  return this.xf.step(value, item)
+    return step(value, input)
+  })
 }
 
-},{}],26:[function(require,module,exports){
+},{"18":18}],26:[function(require,module,exports){
 'use strict'
-module.exports = filter
+var transducer = require(18)
 
+module.exports =
 function filter(predicate) {
-  return function(xf){
-    return new Filter(predicate, xf)
-  }
-}
-function Filter(f, xf) {
-  this.xf = xf
-  this.f = f
-}
-Filter.prototype.init = function(){
-  return this.xf.init()
-}
-Filter.prototype.result = function(result){
-  return this.xf.result(result)
-}
-Filter.prototype.step = function(result, input) {
-  if(this.f(input)){
-    result = this.xf.step(result, input)
-  }
-  return result
+  return transducer(function(step, value, input) {
+    return predicate(input) ? step(value, input) : value
+  })
 }
 
-},{}],27:[function(require,module,exports){
+},{"18":18}],27:[function(require,module,exports){
 'use strict'
 module.exports = {
   map: require(28),
@@ -795,39 +744,28 @@ module.exports = {
   mapcat: require(29),
   partitionAll: require(30),
   partitionBy: require(31),
-  unique: require(37),
+  unique: require(36),
   dedupe: require(23),
-  tap: require(35),
-  transformStep: require(36)
+  tap: require(35)
 }
 
-},{"22":22,"23":23,"24":24,"25":25,"26":26,"28":28,"29":29,"30":30,"31":31,"32":32,"33":33,"34":34,"35":35,"36":36,"37":37}],28:[function(require,module,exports){
+},{"22":22,"23":23,"24":24,"25":25,"26":26,"28":28,"29":29,"30":30,"31":31,"32":32,"33":33,"34":34,"35":35,"36":36}],28:[function(require,module,exports){
 'use strict'
+var transducer = require(18)
+
 module.exports =
 function map(callback) {
-  return function(xf){
-    return new Map(callback, xf)
-  }
-}
-function Map(f, xf) {
-  this.xf = xf
-  this.f = f
-}
-Map.prototype.init = function(){
-  return this.xf.init()
-}
-Map.prototype.result = function(result){
-  return this.xf.result(result)
-}
-Map.prototype.step = function(result, input) {
-  return this.xf.step(result, this.f(input))
+  return transducer(function(step, value, input) {
+    return step(value, callback(input))
+  })
 }
 
-},{}],29:[function(require,module,exports){
+},{"18":18}],29:[function(require,module,exports){
 'use strict'
 var compose = require(7),
     map = require(28),
     cat = require(22)
+
 module.exports =
 function mapcat(callback) {
   return compose(map(callback), cat)
@@ -835,85 +773,70 @@ function mapcat(callback) {
 
 },{"22":22,"28":28,"7":7}],30:[function(require,module,exports){
 'use strict'
-module.exports = partitionAll
+var transducer = require(18)
+
+module.exports =
 function partitionAll(n) {
-  return function(xf){
-    return new PartitionAll(n, xf)
-  }
-}
-function PartitionAll(n, xf) {
-  this.xf = xf
-  this.n = n
-  this.inputs = []
-}
-PartitionAll.prototype.init = function(){
-  return this.xf.init()
-}
-PartitionAll.prototype.result = function(result){
-  var ins = this.inputs
-  if(ins && ins.length){
-    this.inputs = []
-    result = this.xf.step(result, ins)
-  }
-  return this.xf.result(result)
-}
-PartitionAll.prototype.step = function(result, input) {
-  var ins = this.inputs,
-      n = this.n
-  ins.push(input)
-  if(n === ins.length){
-    this.inputs = []
-    result = this.xf.step(result, ins)
-  }
-  return result
+  return transducer(
+    function(step, value, input){
+      if(this.inputs === void 0){
+        this.inputs = []
+      }
+      var ins = this.inputs
+      ins.push(input)
+      if(n === ins.length){
+        this.inputs = []
+        value = step(value, ins)
+      }
+      return value
+    },
+    function(result, value){
+      var ins = this.inputs
+      if(ins && ins.length){
+        this.inputs = []
+        value = this.step(value, ins)
+      }
+      return result(value)
+    })
 }
 
-},{}],31:[function(require,module,exports){
+},{"18":18}],31:[function(require,module,exports){
 'use strict'
-var isReduced = require(11)
+var transducer = require(18),
+    isReduced = require(11)
 
 module.exports =
 function partitionBy(f) {
-  return function(xf){
-    return new PartitionBy(f, xf)
-  }
-}
-function PartitionBy(f, xf) {
-  this.xf = xf
-  this.f = f
-}
-PartitionBy.prototype.init = function(){
-  return this.xf.init()
-}
-PartitionBy.prototype.result = function(result){
-  var ins = this.inputs
-  if(ins && ins.length){
-    this.inputs = []
-    result = this.xf.step(result, ins)
-  }
-  return this.xf.result(result)
-}
-PartitionBy.prototype.step = function(result, input) {
-  var ins = this.inputs,
-      curr = this.f(input),
-      prev = this.prev
-  this.prev = curr
-
-  if(ins === void 0){
-    this.inputs = [input]
-  } else if(prev === curr){
-    ins.push(input)
-  } else {
-    this.inputs = []
-    result = this.xf.step(result, ins)
-    if(!isReduced(result)){
-      this.inputs.push(input)
-    }
-  }
-  return result
+  return transducer(
+    function(step, value, input){
+      var ins = this.inputs,
+          curr = f(input),
+          prev = this.prev
+      this.prev = curr
+      if(ins === void 0){
+        this.inputs = [input]
+      } else if(prev === curr){
+        ins.push(input)
+      } else {
+        this.inputs = []
+        value = step(value, ins)
+        if(!isReduced(value)){
+          this.inputs.push(input)
+        }
+      }
+      return value
+    },
+    function(result, value){
+      var ins = this.inputs
+      if(ins && ins.length){
+        this.inputs = []
+        value = this.step(value, ins)
+      }
+      return result(value)
+    })
 }
 
-},{"11":11}],32:[function(require,module,exports){
+},{"11":11,"18":18}],32:[function(require,module,exports){
 'use strict'
 var filter = require(26)
 
@@ -927,123 +850,70 @@ function remove(p){
 
 },{"26":26}],33:[function(require,module,exports){
 'use strict'
-
-var reduced = require(15)
+var transducer = require(18),
+    reduced = require(15)
 
 module.exports =
 function take(n){
-  return function(xf){
-    return new Take(n, xf)
-  }
-}
-function Take(n, xf){
-  this.xf = xf
-  this.n = n
-}
-Take.prototype.init = function(){
-  return this.xf.init()
-}
-Take.prototype.result = function(value){
-  return this.xf.result(value)
-}
-Take.prototype.step = function(value, item){
-  if(this.n-- > 0){
-    value = this.xf.step(value, item)
-  }
-  if(this.n <= 0){
-    value = reduced(value)
-  }
-  return value
+  return transducer(function(step, value, item){
+    if(this.n === void 0){
+      this.n = n
+    }
+    if(this.n-- > 0){
+      value = step(value, item)
+    }
+    if(this.n <= 0){
+      value = reduced(value)
+    }
+    return value
+  })
 }
 
-},{"15":15}],34:[function(require,module,exports){
+},{"15":15,"18":18}],34:[function(require,module,exports){
 'use strict'
-var reduced = require(15)
+var transducer = require(18),
+    reduced = require(15)
 
 module.exports =
 function takeWhile(p){
-  return function(xf){
-    return new TakeWhile(p, xf)
-  }
-}
-function TakeWhile(p, xf){
-  this.xf = xf
-  this.p = p
-}
-TakeWhile.prototype.init = function(){
-  return this.xf.init()
-}
-TakeWhile.prototype.result = function(value){
-  return this.xf.result(value)
-}
-TakeWhile.prototype.step = function(value, item){
-  if(this.p(item)){
-    value = this.xf.step(value, item)
-  } else {
-    value = reduced(value)
-  }
-  return value
+  return transducer(function(step, value, input){
+    return p(input) ? step(value, input) : reduced(value)
+  })
 }
 
-},{"15":15}],35:[function(require,module,exports){
+},{"15":15,"18":18}],35:[function(require,module,exports){
 'use strict'
+var transducer = require(18)
 
-// Invokes interceptor with each result and input, and then passes through input.
-// The primary purpose of this method is to "tap into" a method chain, in
-// order to perform operations on intermediate results within the chain.
-// Executes interceptor with current result and input
 module.exports =
 function tap(interceptor) {
-  return function(xf){
-    return new Tap(interceptor, xf)
-  }
-}
-function Tap(f, xf) {
-  this.xf = xf
-  this.f = f
-}
-Tap.prototype.init = function(){
-  return this.xf.init()
-}
-Tap.prototype.result = function(result){
-  return this.xf.result(result)
-}
-Tap.prototype.step = function(result, input) {
-  this.f(result, input)
-  return this.xf.step(result, input)
+  return transducer(function(step, value, input){
+    interceptor(value, input)
+    return step(value, input)
+  })
 }
 
-},{}],36:[function(require,module,exports){
+},{"18":18}],36:[function(require,module,exports){
 'use strict'
-module.exports =
-function transformStep(xfStep) {
-  return function(xf){
-    return new TransformStep(xfStep, xf)
-  }
-}
-function TransformStep(xfStep, xf) {
-  this.xf = xf
-  this.xfStep = xfStep
-  this.context = {}
-}
-TransformStep.prototype.init = function(){
-  return this.xf.init()
-}
-TransformStep.prototype.step = function(result, input){
-  return this.xfStep.call(this.context, this.xf, result, input)
-}
-TransformStep.prototype.result = function(result){
-  return this.xf.result(result)
-}
-
-},{}],37:[function(require,module,exports){
-'use strict'
-var _unique = require(21)
+var transducer = require(18),
+    identity = require(21).identity
 
 module.exports =
 function unique(f) {
-  return _unique(f, true)
+  f = f || identity
+  return transducer(function(step, value, input){
+    if(this.seen === void 0){
+      this.seen = []
+    }
+    var seen = this.seen,
+        computed = f(input)
+    if (seen.indexOf(computed) < 0) {
+      seen.push(computed)
+      value = step(value, input)
+    }
+    return value
+  })
 }
 
-},{"21":21}]},{},[1])(1)
+},{"18":18,"21":21}]},{},[1])(1)
 });
