@@ -1,7 +1,8 @@
 'use strict'
 var isReduced = require('./isReduced'),
     iterable = require('./iterable'),
-    symbol = require('./protocols').iterator
+    protocols = require('./protocols'),
+    tp = protocols.transducer
 
 module.exports =
 function sequence(t, coll) {
@@ -12,8 +13,8 @@ function LazyIterable(t, coll){
   this.t = t
   this.coll = coll
 }
-LazyIterable.prototype[symbol] = function(){
-  var iter = iterable(this.coll)[symbol]()
+LazyIterable.prototype[protocols.iterator] = function(){
+  var iter = iterable(this.coll)[protocols.iterator]()
   return new LazyIterator(new Stepper(this.t, iter))
 }
 
@@ -32,16 +33,13 @@ LazyIterator.prototype.next = function(){
 }
 
 var stepTransformer = new StepTransformer()
-function StepTransformer(){
-}
-StepTransformer.prototype.init = function(){
-  throw new Error('Cannot init')
-}
-StepTransformer.prototype.step = function(lt, input){
+function StepTransformer(){}
+StepTransformer.prototype[tp.init] = function(){}
+StepTransformer.prototype[tp.step] = function(lt, input){
   lt.values.push(input)
   return lt
 }
-StepTransformer.prototype.result = function(lt){
+StepTransformer.prototype[tp.result] = function(lt){
   lt.stepper = null
   return lt
 }
@@ -59,13 +57,13 @@ Stepper.prototype.step = function(lt){
   while(prevLen === values.length){
     next = iter.next()
     if(next.done){
-      xf.result(lt)
+      xf[tp.result](lt)
       break
     }
 
-    result = xf.step(lt, next.value)
+    result = xf[tp.step](lt, next.value)
     if(isReduced(result)){
-      xf.result(lt)
+      xf[tp.result](lt)
       break
     }
   }

@@ -2,9 +2,14 @@ var /* global Symbol */
     /* jshint newcap:false */
     symbolExists = typeof Symbol !== 'undefined',
     iterator = symbolExists ? Symbol.iterator : '@@iterator'
-    transformer = '@@transformer'
 
 module.exports = {
   iterator: iterator,
-  transformer: transformer
+  transducer: {
+    init: '@@transducer/init',
+    step: '@@transducer/step',
+    result: '@@transducer/result',
+    reduced: '@@transducer/reduced',
+    value: '@@transducer/value'
+  }
 }

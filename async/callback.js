@@ -1,15 +1,16 @@
 'use strict'
 var isReduced = require('../core/isReduced'),
     unreduced = require('../core/unreduced'),
-    transformer = require('../core/transformer')
+    transformer = require('../core/transformer'),
+    tp = require('../core/protocols').transducer
 
 module.exports =
 function callback(t, init, continuation){
-  var done = false, stepper, result,
+  var done = false, stepper, value,
       xf = transformer(init)
 
   stepper = t(xf)
-  result = stepper.init()
+  value = stepper[tp.init]()
 
   function checkDone(err, item){
     if(done){
@@ -19,24 +20,24 @@ function callback(t, init, continuation){
     err = err || null
 
     // check if exhausted
-    if(isReduced(result)){
-      result = unreduced(result)
+    if(isReduced(value)){
+      value = unreduced(value)
       done = true
     }
 
     if(err || done || item === void 0){
-      result = stepper.result(result)
+      value = stepper[tp.result](value)
       done = true
     }
 
     // notify if done
     if(done){
       if(continuation){
-        continuation(err, result)
+        continuation(err, value)
         continuation = null
-        result = null
+        value = null
       } else if(err){
-        result = null
+        value = null
         throw err
       }
     }
@@ -48,12 +49,12 @@ function callback(t, init, continuation){
     if(!checkDone(err, item)){
       try {
         // step to next result.
-        result = stepper.step(result, item)
+        value = stepper[tp.step](value, item)
         checkDone(err, item)
       } catch(err2){
         checkDone(err2, item)
       }
     }
-    if(done) return result
+    if(done) return value
   }
 }

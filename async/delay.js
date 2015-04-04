@@ -1,5 +1,6 @@
 'use strict'
-var Prom = require('any-promise')
+var Prom = require('any-promise'),
+    tp = require('../core/protocols').transducer
 
 module.exports = 
 function delay(wait) {
@@ -16,7 +17,7 @@ function Delay(wait, xf) {
   self._result = spread(task.result, task)
 }
 
-Delay.prototype.init = function(){
+Delay.prototype[tp.init] = function(){
   var self = this,
       task = self.task
   if(task.resolved){
@@ -24,9 +25,9 @@ Delay.prototype.init = function(){
   }
 
   return Prom
-    .resolve(self.xf.init())
+    .resolve(self.xf[tp.init]())
 }
-Delay.prototype.step = function(value, input) {
+Delay.prototype[tp.step] = function(value, input) {
   var self = this,
       task = self.task
   if(task.resolved){
@@ -37,7 +38,7 @@ Delay.prototype.step = function(value, input) {
     .all([value, input])
     .then(self._step)
 }
-Delay.prototype.result = function(value){
+Delay.prototype[tp.result] = function(value){
   var self = this,
       task = self.task
   if(task.resolved){
@@ -75,7 +76,7 @@ DelayTask.prototype.step = function(value, input){
 
     function step(){
       try {
-        resolve(task.xf.step(value, input))
+        resolve(task.xf[tp.step](value, input))
         task.q.shift()
         if(task.q.length > 0){
           task.call()
@@ -94,7 +95,7 @@ DelayTask.prototype.result = function(value){
     function result(){
       try {
         task.q = []
-        resolve(task.xf.result(value))
+        resolve(task.xf[tp.result](value))
       } catch(e){
         reject(e)
       }

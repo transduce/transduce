@@ -1,6 +1,7 @@
 'use strict'
 var transformer = require('../transformer'),
-    isFunction = require('../util').isFunction
+    isFunction = require('../util').isFunction,
+    tp = require('../protocols').transducer
 
 module.exports = function(core){
   var reduce = core.reduce,
@@ -31,15 +32,15 @@ module.exports = function(core){
           return intoCurryXfT(xf, t)
         }
         coll = t
-        return reduce(xf, xf.init(), coll)
+        return reduce(xf, xf[tp.init](), coll)
       }
-      return transduce(t, xf, xf.init(), coll)
+      return transduce(t, xf, xf[tp.init](), coll)
     }
   }
 
   function intoCurryXfT(xf, t){
     return function intoXfT(coll){
-      return transduce(t, xf, xf.init(), coll)
+      return transduce(t, xf, xf[tp.init](), coll)
     }
   }
 }

@@ -1,5 +1,5 @@
 'use strict'
-var symbol = require('./protocols').transformer,
+var tp = require('./protocols').transducer,
     completing = require('./completing'),
     util = require('./util'),
     identity = util.identity,
@@ -10,23 +10,18 @@ var symbol = require('./protocols').transformer,
     arrayPush = util.arrayPush,
     stringAppend = util.stringAppend,
     slice = Array.prototype.slice,
-    lastValue = {
-      init: function(){},
-      step: function(result, input){return input},
-      result: identity
-    }
+    lastValue = {}
+
+lastValue[tp.init] = function(){}
+lastValue[tp.step] = function(result, input){return input}
+lastValue[tp.result] = identity
 
 module.exports =
 function transformer(value){
   var xf
   if(value === void 0 || value === null){
     xf = lastValue
-  } else if(value[symbol] !== void 0){
-    xf = value[symbol]
-    if(isFunction(xf)){
-      xf = xf()
-    }
-  } else if(isFunction(value.step) && isFunction(value.result)){
+  } else if(isFunction(value[tp.step])){
     xf = value
   } else if(isFunction(value)){
     xf = completing(value)
@@ -47,11 +42,11 @@ function transformer(value){
 function ArrayTransformer(defaultValue){
   this.defaultValue = defaultValue === void 0 ? [] : defaultValue
 }
-ArrayTransformer.prototype.init = function(){
+ArrayTransformer.prototype[tp.init] = function(){
   return slice.call(this.defaultValue)
 }
-ArrayTransformer.prototype.step = arrayPush
-ArrayTransformer.prototype.result = identity
+ArrayTransformer.prototype[tp.step] = arrayPush
+ArrayTransformer.prototype[tp.result] = identity
 
 
 // Appends value onto string, using optional constructor arg as default, or '' if not provided
@@ -61,11 +56,11 @@ ArrayTransformer.prototype.result = identity
 function StringTransformer(str){
   this.strDefault = str === void 0 ? '' : str
 }
-StringTransformer.prototype.init = function(){
+StringTransformer.prototype[tp.init] = function(){
   return this.strDefault
 }
-StringTransformer.prototype.step = stringAppend
-StringTransformer.prototype.result = identity
+StringTransformer.prototype[tp.step] = stringAppend
+StringTransformer.prototype[tp.result] = identity
 
 // Merges value into object, using optional constructor arg as default, or {} if undefined
 // init will clone the default
@@ -74,8 +69,8 @@ StringTransformer.prototype.result = identity
 function ObjectTransformer(obj){
   this.objDefault = obj === void 0 ? {} : objectMerge({}, obj)
 }
-ObjectTransformer.prototype.init = function(){
+ObjectTransformer.prototype[tp.init] = function(){
   return objectMerge({}, this.objDefault)
 }
-ObjectTransformer.prototype.step = objectMerge
-ObjectTransformer.prototype.result = identity
+ObjectTransformer.prototype[tp.step] = objectMerge
+ObjectTransformer.prototype[tp.result] = identity

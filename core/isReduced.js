@@ -1,6 +1,8 @@
 'use strict'
 
+var tp = require('./protocols').transducer
+
 module.exports =
 function isReduced(value){
-  return !!(value && value.__transducers_reduced__)
+  return !!(value && value[tp.reduced])
 }

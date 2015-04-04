@@ -1,5 +1,6 @@
 'use strict'
 var tr = require('../'),
+    tp = tr.protocols.transducer,
     async = tr.async,
     test = require('tape'),
     Prom = require('any-promise')
@@ -155,17 +156,16 @@ test('delay', function(t) {
 test('deferred transformer', function(t) {
   t.plan(7)
 
-  var xf = {
-    init: function(){
-      return resolve([])
-    },
-    step: function(arr, item){
-      arr.push(item)
-      return resolve(arr)
-    },
-    result: function(arr){
-      return resolve(arr)
-    }
+  var xf = {}
+  xf[tp.init] = function(){
+    return resolve([])
+  }
+  xf[tp.step] = function(arr, item){
+    arr.push(item)
+    return resolve(arr)
+  }
+  xf[tp.result] = function(arr){
+    return resolve(arr)
   }
 
   var arr = async.reduce(xf, [1,2,3])

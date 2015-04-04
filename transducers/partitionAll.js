@@ -1,33 +1,27 @@
 'use strict'
-module.exports = partitionAll
+var transducer = require('../core/transducer')
+
+module.exports =
 function partitionAll(n) {
-  return function(xf){
-    return new PartitionAll(n, xf)
-  }
-}
-function PartitionAll(n, xf) {
-  this.xf = xf
-  this.n = n
-  this.inputs = []
-}
-PartitionAll.prototype.init = function(){
-  return this.xf.init()
-}
-PartitionAll.prototype.result = function(result){
-  var ins = this.inputs
-  if(ins && ins.length){
-    this.inputs = []
-    result = this.xf.step(result, ins)
-  }
-  return this.xf.result(result)
-}
-PartitionAll.prototype.step = function(result, input) {
-  var ins = this.inputs,
-      n = this.n
-  ins.push(input)
-  if(n === ins.length){
-    this.inputs = []
-    result = this.xf.step(result, ins)
-  }
-  return result
+  return transducer(
+    function(step, value, input){
+      if(this.inputs === void 0){
+        this.inputs = []
+      }
+      var ins = this.inputs
+      ins.push(input)
+      if(n === ins.length){
+        this.inputs = []
+        value = step(value, ins)
+      }
+      return value
+    },
+    function(result, value){
+      var ins = this.inputs
+      if(ins && ins.length){
+        this.inputs = []
+        value = this.step(value, ins)
+      }
+      return result(value)
+    })
 }

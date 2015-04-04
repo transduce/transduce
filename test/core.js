@@ -1,8 +1,10 @@
 'use strict'
 var tr = require('../'),
+    tp = tr.protocols.transducer,
     iterdone = require('iterdone'),
     test = require('tape'),
-    compose = tr.compose
+    compose = tr.compose,
+    stringReduce = tr.transformer('')
 
 function isOdd(x){return x % 2 === 1}
 function not(p){
@@ -17,17 +19,6 @@ function add(x){
 }
 var isEven = not(isOdd)
 
-var stringReduce = {
-  init: function() {
-    return ''
-  },
-  step: function(result, val) {
-    return result + val
-  },
-  result: function(result) {
-    return result
-  }
-}
 function count(){
   var cnt = 0
   return function(){
@@ -179,46 +170,46 @@ test('eduction', function(t){
 
 test('transform array', function(t){
   var xf = tr.transformer([]), result
-  result = xf.init()
+  result = xf[tp.init]()
   t.deepEquals([], result)
-  result = xf.step(result, 1)
+  result = xf[tp.step](result, 1)
   t.deepEquals([1], result)
-  result = xf.step(result, 2)
+  result = xf[tp.step](result, 2)
   t.deepEquals([1,2], result)
-  result = xf.step(result, 3)
+  result = xf[tp.step](result, 3)
   t.deepEquals([1,2,3], result)
-  result = xf.result(result)
+  result = xf[tp.result](result)
   t.deepEquals([1,2,3], result)
 
-  result = xf.init()
+  result = xf[tp.init]()
   t.deepEquals([], result)
-  result = xf.step(result, 1)
+  result = xf[tp.step](result, 1)
   t.deepEquals([1], result)
-  result = xf.step(result, 2)
+  result = xf[tp.step](result, 2)
   t.deepEquals([1,2], result)
-  result = xf.result(result)
+  result = xf[tp.result](result)
   t.deepEquals([1,2], result)
 
   xf = tr.transformer([4,5])
 
-  result = xf.init()
+  result = xf[tp.init]()
   t.deepEquals([4,5], result)
-  result = xf.step(result, 1)
+  result = xf[tp.step](result, 1)
   t.deepEquals([4,5,1], result)
-  result = xf.step(result, 2)
+  result = xf[tp.step](result, 2)
   t.deepEquals([4,5,1,2], result)
-  result = xf.step(result, 3)
+  result = xf[tp.step](result, 3)
   t.deepEquals([4,5,1,2,3], result)
-  result = xf.result(result)
+  result = xf[tp.result](result)
   t.deepEquals([4,5,1,2,3], result)
 
-  result = xf.init()
+  result = xf[tp.init]()
   t.deepEquals([4,5], result)
-  result = xf.step(result, 1)
+  result = xf[tp.step](result, 1)
   t.deepEquals([4,5,1], result)
-  result = xf.step(result, 2)
+  result = xf[tp.step](result, 2)
   t.deepEquals([4,5,1,2], result)
-  result = xf.result(result)
+  result = xf[tp.result](result)
   t.deepEquals([4,5,1,2], result)
 
   t.end()
@@ -226,35 +217,35 @@ test('transform array', function(t){
 
 test('transform string', function(t){
   var xf = tr.transformer(''), result
-  result = xf.init()
+  result = xf[tp.init]()
   t.deepEquals('', result)
-  result = xf.step(result, 1)
+  result = xf[tp.step](result, 1)
   t.deepEquals('1', result)
-  result = xf.step(result, 2)
+  result = xf[tp.step](result, 2)
   t.deepEquals('12', result)
-  result = xf.step(result, 3)
+  result = xf[tp.step](result, 3)
   t.deepEquals('123', result)
-  result = xf.result(result)
+  result = xf[tp.result](result)
   t.deepEquals('123', result)
 
   xf = tr.transformer('45')
 
-  result = xf.init()
+  result = xf[tp.init]()
   t.deepEquals('45', result)
-  result = xf.step(result, 1)
+  result = xf[tp.step](result, 1)
   t.deepEquals('451', result)
-  result = xf.step(result, 2)
+  result = xf[tp.step](result, 2)
   t.deepEquals('4512', result)
-  result = xf.result(result)
+  result = xf[tp.result](result)
   t.deepEquals('4512', result)
 
-  result = xf.init()
+  result = xf[tp.init]()
   t.deepEquals('45', result)
-  result = xf.step(result, 1)
+  result = xf[tp.step](result, 1)
   t.deepEquals('451', result)
-  result = xf.step(result, 2)
+  result = xf[tp.step](result, 2)
   t.deepEquals('4512', result)
-  result = xf.result(result)
+  result = xf[tp.result](result)
   t.deepEquals('4512', result)
 
   t.end()
@@ -262,33 +253,33 @@ test('transform string', function(t){
 
 test('transform object', function(t){
   var xf = tr.transformer({}), result
-  result = xf.init()
+  result = xf[tp.init]()
   t.deepEquals({}, result)
-  result = xf.step(result, {a:1})
+  result = xf[tp.step](result, {a:1})
   t.deepEquals({a:1}, result)
-  result = xf.step(result, ['b', 2])
+  result = xf[tp.step](result, ['b', 2])
   t.deepEquals({a:1, b:2}, result)
-  result = xf.step(result, {c:3})
+  result = xf[tp.step](result, {c:3})
   t.deepEquals({a:1, b:2, c:3}, result)
-  result = xf.result(result)
+  result = xf[tp.result](result)
   t.deepEquals({a:1,b:2,c:3}, result)
 
-  result = xf.init()
+  result = xf[tp.init]()
   t.deepEquals({}, result)
-  result = xf.step(result, {a:1, b:2})
+  result = xf[tp.step](result, {a:1, b:2})
   t.deepEquals({a:1, b:2}, result)
-  result = xf.step(result, {c:3})
+  result = xf[tp.step](result, {c:3})
   t.deepEquals({a:1, b:2, c:3}, result)
-  result = xf.result(result)
+  result = xf[tp.result](result)
   t.deepEquals({a:1,b:2,c:3}, result)
 
   xf = tr.transformer({d:4})
 
-  result = xf.init()
+  result = xf[tp.init]()
   t.deepEquals({d:4}, result)
-  result = xf.step(result, {a:1, b:2})
+  result = xf[tp.step](result, {a:1, b:2})
   t.deepEquals({a:1, b:2, d:4}, result)
-  result = xf.result(result)
+  result = xf[tp.result](result)
   t.deepEquals({a:1, b:2, d:4}, result)
 
   t.end()
@@ -297,13 +288,13 @@ test('transform object', function(t){
 test('transform function', function(t){
   var xf = tr.transformer(function(result, input){return result+input}), result
   result = 0
-  result = xf.step(result, 1)
+  result = xf[tp.step](result, 1)
   t.deepEquals(1, result)
-  result = xf.step(result, 2)
+  result = xf[tp.step](result, 2)
   t.deepEquals(3, result)
-  result = xf.step(result, 3)
+  result = xf[tp.step](result, 3)
   t.deepEquals(6, result)
-  result = xf.result(result)
+  result = xf[tp.result](result)
   t.deepEquals(6, result)
 
   t.end()
@@ -464,8 +455,8 @@ test('isReduced', function(t){
   t.ok(tr.isReduced(tr.reduced('')), 'isReduced')
   t.ok(!tr.isReduced(tr.unreduced(tr.reduced(''))), 'not isReduced')
   t.ok(!tr.isReduced({}), 'not isReduced')
-  t.ok(!tr.isReduced({__transducers_reduced__:false}), 'not isReduced')
-  t.ok(tr.isReduced({__transducers_reduced__:true}), 'not isReduced')
+  t.ok(!tr.isReduced({'@@transducer/reduced':false}), 'not isReduced')
+  t.ok(tr.isReduced({'@@transducer/reduced':true}), 'not isReduced')
 
   t.end()
 })
@@ -483,7 +474,7 @@ test('is', function(t){
 })
 
 test('arrayPush', function(t){
-  var arrayPush = tr.transformer([]).step,
+  var arrayPush = tr.transformer([])[tp.step],
       arr = []
   arr = arrayPush(arr, 1)
   t.deepEqual([1], arr)
@@ -495,7 +486,7 @@ test('arrayPush', function(t){
 })
 
 test('stringAppend', function(t){
-  var stringAppend = tr.transformer('').step,
+  var stringAppend = tr.transformer('')[tp.step],
       str = ''
   str = stringAppend(str, '1')
   t.deepEqual('1', str)
@@ -507,7 +498,7 @@ test('stringAppend', function(t){
 })
 
 test('objectMerge pair', function(t){
-  var objectMerge = tr.transformer({}).step,
+  var objectMerge = tr.transformer({})[tp.step],
       obj = {}
   obj = objectMerge(obj, ['a', 1])
   t.deepEqual({a:1}, obj)
@@ -521,7 +512,7 @@ test('objectMerge pair', function(t){
 })
 
 test('objectMerge obj', function(t){
-  var objectMerge = tr.transformer({}).step,
+  var objectMerge = tr.transformer({})[tp.step],
       obj = {}
   obj = objectMerge(obj, {a:1})
   t.deepEqual({a:1}, obj)
@@ -537,7 +528,7 @@ test('objectMerge obj', function(t){
 })
 
 test('objectMerge Object.create(null)', function(t){
-  var objectMerge = tr.transformer({}).step,
+  var objectMerge = tr.transformer({})[tp.step],
       obj = Object.create(null)
   obj.a = 1;
   obj = objectMerge({}, obj)

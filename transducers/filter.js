@@ -1,24 +1,9 @@
 'use strict'
-module.exports = filter
+var transducer = require('../core/transducer')
 
+module.exports =
 function filter(predicate) {
-  return function(xf){
-    return new Filter(predicate, xf)
-  }
-}
-function Filter(f, xf) {
-  this.xf = xf
-  this.f = f
-}
-Filter.prototype.init = function(){
-  return this.xf.init()
-}
-Filter.prototype.result = function(result){
-  return this.xf.result(result)
-}
-Filter.prototype.step = function(result, input) {
-  if(this.f(input)){
-    result = this.xf.step(result, input)
-  }
-  return result
+  return transducer(function(step, value, input) {
+    return predicate(input) ? step(value, input) : value
+  })
 }

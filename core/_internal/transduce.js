@@ -1,7 +1,8 @@
 'use strict'
 var completing = require('../completing'),
     util = require('../util'),
-    isFunction = util.isFunction
+    isFunction = util.isFunction,
+    tp = require('../protocols').transducer
 
 module.exports = function(core){
   return function transduce(t, xf, init, coll) {
@@ -11,7 +12,7 @@ module.exports = function(core){
     xf = t(xf)
     if (arguments.length === 3) {
       coll = init
-      init = xf.init()
+      init = xf[tp.init]()
     }
     return core.reduce(xf, init, coll)
   }

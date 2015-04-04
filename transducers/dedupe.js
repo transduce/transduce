@@ -1,7 +1,14 @@
 'use strict'
-var _unique = require('./_internal/unique')
+var transducer = require('../core/transducer')
 
 module.exports =
 function dedupe(){
-  return _unique()
+  return transducer(function(step, value, input){
+    if (!this.sawFirst || this.last !== input){
+      value = step(value, input)
+    }
+    this.last = input
+    this.sawFirst = true
+    return value
+  })
 }

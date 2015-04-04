@@ -1,27 +1,15 @@
 'use strict'
+var transducer = require('../core/transducer')
 
 module.exports =
 function dropWhile(p){
-  return function(xf){
-    return new DropWhile(p, xf)
-  }
-}
-function DropWhile(p, xf){
-  this.xf = xf
-  this.p = p
-}
-DropWhile.prototype.init = function(){
-  return this.xf.init()
-}
-DropWhile.prototype.result = function(value){
-  return this.xf.result(value)
-}
-DropWhile.prototype.step = function(value, item){
-  if(this.p){
-    if(this.p(item)){
-      return value
+  return transducer(function(step, value, input){
+    if(!this.found){
+      if(p(input)){
+        return value
+      }
+      this.found = true
     }
-    this.p = null
-  }
-  return this.xf.step(value, item)
+    return step(value, input)
+  })
 }
