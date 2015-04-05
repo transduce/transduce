@@ -941,11 +941,12 @@ module.exports = {
   completing: require(28),
   transformer: require(41),
   iterable: require(34),
+  transducer: require(40),
   protocols: require(35),
   util: require(43)
 }
 
-},{"28":28,"29":29,"30":30,"32":32,"33":33,"34":34,"35":35,"36":36,"37":37,"38":38,"39":39,"41":41,"42":42,"43":43}],32:[function(require,module,exports){
+},{"28":28,"29":29,"30":30,"32":32,"33":33,"34":34,"35":35,"36":36,"37":37,"38":38,"39":39,"40":40,"41":41,"42":42,"43":43}],32:[function(require,module,exports){
 'use strict'
 module.exports = require(25)(require(24))
 

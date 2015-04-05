@@ -12,6 +12,7 @@ module.exports = {
   completing: require('./completing'),
   transformer: require('./transformer'),
   iterable: require('./iterable'),
+  transducer: require('./transducer'),
   protocols: require('./protocols'),
   util: require('./util')
 }

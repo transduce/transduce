@@ -234,11 +234,12 @@ module.exports = {
   completing: require(6),
   transformer: require(19),
   iterable: require(12),
+  transducer: require(18),
   protocols: require(13),
   util: require(21)
 }
 
-},{"10":10,"11":11,"12":12,"13":13,"14":14,"15":15,"16":16,"17":17,"19":19,"20":20,"21":21,"6":6,"7":7,"8":8}],10:[function(require,module,exports){
+},{"10":10,"11":11,"12":12,"13":13,"14":14,"15":15,"16":16,"17":17,"18":18,"19":19,"20":20,"21":21,"6":6,"7":7,"8":8}],10:[function(require,module,exports){
 'use strict'
 module.exports = require(3)(require(2))
 
