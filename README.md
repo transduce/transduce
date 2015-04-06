@@ -59,22 +59,7 @@ tr.into([], transducer, [[1,2],[3,4],[5,6]])
 // [1,2,3,4,5,6,7]
 ```
 
-If you want to be reduce bundle size (or just like to be explicit), require with path from `transduce`.
-
-```javascript
-var into = require('transduce/core/into'),
-    compose = require('transduce/core/compose'),
-    cat = require('transduce/transducers/cat'),
-    map = require('transduce/transducers/map'),
-    unshift = require('transduce/array/unshift')
-
-var transducer = compose(cat, unshift(0), map(add(1)))
-into([], transducer, [[1,2],[3,4],[5,6]])
-// [1,2,3,4,5,6,7])
-
-```
-
-Too explicit? Require the packages:
+If you want to be reduce bundle size (or just like to be explicit), require packages with path from `transduce`.
 
 ```javascript
   var core = require('transduce/core'),
@@ -209,7 +194,6 @@ async {
 Core functionality mixed into `transduce` directly or available by explictly requiring from `transduce/core`.  The following are equivalent:
 
 - `require('transduce').into`
-- `require('transduce/core/into')`
 - `require('transduce/core').into`
 
 ##### into(init, t?, coll?)
@@ -299,48 +283,48 @@ String that acts as symbols for supporting the transducer protocol. Used to defi
 ##### transducer(step?, result?, init?)
 Creates a transducer from a reducing function, `step`, result extraction function `result` and initial value function `init`.  If any function is `null` or `undefined`, default is to forward directly to wrapped transformer.
 
-The `@@transducer/step` function of the resulting transformer calls `step(xfStep, result, input)` bound to an empty context, where `xfStep` calls `step` on the wrapped transformer. The `init` and `result` functions behave similarly.
+The `@@transducer/step` function of the resulting transformer calls `step(xfStep, result, input)` bound to a transducer instance, where `xfStep` calls `step` on the wrapped transformer. The `init` and `result` functions behave similarly.
 
-All functions are called with a bound context (`this` parameter) that contains `init`, `step` and `result` functions that forward to wrapped transformer. The context can be used to implement stateful transducers. 
+All functions are called with a bound to a transducer instance (`this` parameter) that contains `init`, `step` and `result` functions that forward to wrapped transformer. The context can be used to implement stateful transducers.
 
 ```javascript
 // Map from a step function
 function map(callback) {
-  return transducer(function(step, value, input) {
-    return step(value, callback(input))
+  return transducer(function(xfStep, value, input) {
+    return xfStep(value, callback(input))
   })
 }
 
 // using reduced
 function takeWhile(p){
-  return transducer(function(step, value, input){
-    return p(input) ? step(value, input) : reduced(value)
+  return transducer(function(xfStep, value, input){
+    return p(input) ? xfStep(value, input) : reduced(value)
   })
 }
 
 // using context for stateful transducers
 function drop(n){
-  return transducer(function(step, value, item){
+  return transducer(function(xfStep, value, item){
     if(this.n === void 0) this.n = n
-    return (--this.n < 0) ? step(value, item) : value
+    return (--this.n < 0) ? xfStep(value, item) : value
   })
 }
 
 // using custom result
 function some(predicate) {
   return transducer(
-    function(step, value, input){
+    function(xfStep, value, input){
       if(predicate(input)){
         this.found = true
-        return reduced(step(value, true))
+        return reduced(xfStep(value, true))
       }
       return value
     },
-    function(result, value){
+    function(xfResult, value){
       if(!this.found){
-        value = this.step(value, false)
+        value = this.xfStep(value, false)
       }
-      return result(value)
+      return xfResult(value)
     })
 }
 ```
@@ -348,7 +332,6 @@ function some(predicate) {
 #### Transducers
 Common transducers mixed into `transduce` directly or available by explictly requiring from `transduce/transducers`. The following are equivalent:
 - `require('transduce').map`
-- `require('transduce/transducers/map')`
 - `require('transduce/transducers).map`
 
 ##### map(f)
@@ -399,7 +382,6 @@ Use Array methods as Transducers.  Treats each stepped item as an item in the ar
 Mixed into `transduce.array` or available by explictly requiring from `transduce/array`.  The following are equivalent:
 
 - `require('transduce').array.forEach`
-- `require('transduce/array/forEach')`
 - `require('transduce/array').forEach`
 
 ##### array.forEach(callback)
@@ -443,7 +425,6 @@ Note that no items will be sent until completion.
 Mixed into `transduce.math` or available by explictly requiring from `transduce/math`.  The following are equivalent:
 
 - `require('transduce').math.min`
-- `require('transduce/math/min')`
 - `require('transduce/math').min`
 
 ##### math.min(f?)
@@ -460,7 +441,6 @@ Treats every item as a substring, and splits across the entire transducer sequen
 Mixed into `transduce.string` or available by explictly requiring from `transduce/string`.  The following are equivalent:
 
 - `require('transduce').string.split`
-- `require('transduce/string/split')`
 - `require('transduce/string').split`
 
 ##### string.split(separator, limit?)
@@ -487,7 +467,6 @@ Use Transducers with async iterators and observables by supporting Promises in i
 Mixed into `transduce.async` or available by explictly requiring from `transduce/async`.  The following are equivalent:
 
 - `require('transduce').async.defer`
-- `require('transduce/async/defer')`
 - `require('transduce/async').defer`
 
 ##### async.defer()
