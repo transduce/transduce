@@ -92,7 +92,7 @@ test('partitionBy', function(t) {
   var result = tr.into([], tr.partitionBy(isOdd), [0,1,1,3,4,6,8,7,7,8])
   t.deepEqual(result, [[0], [1,1,3], [4,6,8], [7,7], [8]])
   var arr = [1,1,1,2,2,3,3,3]
-  result = tr.into([], compose(tr.partitionBy(tr.util.identity), tr.take(2)), arr)
+  result = tr.into([], compose(tr.partitionBy(tr.identity), tr.take(2)), arr)
   t.deepEqual(result, [[1,1,1],[2,2]])
   result = tr.into([], tr.partitionBy(isOdd), [])
   t.deepEqual(result, [])

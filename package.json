@@ -26,12 +26,15 @@
   },
   "devDependencies": {
     "browserify": "~9.0.3",
-    "jshint": "~2.6.0",
-    "tape": "~3.5.0",
-    "uglify-js": "~2.4.16",
     "bundle-collapser": "~1.1.4",
-    "tap-bail": "0.0.0",
+    "gulp": "^3.8.11",
+    "gulp-babel": "^5.0.0",
+    "gulp-sourcemaps": "^1.5.1",
+    "iterdone": "~0.1.0",
+    "jshint": "~2.6.0",
     "promise": "~6.1.0",
-    "iterdone": "~0.1.0"
+    "tap-bail": "0.0.0",
+    "tape": "~3.5.0",
+    "uglify-js": "~2.4.16"
   }
 }

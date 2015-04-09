@@ -167,6 +167,50 @@ test('eduction', function(t){
   t.end()
 })
 
+test('transducer', function(t){
+  // Map from a step function
+  function map(callback) {
+    return tr.transducer(function(xfStep, value, input) {
+      return xfStep(value, callback(input))
+    })
+  }
+
+  // using custom result
+  function some(predicate) {
+    return tr.transducer(
+      function(xfStep, value, input){
+        if(predicate(input)){
+          this.found = true
+          return tr.reduced(xfStep(value, true))
+        }
+        return value
+      },
+      function(result, value){
+        if(!this.found){
+          value = this.xfStep(value, false)
+        }
+        return result(value)
+      })
+  }
+
+  var doubled = map(function(num){ return num * 2 })
+  t.deepEqual([2,4,6], tr.into([], doubled, [1,2,3]), 'can double')
+
+  var tripled = map(function(num){ return num * 3 })
+  t.deepEqual([3,6,9], tr.into([], tripled, [1,2,3]), 'can triple')
+
+  doubled = compose(
+    map(function(num){ return num * 2 }),
+    map(function(num){ return num * 3 }))
+  t.deepEqual([6,12,18], tr.into([], doubled, [1,2,3]), 'can double and triple in chain value')
+
+  t.deepEqual(tr.into([], some(tr.identity), []), [false], 'the empty set')
+  t.deepEqual(tr.into([], some(function(num){ return num % 2 === 0 }), [1, 11, 29]), [false], 'all odd numbers')
+  t.deepEqual(tr.into([], some(function(num){ return num % 2 === 0 }), [1, 10, 29]), [true], 'one even numbers')
+
+  t.end()
+})
+
 
 test('transform array', function(t){
   var xf = tr.transformer([]), result
@@ -395,6 +439,35 @@ test('iterate fn', function(t){
   t.end()
 })
 
+test('iterate next fn', function(t){
+  var fn, iterator, start, symbol = tr.protocols.iterator
+
+  function count(init){
+    var cnt = init
+    return {
+      next: function(){
+        return {done: false, value: cnt++}
+      }
+    }
+  }
+
+  start = 0
+  iterator = tr.iterable(count(start))[symbol]()
+  t.deepEquals({value: start++, done: false}, iterator.next())
+  t.deepEquals({value: start++, done: false}, iterator.next())
+  t.deepEquals({value: start++, done: false}, iterator.next())
+  t.deepEquals({value: start++, done: false}, iterator.next())
+
+  start = 10
+  iterator = tr.iterable(count(start))[symbol]()
+  t.deepEquals({value: start++, done: false}, iterator.next())
+  t.deepEquals({value: start++, done: false}, iterator.next())
+  t.deepEquals({value: start++, done: false}, iterator.next())
+  t.deepEquals({value: start++, done: false}, iterator.next())
+
+  t.end()
+})
+
 
 test('sequence array', function(t){
   var xf,
@@ -457,18 +530,6 @@ test('isReduced', function(t){
   t.ok(!tr.isReduced({}), 'not isReduced')
   t.ok(!tr.isReduced({'@@transducer/reduced':false}), 'not isReduced')
   t.ok(tr.isReduced({'@@transducer/reduced':true}), 'not isReduced')
-
-  t.end()
-})
-
-test('is', function(t){
-  t.ok(tr.util.isFunction(test))
-  t.ok(tr.util.isFunction(tr.util.identity))
-  t.ok(tr.util.isString(''))
-  t.ok(tr.util.isRegExp(/./))
-  t.ok(tr.util.isUndefined())
-  t.ok(tr.util.isArray([]))
-  t.ok(tr.util.isNumber(2))
 
   t.end()
 })
