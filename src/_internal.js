@@ -91,6 +91,10 @@ function Completing(rf, result){
 // Convert a value to an iterable
 const has = {}.hasOwnProperty
 
+export function iterator(value) {
+  return iterable(value)[symIter]()
+}
+
 export function iterable(value){
   var it
   if(value[symIter] !== void 0){

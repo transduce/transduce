@@ -119,6 +119,7 @@ unreduced: function(value)
 completing: function(rf, result?)
 transformer: function(value)
 iterable: function(value)
+iterator: function(value)
 transducer: function(step?, result?, init?)
 
 protocols: {
@@ -273,6 +274,9 @@ Returns the iterable for the parameter, returning if has an iterator protocol or
 Converts arrays to iterables over each indexed item. Converts to functions to infinite iterables that always call function on next. Converts objects to iterables of key, value pairs.
 
 The iterable is an object that has a function identified by `protocols.iterator` that should be called with no args and returns an iterator object that has a `next` method to cycle through the iterator.
+
+##### iterator(value)
+Returns an iterator for the value, shorthand for calling `iterable(value)[protocols.iterator]()`
 
 ##### protocols.iterator
 Symbol (or a string that acts as symbols) for `@@iterator` you can use to configure your custom objects.

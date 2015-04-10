@@ -6,8 +6,8 @@ const symIter = protocols.iterator
 
 // Transformer, iterable, completing
 import {transduceImpl, reduceImpl, intoImpl,
-        transformer, iterable, completing} from './_internal'
-export {transformer, iterable, completing}
+        transformer, iterable, iterator, completing} from './_internal'
+export {transformer, iterable, iterator, completing}
 
 export {compose, identity, protocols, isReduced, reduced, unreduced, Transducer}
 
@@ -47,7 +47,7 @@ function methodReduce(xf, init, coll){
 
 function iteratorReduce(xf, init, iter){
   var value = init, next
-  iter = iterable(iter)[protocols.iterator]()
+  iter = iterator(iter)
   while(true){
     next = iter.next()
     if(next.done){
@@ -96,7 +96,7 @@ class Eduction {
     this.coll = coll
   }
   [symIter](){
-    return sequence(this.t, this.coll)[symIter]()
+    return iterator(sequence(this.t, this.coll))
   }
   reduce(rf, init){
     return transduce(this.t, rf, init, this.coll)
@@ -114,8 +114,7 @@ class LazyIterable {
     this.coll = coll
   }
   [symIter](){
-    var iter = iterable(this.coll)[symIter]()
-    return new LazyIterator(new Stepper(this.t, iter))
+    return new LazyIterator(new Stepper(this.t, iterator(this.coll)))
   }
 }
 
