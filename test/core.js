@@ -596,3 +596,9 @@ test('objectMerge Object.create(null)', function(t){
   t.deepEqual({a:1}, obj)
   t.end()
 })
+
+test('iterator', function(t) {
+  t.plan(1)
+  var x = tr.iterator([1, 2, 3])
+  t.ok(typeof x.next === 'function')
+})
