@@ -148,3 +148,11 @@ test('tap', function(t){
   t.deepEqual(results, [[], [4]], 'filter and map chained with tap results')
   t.deepEqual(items, [2, 200], 'filter and map chained with tap items')
 })
+
+test('interpose', function(t) {
+  t.plan(1)
+
+  var letters = ['a', 'b', 'c']
+  t.deepEqual(tr.into([], tr.interpose(','), letters), ['a', ',', 'b', ',', 'c'])
+
+})

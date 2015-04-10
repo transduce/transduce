@@ -376,6 +376,9 @@ Produce a duplicate-free version of the transformation. If `f` is passed, it wil
 ##### tap(interceptor)
 Transducer that invokes interceptor with each result and input, and then passes through input. The primary purpose of this method is to "tap into" a method chain, in order to perform operations on intermediate results within the chain.  Executes interceptor with current result and input.
 
+##### interpose(separator)
+Transducer that places separator between each stepped value.
+
 #### Array
 Use Array methods as Transducers.  Treats each stepped item as an item in the array, and defines transducers that step items with the same contract as array methods.
 

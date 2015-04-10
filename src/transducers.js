@@ -195,7 +195,7 @@ class Unique extends Transducer {
   }
   [tStep](value, input){
     var computed = this.f(input)
-    if (this.seen.indexOf(computed) < 0) {
+    if (this.seen.indexOf(computed) < 0){
       this.seen.push(computed)
       value = this.xfStep(value, input)
     }
@@ -212,5 +212,27 @@ class Tap extends Transducer {
   [tStep](value, input){
     this.f(value, input)
     return this.xfStep(value, input)
+  }
+}
+
+export const interpose = separator => xf => new Interpose(separator, xf)
+class Interpose extends Transducer {
+  constructor(separator, xf){
+    super(xf)
+    this.separator = separator
+    this.started   = false
+  }
+  [tStep](value, input){
+    if (this.started){
+      let withSep = this.xf[tStep](value, this.separator)
+      if (isReduced(withSep)){
+        return withSep
+      } else {
+        return this.xfStep(withSep, input)
+      }
+    } else {
+      this.started = true
+      return this.xfStep(value, input)
+    }
   }
 }
