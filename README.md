@@ -278,6 +278,12 @@ The iterable is an object that has a function identified by `protocols.iterator`
 ##### iterator(value)
 Returns an iterator for the value, shorthand for calling `iterable(value)[protocols.iterator]()`
 
+##### isIterable(value)
+Returns `true` if a value fulfills the iterator protocol, also returning true for `Array` and `String` as these types both implement the iterator protocol in ES6. 
+
+##### isIterator(value)
+Returns `true` if a value is an iterator, defined an object with a `next` function.
+
 ##### protocols.iterator
 Symbol (or a string that acts as symbols) for `@@iterator` you can use to configure your custom objects.
 

@@ -13,6 +13,13 @@ function predicateToString(type){
   return (value) => str === toString.call(value)
 }
 
+export function isIterable(value) {
+  return !!(isString(value) || isArray(value) || (value && value[protocols.iterator]))
+}
+export function isIterator(value) {
+  return !!(value && isFunction(value.next))
+}
+
 // convenience functions
 export const identity = v => v
 

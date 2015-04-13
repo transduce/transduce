@@ -1,5 +1,5 @@
 import {Transducer, compose, identity, protocols,
-        isReduced, reduced, unreduced, isArray, isFunction} from './util'
+        isReduced, reduced, unreduced, isArray, isFunction, isIterable, isIterator} from './util'
 
 const {init: tInit, step: tStep, result: tResult} = protocols.transducer
 const symIter = protocols.iterator
@@ -9,7 +9,7 @@ import {transduceImpl, reduceImpl, intoImpl,
         transformer, iterable, iterator, completing} from './_internal'
 export {transformer, iterable, iterator, completing}
 
-export {compose, identity, protocols, isReduced, reduced, unreduced, Transducer}
+export {compose, identity, protocols, isReduced, reduced, unreduced, Transducer, isIterable, isIterator}
 
 // Transduce, reduce, into
 export const reduce = reduceImpl(_reduce)
