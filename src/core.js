@@ -127,7 +127,7 @@ class LazyIterator {
     if(this.stepper && this.values.length === 0){
       this.stepper.step(this)
     }
-    return this.values.length ? {done: false, value: this.values.pop()} : {done: true}
+    return this.values.length ? {done: false, value: this.values.shift()} : {done: true}
   }
 }
 

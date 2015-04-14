@@ -479,7 +479,8 @@ test('iterate next fn', function(t){
 test('sequence array', function(t){
   var xf,
       toArray = iterdone.toArray,
-      sequence = tr.sequence
+      sequence = tr.sequence,
+      transducer = tr.transducer
 
   xf = tr.map(add(1))
   t.deepEqual(toArray(sequence(xf, [1,2,3])), [2,3,4])
@@ -493,6 +494,13 @@ test('sequence array', function(t){
 
   xf = compose(tr.filter(isOdd), tr.drop(3))
   t.deepEqual(toArray(sequence(xf, [1,2,3,4,5,7,9,10,12,13,15])), [7,9,13,15])
+
+  t.deepEqual(toArray(sequence(transducer(function(step, value, input) {
+    if (input === 1) {
+      value = step(value, 'a')
+    }
+    return step(value, input)
+  }), [1, 2, 3])), ['a', 1, 2, 3])
 
   t.end()
 })
