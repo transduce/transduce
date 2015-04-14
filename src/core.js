@@ -1,7 +1,7 @@
 import {Transducer, compose, identity, protocols,
         isReduced, reduced, unreduced, isArray, isFunction, isIterable, isIterator} from './util'
 
-const {init: tInit, step: tStep, result: tResult} = protocols.transducer
+const {init: tInit, step: tStep, result: tResult, reduce: tReduce} = protocols.transducer
 const symIter = protocols.iterator
 
 // Transformer, iterable, completing
@@ -20,7 +20,7 @@ function _reduce(xf, init, coll){
   if(isArray(coll)){
     return arrayReduce(xf, init, coll)
   }
-  if(isFunction(coll.reduce)){
+  if(isFunction(coll[tReduce])){
     return methodReduce(xf, init, coll)
   }
   return iteratorReduce(xf, init, coll)
@@ -41,7 +41,7 @@ function arrayReduce(xf, init, arr){
 }
 
 function methodReduce(xf, init, coll){
-  var value = coll.reduce(xf[tStep].bind(xf), init)
+  var value = coll[tReduce](xf[tStep].bind(xf), init)
   return xf[tResult](value)
 }
 
@@ -98,7 +98,7 @@ class Eduction {
   [symIter](){
     return iterator(sequence(this.t, this.coll))
   }
-  reduce(rf, init){
+  [tReduce](rf, init){
     return transduce(this.t, rf, init, this.coll)
   }
 }
