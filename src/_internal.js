@@ -54,9 +54,9 @@ export function intoImpl(reduce){
         return intoCurryXfT(xf, t)
       }
       coll = t
-      return reduce(xf, init, coll)
+      return reduce(xf, xf[tInit](), coll)
     }
-    return reduce(t(xf), init, coll)
+    return reduce(t(xf), xf[tInit](), coll)
   }
 
   function intoCurryXf(xf){
