@@ -406,6 +406,7 @@ test('iterate object', function(t){
   obj = {a:1, b:2, c:3}
   arr = [['a', 1],['b', 2],['c', 3]]
 
+  t.deepEqual(tr.into([], tr.iterable(obj)), arr)
   t.deepEqual(toArray(obj).sort(), arr)
   t.deepEqual(toArray({}), [])
 

@@ -150,7 +150,7 @@ class ObjectIterable {
           return {done: true}
         }
         var key = this.keys[idx++]
-        return {done: false, value: [key, obj[key]]}
+        return {done: false, value: [key, this.obj[key]]}
       }
     }
   }
