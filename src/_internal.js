@@ -111,7 +111,7 @@ export function iterable(value){
   return it
 }
 
-class ArrayIterable {
+export class ArrayIterable {
   constructor(arr){
     this.arr = arr
   }
@@ -128,7 +128,7 @@ class ArrayIterable {
   }
 }
 
-class FunctionIterable {
+export class FunctionIterable {
   constructor(fn){
     this.fn = fn
   }
@@ -137,7 +137,7 @@ class FunctionIterable {
   }
 }
 
-class ObjectIterable {
+export class ObjectIterable {
   constructor(obj){
     this.obj = obj
     this.keys = Object.keys(obj)
@@ -187,7 +187,7 @@ export function transformer(value){
 // init will clone the default
 // step will push input onto array and return result
 // result is identity
-class ArrayTransformer {
+export class ArrayTransformer {
   constructor(defaultValue){
     this.defaultValue = defaultValue === void 0 ? [] : defaultValue
   }
@@ -205,7 +205,7 @@ class ArrayTransformer {
 // init will return the default
 // step will append input onto string and return result
 // result is identity
-class StringTransformer {
+export class StringTransformer {
   constructor(str){
     this.strDefault = str === void 0 ? '' : str
   }
@@ -222,7 +222,7 @@ class StringTransformer {
 // init will clone the default
 // step will merge input into object and return result
 // result is identity
-class ObjectTransformer {
+export class ObjectTransformer {
   constructor(obj){
     this.objDefault = obj === void 0 ? {} : objectMerge({}, obj)
   }
