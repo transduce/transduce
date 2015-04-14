@@ -135,6 +135,16 @@ test('into', function(t) {
   t.deepEqual(toObject(tr.partitionAll(2), ['a', 'b', 'b', 'c']), {a: 'b', b: 'c'})
   t.deepEqual(toObject(tr.partitionAll(2))(['a', 'b', 'b', 'c']), {a: 'b', b: 'c'})
 
+  var intoInit = {}
+  intoInit[tp.init] = function() { return [4] }
+  intoInit[tp.step] = function(value, input) { 
+    value.push(input)
+    return value
+  }
+  intoInit[tp.result] = tr.identity
+
+  t.deepEqual(tr.into(intoInit, [1, 2, 3]), [4, 1, 2, 3])
+
   t.end()
 })
 
