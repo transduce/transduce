@@ -128,6 +128,7 @@ protocols: {
     init: '@@transducer/init',
     step: '@@transducer/step',
     result: '@@transducer/result',
+    reduce: '@@transducer/reduce',
     reduced: '@@transducer/reduced',
     value: '@@transducer/value'
   }
@@ -235,13 +236,13 @@ part2(['a', 'b', 'b', 'c']) // {a: 'b', b: 'c'})
 ```
 
 ##### reduce(xf, init?, coll)
-Reduces over a transformation. If `xf` is not a `transformer`, it is converted to one using `completing`. Arrays are special cased to reduce using for loop and to allow transducers using `reduced`.  If `coll` has a `reduce` method, it is called with `xf.step` and `init`. Otherwise,`coll` is converted to an `iterator`.  If the function is called with arity-2, the `xf.init()` is used as the `init` value.
+Reduces over a transformation. If `xf` is not a `transformer`, it is converted to one using `completing`. Arrays are special cased to reduce using for loop and to allow transducers using `reduced`.  If `coll` has a `'@@transducer/reduce'` method, it is called with `xf.step` and `init`. Otherwise,`coll` is converted to an `iterator`.  If the function is called with arity-2, the `xf.init()` is used as the `init` value.
 
 ##### transduce(t, xf, init?, coll)
 Transduces over a transformation. The transducer `t` is initialized with `xf` and is passed to `reduce`. `xf` is converted to a `transformer` if it is not one already using `completing`. If the function is called with arity-3, the `xf.init()` is used as the `init` value.
 
 ##### eduction(t, coll)
-Creates an iterable and reducible application of the collection `coll` transformed by transducer`t`.  The returned eduction will be iterable using `sequence` and have a `reduce(rf, init)` method using `transduce`.
+Creates an iterable and reducible application of the collection `coll` transformed by transducer`t`.  The returned eduction will be iterable using `sequence` and have a `['@@transducer/reduce'](rf, init)` method using `transduce`.
 
 ##### sequence(t, value)
 Create an ES6 Iterable by transforming an input source using transducer `t`.

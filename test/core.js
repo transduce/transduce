@@ -43,6 +43,12 @@ test('reduce', function(t) {
   var reducer  = tr.dedupe()(stringReduce)
   t.equal(tr.reduce(reducer, '', ['a', 'b', 'b', 'c']), 'abc')
   t.equal(tr.reduce(reducer, ['a', 'b', 'b', 'c']), 'abc')
+
+  var reduce10 = {}
+  reduce10[tp.reduce] = function(rf, init){ return rf(10, init)}
+  sum = tr.reduce(function(sum, num){ return sum + num }, 7, reduce10)
+  t.equal(sum, 17, 'can dispatch on @@transducer/reduce')
+
   t.end()
 })
 

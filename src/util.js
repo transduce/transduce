@@ -42,6 +42,7 @@ export const protocols = {
     init: '@@transducer/init',
     step: '@@transducer/step',
     result: '@@transducer/result',
+    reduce: '@@transducer/reduce',
     reduced: '@@transducer/reduced',
     value: '@@transducer/value'
   }
