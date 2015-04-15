@@ -46,37 +46,41 @@ export function intoImpl(reduce){
         len = arguments.length
 
     if(len === 1){
-      return intoCurryXf(xf)
+      return intoCurryInitXf(intoInit(init, xf), xf)
     }
 
     if(len === 2){
       if(isFunction(t)){
-        return intoCurryXfT(xf, t)
+        return intoCurryInitXfT(intoInit(init, xf), xf, t)
       }
       coll = t
-      return reduce(xf, xf[tInit](), coll)
+      return reduce(xf, init, coll)
     }
-    return reduce(t(xf), xf[tInit](), coll)
+    return reduce(t(xf), init, coll)
   }
 
-  function intoCurryXf(xf){
-    return function intoXf(t, coll){
+  function intoCurryInitXf(init, xf){
+    return function intoInitXf(t, coll){
       if(arguments.length === 1){
         if(isFunction(t)){
-          return intoCurryXfT(xf, t)
+          return intoCurryInitXfT(init, xf, t)
         }
         coll = t
-        return reduce(xf, xf[tInit](), coll)
+        return reduce(xf, init(), coll)
       }
-      return reduce(t(xf), xf[tInit](), coll)
+      return reduce(t(xf), init(), coll)
     }
   }
 
-  function intoCurryXfT(xf, t){
-    return function intoXfT(coll){
-      return reduce(t(xf), xf[tInit](), coll)
+  function intoCurryInitXfT(init, xf, t){
+    return function intoInitXfT(coll){
+      return reduce(t(xf), init(), coll)
     }
   }
+
+  function intoInit(init, xf) {
+    return () => reduce(xf, xf[tInit](), init)
+  }  
 }
 
 // Turns a step function into a transfomer with init, step, result
@@ -156,9 +160,6 @@ export class ObjectIterable {
   }
 }
 
-// converts a value to a transformer
-const slice = Array.prototype.slice
-      
 const lastValue = {
   [tInit]: () => {},
   [tStep]: (result, input) => input,
@@ -174,11 +175,11 @@ export function transformer(value){
   } else if(isFunction(value)){
     xf = completing(value)
   } else if(isArray(value)){
-    xf = new ArrayTransformer(value)
+    xf = arrayTransformer
   } else if(isString(value)){
-    xf = new StringTransformer(value)
+    xf = stringTransformer
   } else {
-    xf = new ObjectTransformer(value)
+    xf = objectTransformer
   }
   return xf
 }
@@ -187,61 +188,51 @@ export function transformer(value){
 // init will clone the default
 // step will push input onto array and return result
 // result is identity
-export class ArrayTransformer {
-  constructor(defaultValue){
-    this.defaultValue = defaultValue === void 0 ? [] : defaultValue
-  }
-  [tInit](){
-    return slice.call(this.defaultValue)
-  }
+const arrayTransformer = {
+  [tInit]() {
+    return []
+  },
   [tStep](result, input){
     result.push(input)
     return result
-  }
-  [tResult](value){ return value }
+  },
+  [tResult]: identity
 }
 
 // Appends value onto string, using optional constructor arg as default, or '' if not provided
 // init will return the default
 // step will append input onto string and return result
 // result is identity
-export class StringTransformer {
-  constructor(str){
-    this.strDefault = str === void 0 ? '' : str
-  }
-  [tInit](){
-    return this.strDefault
-  }
+const stringTransformer = {
+  [tInit]() {
+    return ''
+  },
   [tStep](result, input){
     return result + input
-  }
-  [tResult](value){ return value }
+  },
+  [tResult]: identity
 }
 
 // Merges value into object, using optional constructor arg as default, or {} if undefined
 // init will clone the default
 // step will merge input into object and return result
 // result is identity
-export class ObjectTransformer {
-  constructor(obj){
-    this.objDefault = obj === void 0 ? {} : objectMerge({}, obj)
-  }
-  [tInit](){
-    return objectMerge({}, this.objDefault)
-  }
-  [tResult](value){ return value }
-}
-ObjectTransformer.prototype[tStep] = objectMerge
-function objectMerge(result, input){
-  if(isArray(input) && input.length === 2){
-    result[input[0]] = input[1]
-  } else {
-    var prop
-    for(prop in input){
-      if(has.call(input, prop)){
-        result[prop] = input[prop]
+const objectTransformer = {
+  [tInit]() {
+    return {}
+  },
+  [tStep]: function objectMerge(result, input){
+    if (isArray(input) && input.length === 2) {
+      result[input[0]] = input[1]
+    } else {
+      var prop
+      for (prop in input){
+        if(has.call(input, prop)){
+          result[prop] = input[prop]
+        }
       }
     }
-  }
-  return result
+    return result
+  },
+  [tResult]: identity
 }
