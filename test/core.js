@@ -87,7 +87,7 @@ test('into', function(t) {
   tx = tr.into([], tr.compose(tr.map(add(1)), tr.filter(isEven)))
   t.deepEqual([[1,2,3], [2,3,4], [5,6,7]].map(tx), [[2,4], [4], [6,8]])
 
-  tx = tr.into(stringReduce, tr.dedupe())
+  tx = tr.into('', tr.dedupe())
   t.equal('abc', tx(['a', 'b', 'b', 'c']))
 
   tx = tr.into('', tr.dedupe())
@@ -134,16 +134,6 @@ test('into', function(t) {
   t.deepEqual(toObject([['a', 'b'], ['b', 'c']]), {a: 'b', b: 'c'})
   t.deepEqual(toObject(tr.partitionAll(2), ['a', 'b', 'b', 'c']), {a: 'b', b: 'c'})
   t.deepEqual(toObject(tr.partitionAll(2))(['a', 'b', 'b', 'c']), {a: 'b', b: 'c'})
-
-  var intoInit = {}
-  intoInit[tp.init] = function() { return [4] }
-  intoInit[tp.step] = function(value, input) { 
-    value.push(input)
-    return value
-  }
-  intoInit[tp.result] = tr.identity
-
-  t.deepEqual(tr.into(intoInit, [1, 2, 3]), [4, 1, 2, 3])
 
   t.end()
 })
@@ -250,28 +240,6 @@ test('transform array', function(t){
   result = xf[tp.result](result)
   t.deepEquals([1,2], result)
 
-  xf = tr.transformer([4,5])
-
-  result = xf[tp.init]()
-  t.deepEquals([4,5], result)
-  result = xf[tp.step](result, 1)
-  t.deepEquals([4,5,1], result)
-  result = xf[tp.step](result, 2)
-  t.deepEquals([4,5,1,2], result)
-  result = xf[tp.step](result, 3)
-  t.deepEquals([4,5,1,2,3], result)
-  result = xf[tp.result](result)
-  t.deepEquals([4,5,1,2,3], result)
-
-  result = xf[tp.init]()
-  t.deepEquals([4,5], result)
-  result = xf[tp.step](result, 1)
-  t.deepEquals([4,5,1], result)
-  result = xf[tp.step](result, 2)
-  t.deepEquals([4,5,1,2], result)
-  result = xf[tp.result](result)
-  t.deepEquals([4,5,1,2], result)
-
   t.end()
 })
 
@@ -287,26 +255,6 @@ test('transform string', function(t){
   t.deepEquals('123', result)
   result = xf[tp.result](result)
   t.deepEquals('123', result)
-
-  xf = tr.transformer('45')
-
-  result = xf[tp.init]()
-  t.deepEquals('45', result)
-  result = xf[tp.step](result, 1)
-  t.deepEquals('451', result)
-  result = xf[tp.step](result, 2)
-  t.deepEquals('4512', result)
-  result = xf[tp.result](result)
-  t.deepEquals('4512', result)
-
-  result = xf[tp.init]()
-  t.deepEquals('45', result)
-  result = xf[tp.step](result, 1)
-  t.deepEquals('451', result)
-  result = xf[tp.step](result, 2)
-  t.deepEquals('4512', result)
-  result = xf[tp.result](result)
-  t.deepEquals('4512', result)
 
   t.end()
 })
@@ -332,15 +280,6 @@ test('transform object', function(t){
   t.deepEquals({a:1, b:2, c:3}, result)
   result = xf[tp.result](result)
   t.deepEquals({a:1,b:2,c:3}, result)
-
-  xf = tr.transformer({d:4})
-
-  result = xf[tp.init]()
-  t.deepEquals({d:4}, result)
-  result = xf[tp.step](result, {a:1, b:2})
-  t.deepEquals({a:1, b:2, d:4}, result)
-  result = xf[tp.result](result)
-  t.deepEquals({a:1, b:2, d:4}, result)
 
   t.end()
 })
