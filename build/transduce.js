@@ -1,44 +1,38 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.transduce = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-module.exports = require(6)
+module.exports = require(5)
 
-},{"6":6}],2:[function(require,module,exports){
+},{"5":5}],2:[function(require,module,exports){
 'use strict';
-
-var _lastValue;
-
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
 
 exports.__esModule = true;
 
-// given a reduce implementation, returns a transduce implementation
-// that delegates to the implementation after handling multiple arity
-// and dynamic argument types
+var _lastValue;
+
 exports.transduceImpl = transduceImpl;
-
-// given a reduce implementation, returns a reduce implementation
-// that delegates to reduce after handling multiple arity
-// and dynamic argument types
 exports.reduceImpl = reduceImpl;
-
-// given a reduce implementation, returns an into implementation
-// that delegates to reduce after handling currying, multiple arity
-// and dynamic argument types
 exports.intoImpl = intoImpl;
 exports.iterator = iterator;
 exports.iterable = iterable;
 exports.transformer = transformer;
 
-var _protocols$isReduced$unreduced$identity$isArray$isFunction$isString = require(10);
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-var _protocols$transducer = _protocols$isReduced$unreduced$identity$isArray$isFunction$isString.protocols.transducer;
+var _util = require(9);
+
+var _protocols$transducer = _util.protocols.transducer;
 var tInit = _protocols$transducer.init;
 var tStep = _protocols$transducer.step;
 var tResult = _protocols$transducer.result;
 
-var symIter = _protocols$isReduced$unreduced$identity$isArray$isFunction$isString.protocols.iterator;
+var symIter = _util.protocols.iterator;
+
+// given a reduce implementation, returns a transduce implementation
+// that delegates to the implementation after handling multiple arity
+// and dynamic argument types
+
 function transduceImpl(reduce) {
   return function transduce(t, xf, init, coll) {
-    if (_protocols$isReduced$unreduced$identity$isArray$isFunction$isString.isFunction(xf)) {
+    if (_util.isFunction(xf)) {
       xf = completing(xf);
     }
     xf = t(xf);
@@ -50,9 +44,13 @@ function transduceImpl(reduce) {
   };
 }
 
+// given a reduce implementation, returns a reduce implementation
+// that delegates to reduce after handling multiple arity
+// and dynamic argument types
+
 function reduceImpl(_reduce) {
   return function reduce(xf, init, coll) {
-    if (_protocols$isReduced$unreduced$identity$isArray$isFunction$isString.isFunction(xf)) {
+    if (_util.isFunction(xf)) {
       xf = completing(xf);
     }
     if (arguments.length === 2) {
@@ -62,6 +60,10 @@ function reduceImpl(_reduce) {
     return _reduce(xf, init, coll);
   };
 }
+
+// given a reduce implementation, returns an into implementation
+// that delegates to reduce after handling currying, multiple arity
+// and dynamic argument types
 
 function intoImpl(reduce) {
   return function into(init, t, coll) {
@@ -73,7 +75,7 @@ function intoImpl(reduce) {
     }
 
     if (len === 2) {
-      if (_protocols$isReduced$unreduced$identity$isArray$isFunction$isString.isFunction(t)) {
+      if (_util.isFunction(t)) {
         return intoCurryXfT(xf, t);
       }
       coll = t;
@@ -85,7 +87,7 @@ function intoImpl(reduce) {
   function intoCurryXf(xf) {
     return function intoXf(t, coll) {
       if (arguments.length === 1) {
-        if (_protocols$isReduced$unreduced$identity$isArray$isFunction$isString.isFunction(t)) {
+        if (_util.isFunction(t)) {
           return intoCurryXfT(xf, t);
         }
         coll = t;
@@ -111,7 +113,7 @@ exports.completing = completing;
 function Completing(rf, result) {
   this[tInit] = rf;
   this[tStep] = rf;
-  this[tResult] = result || _protocols$isReduced$unreduced$identity$isArray$isFunction$isString.identity;
+  this[tResult] = result || _util.identity;
 }
 
 // Convert a value to an iterable
@@ -125,13 +127,13 @@ function iterable(value) {
   var it;
   if (value[symIter] !== void 0) {
     it = value;
-  } else if (_protocols$isReduced$unreduced$identity$isArray$isFunction$isString.isArray(value) || _protocols$isReduced$unreduced$identity$isArray$isFunction$isString.isString(value)) {
+  } else if (_util.isArray(value) || _util.isString(value)) {
     it = new ArrayIterable(value);
-  } else if (_protocols$isReduced$unreduced$identity$isArray$isFunction$isString.isFunction(value)) {
+  } else if (_util.isFunction(value)) {
     it = new FunctionIterable(function () {
       return { done: false, value: value() };
     });
-  } else if (_protocols$isReduced$unreduced$identity$isArray$isFunction$isString.isFunction(value.next)) {
+  } else if (_util.isFunction(value.next)) {
     it = new FunctionIterable(function () {
       return value.next();
     });
@@ -191,6 +193,8 @@ var ObjectIterable = (function () {
     this.keys = Object.keys(obj);
   }
 
+  // converts a value to a transformer
+
   ObjectIterable.prototype[symIter] = function () {
     var _this2 = this;
 
@@ -210,25 +214,23 @@ var ObjectIterable = (function () {
 })();
 
 exports.ObjectIterable = ObjectIterable;
-
-// converts a value to a transformer
 var slice = Array.prototype.slice;
 
 var lastValue = (_lastValue = {}, _lastValue[tInit] = function () {}, _lastValue[tStep] = function (result, input) {
   return input;
-}, _lastValue[tResult] = _protocols$isReduced$unreduced$identity$isArray$isFunction$isString.identity, _lastValue);
+}, _lastValue[tResult] = _util.identity, _lastValue);
 
 function transformer(value) {
   var xf;
   if (value === void 0 || value === null) {
     xf = lastValue;
-  } else if (_protocols$isReduced$unreduced$identity$isArray$isFunction$isString.isFunction(value[tStep])) {
+  } else if (_util.isFunction(value[tStep])) {
     xf = value;
-  } else if (_protocols$isReduced$unreduced$identity$isArray$isFunction$isString.isFunction(value)) {
+  } else if (_util.isFunction(value)) {
     xf = completing(value);
-  } else if (_protocols$isReduced$unreduced$identity$isArray$isFunction$isString.isArray(value)) {
+  } else if (_util.isArray(value)) {
     xf = new ArrayTransformer(value);
-  } else if (_protocols$isReduced$unreduced$identity$isArray$isFunction$isString.isString(value)) {
+  } else if (_util.isString(value)) {
     xf = new StringTransformer(value);
   } else {
     xf = new ObjectTransformer(value);
@@ -248,6 +250,11 @@ var ArrayTransformer = (function () {
     this.defaultValue = defaultValue === void 0 ? [] : defaultValue;
   }
 
+  // Appends value onto string, using optional constructor arg as default, or '' if not provided
+  // init will return the default
+  // step will append input onto string and return result
+  // result is identity
+
   ArrayTransformer.prototype[tInit] = function () {
     return slice.call(this.defaultValue);
   };
@@ -266,17 +273,17 @@ var ArrayTransformer = (function () {
 
 exports.ArrayTransformer = ArrayTransformer;
 
-// Appends value onto string, using optional constructor arg as default, or '' if not provided
-// init will return the default
-// step will append input onto string and return result
-// result is identity
-
 var StringTransformer = (function () {
   function StringTransformer(str) {
     _classCallCheck(this, StringTransformer);
 
     this.strDefault = str === void 0 ? '' : str;
   }
+
+  // Merges value into object, using optional constructor arg as default, or {} if undefined
+  // init will clone the default
+  // step will merge input into object and return result
+  // result is identity
 
   StringTransformer.prototype[tInit] = function () {
     return this.strDefault;
@@ -294,11 +301,6 @@ var StringTransformer = (function () {
 })();
 
 exports.StringTransformer = StringTransformer;
-
-// Merges value into object, using optional constructor arg as default, or {} if undefined
-// init will clone the default
-// step will merge input into object and return result
-// result is identity
 
 var ObjectTransformer = (function () {
   function ObjectTransformer(obj) {
@@ -322,7 +324,7 @@ exports.ObjectTransformer = ObjectTransformer;
 
 ObjectTransformer.prototype[tStep] = objectMerge;
 function objectMerge(result, input) {
-  if (_protocols$isReduced$unreduced$identity$isArray$isFunction$isString.isArray(input) && input.length === 2) {
+  if (_util.isArray(input) && input.length === 2) {
     result[input[0]] = input[1];
   } else {
     var prop;
@@ -335,21 +337,22 @@ function objectMerge(result, input) {
   return result;
 }
 //# sourceMappingURL=_internal.js.map
-},{"10":10}],3:[function(require,module,exports){
+
+},{"9":9}],3:[function(require,module,exports){
 'use strict';
-
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
-
-var _inherits = function (subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
 
 exports.__esModule = true;
 exports.push = push;
 exports.unshift = unshift;
 exports.slice = slice;
 
-var _Transducer$protocols$reduced$isReduced$unreduced$compose = require(10);
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-var _protocols$transducer = _Transducer$protocols$reduced$isReduced$unreduced$compose.protocols.transducer;
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var _util = require(9);
+
+var _protocols$transducer = _util.protocols.transducer;
 var tStep = _protocols$transducer.step;
 var tResult = _protocols$transducer.result;
 var forEach = function forEach(f) {
@@ -360,6 +363,8 @@ var forEach = function forEach(f) {
 exports.forEach = forEach;
 
 var ForEach = (function (_Transducer) {
+  _inherits(ForEach, _Transducer);
+
   function ForEach(f, xf) {
     _classCallCheck(this, ForEach);
 
@@ -368,15 +373,13 @@ var ForEach = (function (_Transducer) {
     this.idx = 0;
   }
 
-  _inherits(ForEach, _Transducer);
-
   ForEach.prototype[tStep] = function (value, input) {
     this.f(input, this.idx++, value);
     return this.xfStep(value, input);
   };
 
   return ForEach;
-})(_Transducer$protocols$reduced$isReduced$unreduced$compose.Transducer);
+})(_util.Transducer);
 
 var find = function find(p) {
   return function (xf) {
@@ -386,6 +389,8 @@ var find = function find(p) {
 exports.find = find;
 
 var Find = (function (_Transducer2) {
+  _inherits(Find, _Transducer2);
+
   function Find(p, xf) {
     _classCallCheck(this, Find);
 
@@ -393,17 +398,15 @@ var Find = (function (_Transducer2) {
     this.p = p;
   }
 
-  _inherits(Find, _Transducer2);
-
   Find.prototype[tStep] = function (value, input) {
     if (this.p(input)) {
-      value = _Transducer$protocols$reduced$isReduced$unreduced$compose.reduced(this.xfStep(value, input));
+      value = _util.reduced(this.xfStep(value, input));
     }
     return value;
   };
 
   return Find;
-})(_Transducer$protocols$reduced$isReduced$unreduced$compose.Transducer);
+})(_util.Transducer);
 
 var every = function every(p) {
   return function (xf) {
@@ -413,6 +416,8 @@ var every = function every(p) {
 exports.every = every;
 
 var Every = (function (_Transducer3) {
+  _inherits(Every, _Transducer3);
+
   function Every(p, xf) {
     _classCallCheck(this, Every);
 
@@ -421,12 +426,10 @@ var Every = (function (_Transducer3) {
     this.found = false;
   }
 
-  _inherits(Every, _Transducer3);
-
   Every.prototype[tStep] = function (value, input) {
     if (!this.p(input)) {
       this.found = true;
-      return _Transducer$protocols$reduced$isReduced$unreduced$compose.reduced(this.xfStep(value, false));
+      return _util.reduced(this.xfStep(value, false));
     }
     return value;
   };
@@ -439,7 +442,7 @@ var Every = (function (_Transducer3) {
   };
 
   return Every;
-})(_Transducer$protocols$reduced$isReduced$unreduced$compose.Transducer);
+})(_util.Transducer);
 
 var some = function some(p) {
   return function (xf) {
@@ -449,6 +452,8 @@ var some = function some(p) {
 exports.some = some;
 
 var Some = (function (_Transducer4) {
+  _inherits(Some, _Transducer4);
+
   function Some(p, xf) {
     _classCallCheck(this, Some);
 
@@ -457,12 +462,10 @@ var Some = (function (_Transducer4) {
     this.found = false;
   }
 
-  _inherits(Some, _Transducer4);
-
   Some.prototype[tStep] = function (value, input) {
     if (this.p(input)) {
       this.found = true;
-      return _Transducer$protocols$reduced$isReduced$unreduced$compose.reduced(this.xfStep(value, true));
+      return _util.reduced(this.xfStep(value, true));
     }
     return value;
   };
@@ -475,7 +478,7 @@ var Some = (function (_Transducer4) {
   };
 
   return Some;
-})(_Transducer$protocols$reduced$isReduced$unreduced$compose.Transducer);
+})(_util.Transducer);
 
 var contains = function contains(target) {
   return some(function (x) {
@@ -496,6 +499,8 @@ function push() {
 }
 
 var Push = (function (_Transducer5) {
+  _inherits(Push, _Transducer5);
+
   function Push(toPush, xf) {
     _classCallCheck(this, Push);
 
@@ -503,15 +508,13 @@ var Push = (function (_Transducer5) {
     this.toPush = toPush;
   }
 
-  _inherits(Push, _Transducer5);
-
   Push.prototype[tResult] = function (value) {
     var idx;
     var len = this.toPush.length;
     for (idx = 0; idx < len; idx++) {
       value = this.xfStep(value, this.toPush[idx]);
-      if (_Transducer$protocols$reduced$isReduced$unreduced$compose.isReduced(value)) {
-        value = _Transducer$protocols$reduced$isReduced$unreduced$compose.unreduced(value);
+      if (_util.isReduced(value)) {
+        value = _util.unreduced(value);
         break;
       }
     }
@@ -519,7 +522,7 @@ var Push = (function (_Transducer5) {
   };
 
   return Push;
-})(_Transducer$protocols$reduced$isReduced$unreduced$compose.Transducer);
+})(_util.Transducer);
 
 function unshift() {
   for (var _len2 = arguments.length, toUnshift = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
@@ -532,6 +535,8 @@ function unshift() {
 }
 
 var Unshift = (function (_Transducer6) {
+  _inherits(Unshift, _Transducer6);
+
   function Unshift(toUnshift, xf) {
     _classCallCheck(this, Unshift);
 
@@ -540,8 +545,6 @@ var Unshift = (function (_Transducer6) {
     this.done = false;
   }
 
-  _inherits(Unshift, _Transducer6);
-
   Unshift.prototype[tStep] = function (value, input) {
     if (!this.done) {
       var idx;
@@ -549,7 +552,7 @@ var Unshift = (function (_Transducer6) {
       this.done = true;
       for (idx = 0; idx < len; idx++) {
         value = this.xfStep(value, this.toUnshift[idx]);
-        if (_Transducer$protocols$reduced$isReduced$unreduced$compose.isReduced(value)) {
+        if (_util.isReduced(value)) {
           return value;
         }
       }
@@ -558,7 +561,7 @@ var Unshift = (function (_Transducer6) {
   };
 
   return Unshift;
-})(_Transducer$protocols$reduced$isReduced$unreduced$compose.Transducer);
+})(_util.Transducer);
 
 var initial = function initial(n) {
   return function (xf) {
@@ -568,6 +571,8 @@ var initial = function initial(n) {
 exports.initial = initial;
 
 var Initial = (function (_Transducer7) {
+  _inherits(Initial, _Transducer7);
+
   function Initial(n, xf) {
     _classCallCheck(this, Initial);
 
@@ -577,8 +582,6 @@ var Initial = (function (_Transducer7) {
     this.idx = 0;
     this.buffer = [];
   }
-
-  _inherits(Initial, _Transducer7);
 
   Initial.prototype[tStep] = function (value, input) {
     this.buffer[this.idx++] = input;
@@ -590,8 +593,8 @@ var Initial = (function (_Transducer7) {
     var count = this.idx - this.n;
     for (idx = 0; idx < count; idx++) {
       value = this.xfStep(value, this.buffer[idx]);
-      if (_Transducer$protocols$reduced$isReduced$unreduced$compose.isReduced(value)) {
-        value = _Transducer$protocols$reduced$isReduced$unreduced$compose.unreduced(value);
+      if (_util.isReduced(value)) {
+        value = _util.unreduced(value);
         break;
       }
     }
@@ -599,7 +602,7 @@ var Initial = (function (_Transducer7) {
   };
 
   return Initial;
-})(_Transducer$protocols$reduced$isReduced$unreduced$compose.Transducer);
+})(_util.Transducer);
 
 var last = function last(n) {
   return function (xf) {
@@ -609,6 +612,8 @@ var last = function last(n) {
 exports.last = last;
 
 var Last = (function (_Transducer8) {
+  _inherits(Last, _Transducer8);
+
   function Last(n, xf) {
     _classCallCheck(this, Last);
 
@@ -622,8 +627,6 @@ var Last = (function (_Transducer8) {
     this.idx = 0;
     this.buffer = [];
   }
-
-  _inherits(Last, _Transducer8);
 
   Last.prototype[tStep] = function (value, input) {
     this.buffer[this.idx++ % this.n] = input;
@@ -639,8 +642,8 @@ var Last = (function (_Transducer8) {
     }
     while (count--) {
       value = this.xfStep(value, this.buffer[idx++ % this.n]);
-      if (_Transducer$protocols$reduced$isReduced$unreduced$compose.isReduced(value)) {
-        value = _Transducer$protocols$reduced$isReduced$unreduced$compose.unreduced(value);
+      if (_util.isReduced(value)) {
+        value = _util.unreduced(value);
         break;
       }
     }
@@ -648,7 +651,7 @@ var Last = (function (_Transducer8) {
   };
 
   return Last;
-})(_Transducer$protocols$reduced$isReduced$unreduced$compose.Transducer);
+})(_util.Transducer);
 
 function slice(begin, end) {
   if (begin === void 0) {
@@ -659,14 +662,14 @@ function slice(begin, end) {
       return last(-begin);
     }
     if (end >= 0) {
-      return _Transducer$protocols$reduced$isReduced$unreduced$compose.compose(last(-begin), slice(0, end + begin + 1));
+      return _util.compose(last(-begin), slice(0, end + begin + 1));
     }
   }
   if (end < 0) {
     if (begin === 0) {
       return initial(-end);
     }
-    return _Transducer$protocols$reduced$isReduced$unreduced$compose.compose(slice(begin), initial(-end));
+    return _util.compose(slice(begin), initial(-end));
   }
   return function (xf) {
     return new Slice(begin, end, xf);
@@ -674,6 +677,8 @@ function slice(begin, end) {
 }
 
 var Slice = (function (_Transducer9) {
+  _inherits(Slice, _Transducer9);
+
   function Slice(begin, end, xf) {
     _classCallCheck(this, Slice);
 
@@ -683,470 +688,78 @@ var Slice = (function (_Transducer9) {
     this.idx = 0;
   }
 
-  _inherits(Slice, _Transducer9);
-
   Slice.prototype[tStep] = function (value, input) {
     if (this.idx++ >= this.begin) {
       value = this.xfStep(value, input);
     }
     if (this.idx >= this.end) {
-      value = _Transducer$protocols$reduced$isReduced$unreduced$compose.reduced(value);
+      value = _util.reduced(value);
     }
     return value;
   };
 
   return Slice;
-})(_Transducer$protocols$reduced$isReduced$unreduced$compose.Transducer);
+})(_util.Transducer);
 //# sourceMappingURL=array.js.map
-},{"10":10}],4:[function(require,module,exports){
+
+},{"9":9}],4:[function(require,module,exports){
 'use strict';
-
-var _interopRequireWildcard = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
-
-var _inherits = function (subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
-
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
 
 exports.__esModule = true;
-
-// Defer, delay compose
-exports.compose = compose;
-exports.callback = callback;
-exports.emitInto = emitInto;
-
-var _Prom = require(11);
-
-var _Prom2 = _interopRequireWildcard(_Prom);
-
-var _Transducer$protocols$isReduced$unreduced$identity$comp = require(10);
-
-var _transformer$iterable$transduceImpl$reduceImpl$intoImpl = require(2);
-
-var _protocols$transducer = _Transducer$protocols$isReduced$unreduced$identity$comp.protocols.transducer;
-var tInit = _protocols$transducer.init;
-var tStep = _protocols$transducer.step;
-var tResult = _protocols$transducer.result;
-
-// Transduce, reduce, into
-var reduce = _transformer$iterable$transduceImpl$reduceImpl$intoImpl.reduceImpl(_reduce);
-exports.reduce = reduce;
-var transduce = _transformer$iterable$transduceImpl$reduceImpl$intoImpl.transduceImpl(_reduce);
-exports.transduce = transduce;
-var into = _transformer$iterable$transduceImpl$reduceImpl$intoImpl.intoImpl(_reduce);
-
-exports.into = into;
-var _iterator = function _iterator(coll) {
-  return _transformer$iterable$transduceImpl$reduceImpl$intoImpl.iterable(coll)[_Transducer$protocols$isReduced$unreduced$identity$comp.protocols.iterator]();
-};
-var _iteratorValue = function _iteratorValue(item) {
-  return { done: false, value: item };
-};
-
-function _reduce(xf, init, coll) {
-  if (coll === void 0) {
-    coll = init;
-    init = xf[tInit]();
-  }
-  return _Prom2['default'].all([xf, init, coll]).then(function (_ref) {
-    var xf = _ref[0];
-    var init = _ref[1];
-    var coll = _ref[2];
-    return new Reduce(_iterator(coll), init, xf).iterate();
-  });
-}
-
-var Reduce = (function () {
-  function Reduce(iter, init, xf) {
-    _classCallCheck(this, Reduce);
-
-    this.xf = xf;
-    this.iter = iter;
-    this.value = init;
-    this._step = this.__step.bind(this);
-    this._loop = this.__loop.bind(this);
-  }
-
-  Reduce.prototype.iterate = function iterate() {
-    return _Prom2['default'].resolve(this.next()).then(this._step);
-  };
-
-  Reduce.prototype.next = function next() {
-    var _this = this;
-
-    return new _Prom2['default'](function (resolve, reject) {
-      try {
-        var item = _this.iter.next();
-        if (!item.done) {
-          item = _Prom2['default'].resolve(item.value).then(_iteratorValue);
-        }
-        resolve(item);
-      } catch (e) {
-        reject(e);
-      }
-    });
-  };
-
-  Reduce.prototype.__step = function __step(item) {
-    var _this2 = this;
-
-    return new _Prom2['default'](function (resolve, reject) {
-      try {
-        var result;
-        if (item.done) {
-          result = _this2.xf[tResult](_this2.value);
-        } else {
-          result = _Prom2['default'].resolve(_this2.xf[tStep](_this2.value, item.value)).then(_this2._loop);
-        }
-        resolve(result);
-      } catch (e) {
-        reject(e);
-      }
-    });
-  };
-
-  Reduce.prototype.__loop = function __loop(value) {
-    var _this3 = this;
-
-    this.value = value;
-    return new _Prom2['default'](function (resolve, reject) {
-      try {
-        var result;
-        if (_Transducer$protocols$isReduced$unreduced$identity$comp.isReduced(value)) {
-          result = _this3.xf[tResult](_Transducer$protocols$isReduced$unreduced$identity$comp.unreduced(value));
-        } else {
-          result = _this3.iterate();
-        }
-        resolve(result);
-      } catch (e) {
-        reject(e);
-      }
-    });
-  };
-
-  return Reduce;
-})();
-
-function compose() {
-  for (var _len = arguments.length, fromArgs = Array(_len), _key = 0; _key < _len; _key++) {
-    fromArgs[_key] = arguments[_key];
-  }
-
-  var toArgs = [],
-      len = fromArgs.length,
-      i = 0;
-  for (; i < len; i++) {
-    toArgs.push(fromArgs[i]);
-    toArgs.push(defer());
-  }
-  return _Transducer$protocols$isReduced$unreduced$identity$comp.compose.apply(null, toArgs);
-}
-
-var defer = function defer() {
-  return delay();
-};
-exports.defer = defer;
-var delay = function delay(wait) {
-  return function (xf) {
-    return new Delay(wait, xf);
-  };
-};
-exports.delay = delay;
-
-var Delay = (function () {
-  function Delay(wait, xf) {
-    _classCallCheck(this, Delay);
-
-    var task = new DelayTask(wait, xf);
-    this.xf = xf;
-    this.task = task;
-    this._step = task.step.bind(task);
-    this._result = task.result.bind(task);
-  }
-
-  Delay.prototype[tInit] = function () {
-    if (this.task.resolved) {
-      return this.task.resolved;
-    }
-
-    return _Prom2['default'].resolve(this.xf[tInit]());
-  };
-
-  Delay.prototype[tStep] = function (value, input) {
-    if (this.task.resolved) {
-      return this.task.resolved;
-    }
-
-    return _Prom2['default'].all([value, input]).then(this._step);
-  };
-
-  Delay.prototype[tResult] = function (value) {
-    if (this.task.resolved) {
-      return this.task.resolved;
-    }
-
-    return _Prom2['default'].resolve(value).then(this._result);
-  };
-
-  return Delay;
-})();
-
-var DelayTask = (function () {
-  function DelayTask(wait, xf) {
-    _classCallCheck(this, DelayTask);
-
-    this.wait = wait;
-    this.xf = xf;
-    this.q = [];
-  }
-
-  DelayTask.prototype.call = function call() {
-    var next = this.q[0];
-    if (next && !next.processing) {
-      next.processing = true;
-
-      var wait = next.wait;
-      if (wait > 0) {
-        setTimeout(next.fn, wait);
-      } else {
-        next.fn();
-      }
-    }
-  };
-
-  DelayTask.prototype.step = function step(_ref2) {
-    var value = _ref2[0];
-    var input = _ref2[1];
-
-    var task = this;
-    return new _Prom2['default'](function (resolve, reject) {
-      task.q.push({ fn: taskStep, wait: task.wait });
-      task.call();
-
-      function taskStep() {
-        try {
-          resolve(task.xf[tStep](value, input));
-          task.q.shift();
-          if (task.q.length > 0) {
-            task.call();
-          }
-        } catch (e) {
-          reject(e);
-        }
-      }
-    });
-  };
-
-  DelayTask.prototype.result = function result(value) {
-    var task = this;
-    task.resolved = new _Prom2['default'](function (resolve, reject) {
-      task.q.push({ fn: taskResult });
-      task.call();
-      function taskResult() {
-        try {
-          task.q = [];
-          resolve(task.xf[tResult](value));
-        } catch (e) {
-          reject(e);
-        }
-      }
-    });
-    return task.resolved;
-  };
-
-  return DelayTask;
-})();
-
-// Promises and callbacks
-var when = function when(promiseOrValue, t) {
-  return _Prom2['default'].resolve(promiseOrValue).then(promiseTransform(t));
-};
-exports.when = when;
-var promiseTransform = function promiseTransform(t) {
-  return function (item) {
-    return new _Prom2['default'](function (resolve, reject) {
-      var cb = callback(t, null, function (err, result) {
-        if (err) reject(err);else resolve(result);
-      });
-      cb(null, item);
-      cb();
-    });
-  };
-};
-
-exports.promiseTransform = promiseTransform;
-
-function callback(t, init, continuation) {
-  var done = false,
-      stepper,
-      value,
-      xf = _transformer$iterable$transduceImpl$reduceImpl$intoImpl.transformer(init);
-
-  stepper = t(xf);
-  value = stepper[tInit]();
-
-  function checkDone(err, item) {
-    if (done) {
-      return true;
-    }
-
-    err = err || null;
-
-    // check if exhausted
-    if (_Transducer$protocols$isReduced$unreduced$identity$comp.isReduced(value)) {
-      value = _Transducer$protocols$isReduced$unreduced$identity$comp.unreduced(value);
-      done = true;
-    }
-
-    if (err || done || item === void 0) {
-      value = stepper[tResult](value);
-      done = true;
-    }
-
-    // notify if done
-    if (done) {
-      if (continuation) {
-        continuation(err, value);
-        continuation = null;
-        value = null;
-      } else if (err) {
-        value = null;
-        throw err;
-      }
-    }
-
-    return done;
-  }
-
-  return function (err, item) {
-    if (!checkDone(err, item)) {
-      try {
-        // step to next result.
-        value = stepper[tStep](value, item);
-        checkDone(err, item);
-      } catch (err2) {
-        checkDone(err2, item);
-      }
-    }
-    if (done) return value;
-  };
-}
-
-function emitInto(to, t, from) {
-  var cb;
-  t = _Transducer$protocols$isReduced$unreduced$identity$comp.compose(t, emitData(to));
-  cb = callback(t, null, continuation);
-  from.on('data', onData);
-  from.once('error', onError);
-  from.once('end', onEnd);
-
-  function continuation(err) {
-    if (err) to.emit('error', err);
-    to.emit('end');
-  }
-
-  function onData(item) {
-    cb(null, item);
-  }
-
-  function onError(err) {
-    cb(err);
-  }
-
-  function onEnd() {
-    cb();
-    removeListeners();
-  }
-
-  function removeListeners() {
-    from.removeListener(onData).removeListener(onError).removeListener(onEnd);
-  }
-
-  return to;
-}
-
-var emitData = function emitData(emitter) {
-  return function (xf) {
-    return new EmitData(emitter, xf);
-  };
-};
-
-var EmitData = (function (_Transducer) {
-  function EmitData(emitter, xf) {
-    _classCallCheck(this, EmitData);
-
-    _Transducer.call(this, xf);
-    this.emitter = emitter;
-  }
-
-  _inherits(EmitData, _Transducer);
-
-  EmitData.prototype[tStep] = function (value, input) {
-    this.emitter.emit('data', input);
-    return value;
-  };
-
-  return EmitData;
-})(_Transducer$protocols$isReduced$unreduced$identity$comp.Transducer);
-//# sourceMappingURL=async.js.map
-},{"10":10,"11":11,"2":2}],5:[function(require,module,exports){
-'use strict';
 
 var _stepTransformer;
 
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
-
-var _inherits = function (subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
-
-exports.__esModule = true;
-
-// sequence
 exports.sequence = sequence;
 
-var _Transducer$compose$identity$protocols$isReduced$reduced$unreduced$isArray$isFunction$isIterable$isIterator = require(10);
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var _util = require(9);
 
 // Transformer, iterable, completing
 
-var _transduceImpl$reduceImpl$intoImpl$ArrayIterable$FunctionIterable$ObjectIterable$ArrayTransformer$StringTransformer$ObjectTransformer$transformer$iterable$iterator$completing = require(2);
+var _internal = require(2);
 
-var _protocols$transducer = _Transducer$compose$identity$protocols$isReduced$reduced$unreduced$isArray$isFunction$isIterable$isIterator.protocols.transducer;
+var _protocols$transducer = _util.protocols.transducer;
 var tInit = _protocols$transducer.init;
 var tStep = _protocols$transducer.step;
 var tResult = _protocols$transducer.result;
 var tReduce = _protocols$transducer.reduce;
 
-var symIter = _Transducer$compose$identity$protocols$isReduced$reduced$unreduced$isArray$isFunction$isIterable$isIterator.protocols.iterator;exports.transformer = _transduceImpl$reduceImpl$intoImpl$ArrayIterable$FunctionIterable$ObjectIterable$ArrayTransformer$StringTransformer$ObjectTransformer$transformer$iterable$iterator$completing.transformer;
-exports.iterable = _transduceImpl$reduceImpl$intoImpl$ArrayIterable$FunctionIterable$ObjectIterable$ArrayTransformer$StringTransformer$ObjectTransformer$transformer$iterable$iterator$completing.iterable;
-exports.iterator = _transduceImpl$reduceImpl$intoImpl$ArrayIterable$FunctionIterable$ObjectIterable$ArrayTransformer$StringTransformer$ObjectTransformer$transformer$iterable$iterator$completing.iterator;
-exports.completing = _transduceImpl$reduceImpl$intoImpl$ArrayIterable$FunctionIterable$ObjectIterable$ArrayTransformer$StringTransformer$ObjectTransformer$transformer$iterable$iterator$completing.completing;
-exports.compose = _Transducer$compose$identity$protocols$isReduced$reduced$unreduced$isArray$isFunction$isIterable$isIterator.compose;
-exports.identity = _Transducer$compose$identity$protocols$isReduced$reduced$unreduced$isArray$isFunction$isIterable$isIterator.identity;
-exports.protocols = _Transducer$compose$identity$protocols$isReduced$reduced$unreduced$isArray$isFunction$isIterable$isIterator.protocols;
-exports.isReduced = _Transducer$compose$identity$protocols$isReduced$reduced$unreduced$isArray$isFunction$isIterable$isIterator.isReduced;
-exports.reduced = _Transducer$compose$identity$protocols$isReduced$reduced$unreduced$isArray$isFunction$isIterable$isIterator.reduced;
-exports.unreduced = _Transducer$compose$identity$protocols$isReduced$reduced$unreduced$isArray$isFunction$isIterable$isIterator.unreduced;
-exports.Transducer = _Transducer$compose$identity$protocols$isReduced$reduced$unreduced$isArray$isFunction$isIterable$isIterator.Transducer;
-exports.isIterable = _Transducer$compose$identity$protocols$isReduced$reduced$unreduced$isArray$isFunction$isIterable$isIterator.isIterable;
-exports.isIterator = _Transducer$compose$identity$protocols$isReduced$reduced$unreduced$isArray$isFunction$isIterable$isIterator.isIterator;
-exports.ArrayIterable = _transduceImpl$reduceImpl$intoImpl$ArrayIterable$FunctionIterable$ObjectIterable$ArrayTransformer$StringTransformer$ObjectTransformer$transformer$iterable$iterator$completing.ArrayIterable;
-exports.FunctionIterable = _transduceImpl$reduceImpl$intoImpl$ArrayIterable$FunctionIterable$ObjectIterable$ArrayTransformer$StringTransformer$ObjectTransformer$transformer$iterable$iterator$completing.FunctionIterable;
-exports.ObjectIterable = _transduceImpl$reduceImpl$intoImpl$ArrayIterable$FunctionIterable$ObjectIterable$ArrayTransformer$StringTransformer$ObjectTransformer$transformer$iterable$iterator$completing.ObjectIterable;
-exports.ArrayTransformer = _transduceImpl$reduceImpl$intoImpl$ArrayIterable$FunctionIterable$ObjectIterable$ArrayTransformer$StringTransformer$ObjectTransformer$transformer$iterable$iterator$completing.ArrayTransformer;
-exports.StringTransformer = _transduceImpl$reduceImpl$intoImpl$ArrayIterable$FunctionIterable$ObjectIterable$ArrayTransformer$StringTransformer$ObjectTransformer$transformer$iterable$iterator$completing.StringTransformer;
-exports.ObjectTransformer = _transduceImpl$reduceImpl$intoImpl$ArrayIterable$FunctionIterable$ObjectIterable$ArrayTransformer$StringTransformer$ObjectTransformer$transformer$iterable$iterator$completing.ObjectTransformer;
+var symIter = _util.protocols.iterator;exports.transformer = _internal.transformer;
+exports.iterable = _internal.iterable;
+exports.iterator = _internal.iterator;
+exports.completing = _internal.completing;
+exports.compose = _util.compose;
+exports.identity = _util.identity;
+exports.protocols = _util.protocols;
+exports.isReduced = _util.isReduced;
+exports.reduced = _util.reduced;
+exports.unreduced = _util.unreduced;
+exports.Transducer = _util.Transducer;
+exports.isIterable = _util.isIterable;
+exports.isIterator = _util.isIterator;
+exports.ArrayIterable = _internal.ArrayIterable;
+exports.FunctionIterable = _internal.FunctionIterable;
+exports.ObjectIterable = _internal.ObjectIterable;
+exports.ArrayTransformer = _internal.ArrayTransformer;
+exports.StringTransformer = _internal.StringTransformer;
+exports.ObjectTransformer = _internal.ObjectTransformer;
 
 // Transduce, reduce, into
-var reduce = _transduceImpl$reduceImpl$intoImpl$ArrayIterable$FunctionIterable$ObjectIterable$ArrayTransformer$StringTransformer$ObjectTransformer$transformer$iterable$iterator$completing.reduceImpl(_reduce);
+var reduce = _internal.reduceImpl(_reduce);
 exports.reduce = reduce;
-var transduce = _transduceImpl$reduceImpl$intoImpl$ArrayIterable$FunctionIterable$ObjectIterable$ArrayTransformer$StringTransformer$ObjectTransformer$transformer$iterable$iterator$completing.transduceImpl(_reduce);
+var transduce = _internal.transduceImpl(_reduce);
 exports.transduce = transduce;
-var into = _transduceImpl$reduceImpl$intoImpl$ArrayIterable$FunctionIterable$ObjectIterable$ArrayTransformer$StringTransformer$ObjectTransformer$transformer$iterable$iterator$completing.intoImpl(_reduce);
+var into = _internal.intoImpl(_reduce);
 
 exports.into = into;
 function _reduce(xf, init, coll) {
-  if (_Transducer$compose$identity$protocols$isReduced$reduced$unreduced$isArray$isFunction$isIterable$isIterator.isArray(coll)) {
+  if (_util.isArray(coll)) {
     return arrayReduce(xf, init, coll);
   }
-  if (_Transducer$compose$identity$protocols$isReduced$reduced$unreduced$isArray$isFunction$isIterable$isIterator.isFunction(coll[tReduce])) {
+  if (_util.isFunction(coll[tReduce])) {
     return methodReduce(xf, init, coll);
   }
   return iteratorReduce(xf, init, coll);
@@ -1158,8 +771,8 @@ function arrayReduce(xf, init, arr) {
       len = arr.length;
   for (; i < len; i++) {
     value = xf[tStep](value, arr[i]);
-    if (_Transducer$compose$identity$protocols$isReduced$reduced$unreduced$isArray$isFunction$isIterable$isIterator.isReduced(value)) {
-      value = _Transducer$compose$identity$protocols$isReduced$reduced$unreduced$isArray$isFunction$isIterable$isIterator.unreduced(value);
+    if (_util.isReduced(value)) {
+      value = _util.unreduced(value);
       break;
     }
   }
@@ -1174,7 +787,7 @@ function methodReduce(xf, init, coll) {
 function iteratorReduce(xf, init, iter) {
   var value = init,
       next;
-  iter = _transduceImpl$reduceImpl$intoImpl$ArrayIterable$FunctionIterable$ObjectIterable$ArrayTransformer$StringTransformer$ObjectTransformer$transformer$iterable$iterator$completing.iterator(iter);
+  iter = _internal.iterator(iter);
   while (true) {
     next = iter.next();
     if (next.done) {
@@ -1182,8 +795,8 @@ function iteratorReduce(xf, init, iter) {
     }
 
     value = xf[tStep](value, next.value);
-    if (_Transducer$compose$identity$protocols$isReduced$reduced$unreduced$isArray$isFunction$isIterable$isIterator.isReduced(value)) {
-      value = _Transducer$compose$identity$protocols$isReduced$reduced$unreduced$isArray$isFunction$isIterable$isIterator.unreduced(value);
+    if (_util.isReduced(value)) {
+      value = _util.unreduced(value);
       break;
     }
   }
@@ -1199,6 +812,8 @@ var transducer = function transducer(step, result, init) {
 exports.transducer = transducer;
 
 var FnTransducer = (function (_Transducer) {
+  _inherits(FnTransducer, _Transducer);
+
   function FnTransducer(xf, step, result, init) {
     _classCallCheck(this, FnTransducer);
 
@@ -1213,7 +828,7 @@ var FnTransducer = (function (_Transducer) {
     this.xfResult = this.xfResult.bind(this);
   }
 
-  _inherits(FnTransducer, _Transducer);
+  // eduction
 
   FnTransducer.prototype[tInit] = function () {
     return this._init ? this._init(this.xfInit) : this.xfInit();
@@ -1228,9 +843,8 @@ var FnTransducer = (function (_Transducer) {
   };
 
   return FnTransducer;
-})(_Transducer$compose$identity$protocols$isReduced$reduced$unreduced$isArray$isFunction$isIterable$isIterator.Transducer);
+})(_util.Transducer);
 
-// eduction
 var eduction = function eduction(t, coll) {
   return new Eduction(t, coll);
 };
@@ -1244,8 +858,10 @@ var Eduction = (function () {
     this.coll = coll;
   }
 
+  // sequence
+
   Eduction.prototype[symIter] = function () {
-    return _transduceImpl$reduceImpl$intoImpl$ArrayIterable$FunctionIterable$ObjectIterable$ArrayTransformer$StringTransformer$ObjectTransformer$transformer$iterable$iterator$completing.iterator(sequence(this.t, this.coll));
+    return _internal.iterator(sequence(this.t, this.coll));
   };
 
   Eduction.prototype[tReduce] = function (rf, init) {
@@ -1268,7 +884,7 @@ var LazyIterable = (function () {
   }
 
   LazyIterable.prototype[symIter] = function () {
-    return new LazyIterator(new Stepper(this.t, _transduceImpl$reduceImpl$intoImpl$ArrayIterable$FunctionIterable$ObjectIterable$ArrayTransformer$StringTransformer$ObjectTransformer$transformer$iterable$iterator$completing.iterator(this.coll)));
+    return new LazyIterator(new Stepper(this.t, _internal.iterator(this.coll)));
   };
 
   return LazyIterable;
@@ -1321,7 +937,7 @@ var Stepper = (function () {
       }
 
       result = this.xf[tStep](lt, next.value);
-      if (_Transducer$compose$identity$protocols$isReduced$reduced$unreduced$isArray$isFunction$isIterable$isIterator.isReduced(result)) {
+      if (_util.isReduced(result)) {
         this.xf[tResult](lt);
         break;
       }
@@ -1331,56 +947,55 @@ var Stepper = (function () {
   return Stepper;
 })();
 //# sourceMappingURL=core.js.map
-},{"10":10,"2":2}],6:[function(require,module,exports){
+
+},{"2":2,"9":9}],5:[function(require,module,exports){
 'use strict';
-
-var _defaults = function (obj, defaults) { var keys = Object.getOwnPropertyNames(defaults); for (var i = 0; i < keys.length; i++) { var key = keys[i]; var value = Object.getOwnPropertyDescriptor(defaults, key); if (value && value.configurable && obj[key] === undefined) { Object.defineProperty(obj, key, value); } } return obj; };
-
-var _interopRequireWildcard = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
 
 exports.__esModule = true;
 
-var _import = require(3);
+function _interopExportWildcard(obj, defaults) { var newObj = defaults({}, obj); delete newObj['default']; return newObj; }
 
-var array = _interopRequireWildcard(_import);
+function _defaults(obj, defaults) { var keys = Object.getOwnPropertyNames(defaults); for (var i = 0; i < keys.length; i++) { var key = keys[i]; var value = Object.getOwnPropertyDescriptor(defaults, key); if (value && value.configurable && obj[key] === undefined) { Object.defineProperty(obj, key, value); } } return obj; }
 
-var _import2 = require(8);
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
 
-var string = _interopRequireWildcard(_import2);
+var _array = require(3);
 
-var _import3 = require(7);
+var array = _interopRequireWildcard(_array);
 
-var math = _interopRequireWildcard(_import3);
+var _string = require(7);
 
-var _import4 = require(4);
+var string = _interopRequireWildcard(_string);
 
-var async = _interopRequireWildcard(_import4);
+var _math = require(6);
 
-var _core = require(5);
+var math = _interopRequireWildcard(_math);
 
-_defaults(exports, _interopRequireWildcard(_core));
+var _core = require(4);
 
-var _transducers = require(9);
+_defaults(exports, _interopExportWildcard(_core, _defaults));
 
-_defaults(exports, _interopRequireWildcard(_transducers));
+var _transducers = require(8);
+
+_defaults(exports, _interopExportWildcard(_transducers, _defaults));
 
 exports.array = array;
 exports.string = string;
 exports.math = math;
-exports.async = async;
 //# sourceMappingURL=index.js.map
-},{"3":3,"4":4,"5":5,"7":7,"8":8,"9":9}],7:[function(require,module,exports){
+
+},{"3":3,"4":4,"6":6,"7":7,"8":8}],6:[function(require,module,exports){
 'use strict';
-
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
-
-var _inherits = function (subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
 
 exports.__esModule = true;
 
-var _Transducer$protocols$identity = require(10);
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-var _protocols$transducer = _Transducer$protocols$identity.protocols.transducer;
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var _util = require(9);
+
+var _protocols$transducer = _util.protocols.transducer;
 var tStep = _protocols$transducer.step;
 var tResult = _protocols$transducer.result;
 var max = function max(f) {
@@ -1391,16 +1006,16 @@ var max = function max(f) {
 exports.max = max;
 
 var Max = (function (_Transducer) {
+  _inherits(Max, _Transducer);
+
   function Max(f, xf) {
     _classCallCheck(this, Max);
 
     _Transducer.call(this, xf);
-    this.f = f || _Transducer$protocols$identity.identity;
+    this.f = f || _util.identity;
     this.computedResult = -Infinity;
     this.lastComputed = -Infinity;
   }
-
-  _inherits(Max, _Transducer);
 
   Max.prototype[tStep] = function (value, input) {
     var computed = this.f(input);
@@ -1416,7 +1031,7 @@ var Max = (function (_Transducer) {
   };
 
   return Max;
-})(_Transducer$protocols$identity.Transducer);
+})(_util.Transducer);
 
 var min = function min(f) {
   return function (xf) {
@@ -1426,16 +1041,16 @@ var min = function min(f) {
 exports.min = min;
 
 var Min = (function (_Transducer2) {
+  _inherits(Min, _Transducer2);
+
   function Min(f, xf) {
     _classCallCheck(this, Min);
 
     _Transducer2.call(this, xf);
-    this.f = f || _Transducer$protocols$identity.identity;
+    this.f = f || _util.identity;
     this.computedResult = Infinity;
     this.lastComputed = Infinity;
   }
-
-  _inherits(Min, _Transducer2);
 
   Min.prototype[tStep] = function (value, input) {
     var computed = this.f(input);
@@ -1451,22 +1066,23 @@ var Min = (function (_Transducer2) {
   };
 
   return Min;
-})(_Transducer$protocols$identity.Transducer);
+})(_util.Transducer);
 //# sourceMappingURL=math.js.map
-},{"10":10}],8:[function(require,module,exports){
+
+},{"9":9}],7:[function(require,module,exports){
 'use strict';
-
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
-
-var _inherits = function (subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
 
 exports.__esModule = true;
 exports.words = words;
 exports.split = split;
 
-var _Transducer$protocols$reduced$compose$isRegExp$isNumber$isString = require(10);
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-var _protocols$transducer = _Transducer$protocols$reduced$compose$isRegExp$isNumber$isString.protocols.transducer;
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var _util = require(9);
+
+var _protocols$transducer = _util.protocols.transducer;
 var tStep = _protocols$transducer.step;
 var tResult = _protocols$transducer.result;
 var join = function join(separator) {
@@ -1477,6 +1093,8 @@ var join = function join(separator) {
 exports.join = join;
 
 var Join = (function (_Transducer) {
+  _inherits(Join, _Transducer);
+
   function Join(separator, xf) {
     _classCallCheck(this, Join);
 
@@ -1484,8 +1102,6 @@ var Join = (function (_Transducer) {
     this.buffer = [];
     this.separator = separator;
   }
-
-  _inherits(Join, _Transducer);
 
   Join.prototype[tStep] = function (value, input) {
     this.buffer.push(input);
@@ -1498,7 +1114,7 @@ var Join = (function (_Transducer) {
   };
 
   return Join;
-})(_Transducer$protocols$reduced$compose$isRegExp$isNumber$isString.Transducer);
+})(_util.Transducer);
 
 var nonEmpty = function nonEmpty() {
   return function (xf) {
@@ -1508,23 +1124,23 @@ var nonEmpty = function nonEmpty() {
 exports.nonEmpty = nonEmpty;
 
 var NonEmpty = (function (_Transducer2) {
+  _inherits(NonEmpty, _Transducer2);
+
   function NonEmpty(xf) {
     _classCallCheck(this, NonEmpty);
 
     _Transducer2.call(this, xf);
   }
 
-  _inherits(NonEmpty, _Transducer2);
-
   NonEmpty.prototype[tStep] = function (value, input) {
-    if (_Transducer$protocols$reduced$compose$isRegExp$isNumber$isString.isString(input) && input.trim().length) {
+    if (_util.isString(input) && input.trim().length) {
       value = this.xfStep(value, input);
     }
     return value;
   };
 
   return NonEmpty;
-})(_Transducer$protocols$reduced$compose$isRegExp$isNumber$isString.Transducer);
+})(_util.Transducer);
 
 var lines = function lines(limit) {
   return split('\n', limit);
@@ -1537,11 +1153,11 @@ var chars = function chars(limit) {
 exports.chars = chars;
 
 function words(delimiter, limit) {
-  if (delimiter === void 0 || _Transducer$protocols$reduced$compose$isRegExp$isNumber$isString.isNumber(delimiter)) {
+  if (delimiter === void 0 || _util.isNumber(delimiter)) {
     limit = delimiter;
     delimiter = /\s+/;
   }
-  return _Transducer$protocols$reduced$compose$isRegExp$isNumber$isString.compose(split(delimiter, limit), nonEmpty());
+  return _util.compose(split(delimiter, limit), nonEmpty());
 }
 
 function split(separator, limit) {
@@ -1551,11 +1167,13 @@ function split(separator, limit) {
 }
 
 var Split = (function (_Transducer3) {
+  _inherits(Split, _Transducer3);
+
   function Split(separator, limit, xf) {
     _classCallCheck(this, Split);
 
     _Transducer3.call(this, xf);
-    if (_Transducer$protocols$reduced$compose$isRegExp$isNumber$isString.isRegExp(separator)) {
+    if (_util.isRegExp(separator)) {
       separator = cloneRegExp(separator);
     }
     this.separator = separator;
@@ -1567,16 +1185,14 @@ var Split = (function (_Transducer3) {
     }
     this.limit = limit;
 
-    if (!_Transducer$protocols$reduced$compose$isRegExp$isNumber$isString.isRegExp(separator) && separator !== '') {
+    if (!_util.isRegExp(separator) && separator !== '') {
       this.spliterate = spliterateString;
-    } else if (_Transducer$protocols$reduced$compose$isRegExp$isNumber$isString.isRegExp(separator)) {
+    } else if (_util.isRegExp(separator)) {
       this.spliterate = spliterateRegExp;
     } else {
       this.spliterate = spliterateChars;
     }
   }
-
-  _inherits(Split, _Transducer3);
 
   Split.prototype[tStep] = function (value, input) {
     if (input === null || input === void 0) {
@@ -1596,7 +1212,7 @@ var Split = (function (_Transducer3) {
 
       if (++this.idx >= this.limit) {
         this.next = null;
-        value = _Transducer$protocols$reduced$compose$isRegExp$isNumber$isString.reduced(value);
+        value = _util.reduced(value);
         break;
       }
     }
@@ -1611,7 +1227,7 @@ var Split = (function (_Transducer3) {
   };
 
   return Split;
-})(_Transducer$protocols$reduced$compose$isRegExp$isNumber$isString.Transducer);
+})(_util.Transducer);
 
 function spliterateChars(str) {
   var i = 0,
@@ -1672,20 +1288,21 @@ function cloneRegExp(regexp) {
   return new RegExp(regexp.source, flags.join(''));
 }
 //# sourceMappingURL=string.js.map
-},{"10":10}],9:[function(require,module,exports){
+
+},{"9":9}],8:[function(require,module,exports){
 'use strict';
-
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
-
-var _inherits = function (subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
 
 exports.__esModule = true;
 
-var _Transducer$reduced$isReduced$unreduced$protocols$identity$compose = require(10);
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-var _reduce = require(5);
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var _protocols$transducer = _Transducer$reduced$isReduced$unreduced$protocols$identity$compose.protocols.transducer;
+var _util = require(9);
+
+var _core = require(4);
+
+var _protocols$transducer = _util.protocols.transducer;
 var tStep = _protocols$transducer.step;
 var tResult = _protocols$transducer.result;
 var map = function map(f) {
@@ -1696,6 +1313,8 @@ var map = function map(f) {
 exports.map = map;
 
 var Map = (function (_Transducer) {
+  _inherits(Map, _Transducer);
+
   function Map(f, xf) {
     _classCallCheck(this, Map);
 
@@ -1703,14 +1322,12 @@ var Map = (function (_Transducer) {
     this.f = f;
   }
 
-  _inherits(Map, _Transducer);
-
   Map.prototype[tStep] = function (value, input) {
     return this.xfStep(value, this.f(input));
   };
 
   return Map;
-})(_Transducer$reduced$isReduced$unreduced$protocols$identity$compose.Transducer);
+})(_util.Transducer);
 
 var filter = function filter(p) {
   return function (xf) {
@@ -1720,6 +1337,8 @@ var filter = function filter(p) {
 exports.filter = filter;
 
 var Filter = (function (_Transducer2) {
+  _inherits(Filter, _Transducer2);
+
   function Filter(p, xf) {
     _classCallCheck(this, Filter);
 
@@ -1727,14 +1346,12 @@ var Filter = (function (_Transducer2) {
     this.p = p;
   }
 
-  _inherits(Filter, _Transducer2);
-
   Filter.prototype[tStep] = function (value, input) {
     return this.p(input) ? this.xfStep(value, input) : value;
   };
 
   return Filter;
-})(_Transducer$reduced$isReduced$unreduced$protocols$identity$compose.Transducer);
+})(_util.Transducer);
 
 var remove = function remove(p) {
   return filter(function (x) {
@@ -1751,6 +1368,8 @@ var take = function take(n) {
 exports.take = take;
 
 var Take = (function (_Transducer3) {
+  _inherits(Take, _Transducer3);
+
   function Take(n, xf) {
     _classCallCheck(this, Take);
 
@@ -1758,20 +1377,18 @@ var Take = (function (_Transducer3) {
     this.n = n;
   }
 
-  _inherits(Take, _Transducer3);
-
   Take.prototype[tStep] = function (value, input) {
     if (this.n-- > 0) {
       value = this.xfStep(value, input);
     }
     if (this.n <= 0) {
-      value = _Transducer$reduced$isReduced$unreduced$protocols$identity$compose.reduced(value);
+      value = _util.reduced(value);
     }
     return value;
   };
 
   return Take;
-})(_Transducer$reduced$isReduced$unreduced$protocols$identity$compose.Transducer);
+})(_util.Transducer);
 
 var takeWhile = function takeWhile(p) {
   return function (xf) {
@@ -1781,6 +1398,8 @@ var takeWhile = function takeWhile(p) {
 exports.takeWhile = takeWhile;
 
 var TakeWhile = (function (_Transducer4) {
+  _inherits(TakeWhile, _Transducer4);
+
   function TakeWhile(p, xf) {
     _classCallCheck(this, TakeWhile);
 
@@ -1788,14 +1407,12 @@ var TakeWhile = (function (_Transducer4) {
     this.p = p;
   }
 
-  _inherits(TakeWhile, _Transducer4);
-
   TakeWhile.prototype[tStep] = function (value, input) {
-    return this.p(input) ? this.xfStep(value, input) : _Transducer$reduced$isReduced$unreduced$protocols$identity$compose.reduced(value);
+    return this.p(input) ? this.xfStep(value, input) : _util.reduced(value);
   };
 
   return TakeWhile;
-})(_Transducer$reduced$isReduced$unreduced$protocols$identity$compose.Transducer);
+})(_util.Transducer);
 
 var drop = function drop(n) {
   return function (xf) {
@@ -1805,6 +1422,8 @@ var drop = function drop(n) {
 exports.drop = drop;
 
 var Drop = (function (_Transducer5) {
+  _inherits(Drop, _Transducer5);
+
   function Drop(n, xf) {
     _classCallCheck(this, Drop);
 
@@ -1812,14 +1431,12 @@ var Drop = (function (_Transducer5) {
     this.n = n;
   }
 
-  _inherits(Drop, _Transducer5);
-
   Drop.prototype[tStep] = function (value, input) {
     return --this.n < 0 ? this.xfStep(value, input) : value;
   };
 
   return Drop;
-})(_Transducer$reduced$isReduced$unreduced$protocols$identity$compose.Transducer);
+})(_util.Transducer);
 
 var dropWhile = function dropWhile(p) {
   return function (xf) {
@@ -1829,6 +1446,8 @@ var dropWhile = function dropWhile(p) {
 exports.dropWhile = dropWhile;
 
 var DropWhile = (function (_Transducer6) {
+  _inherits(DropWhile, _Transducer6);
+
   function DropWhile(p, xf) {
     _classCallCheck(this, DropWhile);
 
@@ -1836,8 +1455,6 @@ var DropWhile = (function (_Transducer6) {
     this.p = p;
     this.found = false;
   }
-
-  _inherits(DropWhile, _Transducer6);
 
   DropWhile.prototype[tStep] = function (value, input) {
     if (!this.found) {
@@ -1850,7 +1467,7 @@ var DropWhile = (function (_Transducer6) {
   };
 
   return DropWhile;
-})(_Transducer$reduced$isReduced$unreduced$protocols$identity$compose.Transducer);
+})(_util.Transducer);
 
 var cat = function cat(xf) {
   return new Cat(xf);
@@ -1858,43 +1475,43 @@ var cat = function cat(xf) {
 exports.cat = cat;
 
 var Cat = (function (_Transducer7) {
+  _inherits(Cat, _Transducer7);
+
   function Cat(xf) {
     _classCallCheck(this, Cat);
 
     _Transducer7.call(this, new PreserveReduced(xf));
   }
 
-  _inherits(Cat, _Transducer7);
-
   Cat.prototype[tStep] = function (value, input) {
-    return _reduce.reduce(this.xf, value, input);
+    return _core.reduce(this.xf, value, input);
   };
 
   return Cat;
-})(_Transducer$reduced$isReduced$unreduced$protocols$identity$compose.Transducer);
+})(_util.Transducer);
 
 var PreserveReduced = (function (_Transducer8) {
+  _inherits(PreserveReduced, _Transducer8);
+
   function PreserveReduced(xf) {
     _classCallCheck(this, PreserveReduced);
 
     _Transducer8.call(this, xf);
   }
 
-  _inherits(PreserveReduced, _Transducer8);
-
   PreserveReduced.prototype[tStep] = function (value, input) {
     value = this.xfStep(value, input);
-    if (_Transducer$reduced$isReduced$unreduced$protocols$identity$compose.isReduced(value)) {
-      value = _Transducer$reduced$isReduced$unreduced$protocols$identity$compose.reduced(value, true);
+    if (_util.isReduced(value)) {
+      value = _util.reduced(value, true);
     }
     return value;
   };
 
   return PreserveReduced;
-})(_Transducer$reduced$isReduced$unreduced$protocols$identity$compose.Transducer);
+})(_util.Transducer);
 
 var mapcat = function mapcat(f) {
-  return _Transducer$reduced$isReduced$unreduced$protocols$identity$compose.compose(map(f), cat);
+  return _util.compose(map(f), cat);
 };
 
 exports.mapcat = mapcat;
@@ -1906,6 +1523,8 @@ var partitionAll = function partitionAll(n) {
 exports.partitionAll = partitionAll;
 
 var PartitionAll = (function (_Transducer9) {
+  _inherits(PartitionAll, _Transducer9);
+
   function PartitionAll(n, xf) {
     _classCallCheck(this, PartitionAll);
 
@@ -1913,8 +1532,6 @@ var PartitionAll = (function (_Transducer9) {
     this.n = n;
     this.inputs = [];
   }
-
-  _inherits(PartitionAll, _Transducer9);
 
   PartitionAll.prototype[tStep] = function (value, input) {
     var ins = this.inputs;
@@ -1936,7 +1553,7 @@ var PartitionAll = (function (_Transducer9) {
   };
 
   return PartitionAll;
-})(_Transducer$reduced$isReduced$unreduced$protocols$identity$compose.Transducer);
+})(_util.Transducer);
 
 var partitionBy = function partitionBy(f) {
   return function (xf) {
@@ -1946,14 +1563,14 @@ var partitionBy = function partitionBy(f) {
 exports.partitionBy = partitionBy;
 
 var PartitionBy = (function (_Transducer10) {
+  _inherits(PartitionBy, _Transducer10);
+
   function PartitionBy(f, xf) {
     _classCallCheck(this, PartitionBy);
 
     _Transducer10.call(this, xf);
     this.f = f;
   }
-
-  _inherits(PartitionBy, _Transducer10);
 
   PartitionBy.prototype[tStep] = function (value, input) {
     var ins = this.inputs,
@@ -1967,7 +1584,7 @@ var PartitionBy = (function (_Transducer10) {
     } else {
       this.inputs = [];
       value = this.xfStep(value, ins);
-      if (!_Transducer$reduced$isReduced$unreduced$protocols$identity$compose.isReduced(value)) {
+      if (!_util.isReduced(value)) {
         this.inputs.push(input);
       }
     }
@@ -1984,7 +1601,7 @@ var PartitionBy = (function (_Transducer10) {
   };
 
   return PartitionBy;
-})(_Transducer$reduced$isReduced$unreduced$protocols$identity$compose.Transducer);
+})(_util.Transducer);
 
 var dedupe = function dedupe() {
   return function (xf) {
@@ -1994,14 +1611,14 @@ var dedupe = function dedupe() {
 exports.dedupe = dedupe;
 
 var Dedupe = (function (_Transducer11) {
+  _inherits(Dedupe, _Transducer11);
+
   function Dedupe(xf) {
     _classCallCheck(this, Dedupe);
 
     _Transducer11.call(this, xf);
     this.sawFirst = false;
   }
-
-  _inherits(Dedupe, _Transducer11);
 
   Dedupe.prototype[tStep] = function (value, input) {
     if (!this.sawFirst || this.last !== input) {
@@ -2013,7 +1630,7 @@ var Dedupe = (function (_Transducer11) {
   };
 
   return Dedupe;
-})(_Transducer$reduced$isReduced$unreduced$protocols$identity$compose.Transducer);
+})(_util.Transducer);
 
 var unique = function unique(f) {
   return function (xf) {
@@ -2023,15 +1640,15 @@ var unique = function unique(f) {
 exports.unique = unique;
 
 var Unique = (function (_Transducer12) {
+  _inherits(Unique, _Transducer12);
+
   function Unique(f, xf) {
     _classCallCheck(this, Unique);
 
     _Transducer12.call(this, xf);
     this.seen = [];
-    this.f = f || _Transducer$reduced$isReduced$unreduced$protocols$identity$compose.identity;
+    this.f = f || _util.identity;
   }
-
-  _inherits(Unique, _Transducer12);
 
   Unique.prototype[tStep] = function (value, input) {
     var computed = this.f(input);
@@ -2043,7 +1660,7 @@ var Unique = (function (_Transducer12) {
   };
 
   return Unique;
-})(_Transducer$reduced$isReduced$unreduced$protocols$identity$compose.Transducer);
+})(_util.Transducer);
 
 var tap = function tap(f) {
   return function (xf) {
@@ -2053,6 +1670,8 @@ var tap = function tap(f) {
 exports.tap = tap;
 
 var Tap = (function (_Transducer13) {
+  _inherits(Tap, _Transducer13);
+
   function Tap(f, xf) {
     _classCallCheck(this, Tap);
 
@@ -2060,15 +1679,13 @@ var Tap = (function (_Transducer13) {
     this.f = f;
   }
 
-  _inherits(Tap, _Transducer13);
-
   Tap.prototype[tStep] = function (value, input) {
     this.f(value, input);
     return this.xfStep(value, input);
   };
 
   return Tap;
-})(_Transducer$reduced$isReduced$unreduced$protocols$identity$compose.Transducer);
+})(_util.Transducer);
 
 var interpose = function interpose(separator) {
   return function (xf) {
@@ -2078,6 +1695,8 @@ var interpose = function interpose(separator) {
 exports.interpose = interpose;
 
 var Interpose = (function (_Transducer14) {
+  _inherits(Interpose, _Transducer14);
+
   function Interpose(separator, xf) {
     _classCallCheck(this, Interpose);
 
@@ -2086,12 +1705,10 @@ var Interpose = (function (_Transducer14) {
     this.started = false;
   }
 
-  _inherits(Interpose, _Transducer14);
-
   Interpose.prototype[tStep] = function (value, input) {
     if (this.started) {
       var withSep = this.xf[tStep](value, this.separator);
-      if (_Transducer$reduced$isReduced$unreduced$protocols$identity$compose.isReduced(withSep)) {
+      if (_util.isReduced(withSep)) {
         return withSep;
       } else {
         return this.xfStep(withSep, input);
@@ -2103,12 +1720,11 @@ var Interpose = (function (_Transducer14) {
   };
 
   return Interpose;
-})(_Transducer$reduced$isReduced$unreduced$protocols$identity$compose.Transducer);
+})(_util.Transducer);
 //# sourceMappingURL=transducers.js.map
-},{"10":10,"5":5}],10:[function(require,module,exports){
-'use strict';
 
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
+},{"4":4,"9":9}],9:[function(require,module,exports){
+'use strict';
 
 exports.__esModule = true;
 exports.isIterable = isIterable;
@@ -2116,6 +1732,9 @@ exports.isIterator = isIterator;
 exports.compose = compose;
 exports.reduced = reduced;
 exports.unreduced = unreduced;
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
 var toString = Object.prototype.toString;
 var has = ({}).hasOwnProperty;
 
@@ -2256,8 +1875,6 @@ var Transducer = (function () {
 
 exports.Transducer = Transducer;
 //# sourceMappingURL=util.js.map
-},{}],11:[function(require,module,exports){
-module.exports = Promise;
 
 },{}]},{},[1])(1)
 });
