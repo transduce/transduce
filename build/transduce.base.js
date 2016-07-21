@@ -6,7 +6,7 @@ module.exports = require(3)
 
 exports.__esModule = true;
 
-var _lastValue;
+var _lastValue, _arrayTransformer, _stringTransformer, _objectTransformer;
 
 exports.transduceImpl = transduceImpl;
 exports.reduceImpl = reduceImpl;
@@ -71,12 +71,12 @@ function intoImpl(reduce) {
         len = arguments.length;
 
     if (len === 1) {
-      return intoCurryXf(xf);
+      return intoCurryInitXf(intoInit(init, xf), xf);
     }
 
     if (len === 2) {
       if (_util.isFunction(t)) {
-        return intoCurryXfT(xf, t);
+        return intoCurryInitXfT(intoInit(init, xf), xf, t);
       }
       coll = t;
       return reduce(xf, init, coll);
@@ -84,22 +84,28 @@ function intoImpl(reduce) {
     return reduce(t(xf), init, coll);
   };
 
-  function intoCurryXf(xf) {
-    return function intoXf(t, coll) {
+  function intoCurryInitXf(init, xf) {
+    return function intoInitXf(t, coll) {
       if (arguments.length === 1) {
         if (_util.isFunction(t)) {
-          return intoCurryXfT(xf, t);
+          return intoCurryInitXfT(init, xf, t);
         }
         coll = t;
-        return reduce(xf, xf[tInit](), coll);
+        return reduce(xf, init(), coll);
       }
-      return reduce(t(xf), xf[tInit](), coll);
+      return reduce(t(xf), init(), coll);
     };
   }
 
-  function intoCurryXfT(xf, t) {
-    return function intoXfT(coll) {
-      return reduce(t(xf), xf[tInit](), coll);
+  function intoCurryInitXfT(init, xf, t) {
+    return function intoInitXfT(coll) {
+      return reduce(t(xf), init(), coll);
+    };
+  }
+
+  function intoInit(init, xf) {
+    return function () {
+      return reduce(xf, xf[tInit](), init);
     };
   }
 }
@@ -151,17 +157,18 @@ var ArrayIterable = (function () {
   }
 
   ArrayIterable.prototype[symIter] = function () {
-    var _this = this;
+    var _ref,
+        _this = this;
 
     var idx = 0;
-    return {
+    return _ref = {
       next: function next() {
         if (idx >= _this.arr.length) {
           return { done: true };
         }
         return { done: false, value: _this.arr[idx++] };
       }
-    };
+    }, _ref[symIter] = symIterReturnSelf, _ref;
   };
 
   return ArrayIterable;
@@ -177,7 +184,9 @@ var FunctionIterable = (function () {
   }
 
   FunctionIterable.prototype[symIter] = function () {
-    return { next: this.fn };
+    var _ref2;
+
+    return _ref2 = { next: this.fn }, _ref2[symIter] = symIterReturnSelf, _ref2;
   };
 
   return FunctionIterable;
@@ -193,13 +202,12 @@ var ObjectIterable = (function () {
     this.keys = Object.keys(obj);
   }
 
-  // converts a value to a transformer
-
   ObjectIterable.prototype[symIter] = function () {
-    var _this2 = this;
+    var _ref3,
+        _this2 = this;
 
     var idx = 0;
-    return {
+    return _ref3 = {
       next: function next() {
         if (idx >= _this2.keys.length) {
           return { done: true };
@@ -207,14 +215,13 @@ var ObjectIterable = (function () {
         var key = _this2.keys[idx++];
         return { done: false, value: [key, _this2.obj[key]] };
       }
-    };
+    }, _ref3[symIter] = symIterReturnSelf, _ref3;
   };
 
   return ObjectIterable;
 })();
 
 exports.ObjectIterable = ObjectIterable;
-var slice = Array.prototype.slice;
 
 var lastValue = (_lastValue = {}, _lastValue[tInit] = function () {}, _lastValue[tStep] = function (result, input) {
   return input;
@@ -229,11 +236,11 @@ function transformer(value) {
   } else if (_util.isFunction(value)) {
     xf = completing(value);
   } else if (_util.isArray(value)) {
-    xf = new ArrayTransformer(value);
+    xf = arrayTransformer;
   } else if (_util.isString(value)) {
-    xf = new StringTransformer(value);
+    xf = stringTransformer;
   } else {
-    xf = new ObjectTransformer(value);
+    xf = objectTransformer;
   }
   return xf;
 }
@@ -242,88 +249,30 @@ function transformer(value) {
 // init will clone the default
 // step will push input onto array and return result
 // result is identity
+var arrayTransformer = (_arrayTransformer = {}, _arrayTransformer[tInit] = function () {
+  return [];
+}, _arrayTransformer[tStep] = function (result, input) {
+  result.push(input);
+  return result;
+}, _arrayTransformer[tResult] = _util.identity, _arrayTransformer);
 
-var ArrayTransformer = (function () {
-  function ArrayTransformer(defaultValue) {
-    _classCallCheck(this, ArrayTransformer);
+// Appends value onto string, using optional constructor arg as default, or '' if not provided
+// init will return the default
+// step will append input onto string and return result
+// result is identity
+var stringTransformer = (_stringTransformer = {}, _stringTransformer[tInit] = function () {
+  return '';
+}, _stringTransformer[tStep] = function (result, input) {
+  return result + input;
+}, _stringTransformer[tResult] = _util.identity, _stringTransformer);
 
-    this.defaultValue = defaultValue === void 0 ? [] : defaultValue;
-  }
-
-  // Appends value onto string, using optional constructor arg as default, or '' if not provided
-  // init will return the default
-  // step will append input onto string and return result
-  // result is identity
-
-  ArrayTransformer.prototype[tInit] = function () {
-    return slice.call(this.defaultValue);
-  };
-
-  ArrayTransformer.prototype[tStep] = function (result, input) {
-    result.push(input);
-    return result;
-  };
-
-  ArrayTransformer.prototype[tResult] = function (value) {
-    return value;
-  };
-
-  return ArrayTransformer;
-})();
-
-exports.ArrayTransformer = ArrayTransformer;
-
-var StringTransformer = (function () {
-  function StringTransformer(str) {
-    _classCallCheck(this, StringTransformer);
-
-    this.strDefault = str === void 0 ? '' : str;
-  }
-
-  // Merges value into object, using optional constructor arg as default, or {} if undefined
-  // init will clone the default
-  // step will merge input into object and return result
-  // result is identity
-
-  StringTransformer.prototype[tInit] = function () {
-    return this.strDefault;
-  };
-
-  StringTransformer.prototype[tStep] = function (result, input) {
-    return result + input;
-  };
-
-  StringTransformer.prototype[tResult] = function (value) {
-    return value;
-  };
-
-  return StringTransformer;
-})();
-
-exports.StringTransformer = StringTransformer;
-
-var ObjectTransformer = (function () {
-  function ObjectTransformer(obj) {
-    _classCallCheck(this, ObjectTransformer);
-
-    this.objDefault = obj === void 0 ? {} : objectMerge({}, obj);
-  }
-
-  ObjectTransformer.prototype[tInit] = function () {
-    return objectMerge({}, this.objDefault);
-  };
-
-  ObjectTransformer.prototype[tResult] = function (value) {
-    return value;
-  };
-
-  return ObjectTransformer;
-})();
-
-exports.ObjectTransformer = ObjectTransformer;
-
-ObjectTransformer.prototype[tStep] = objectMerge;
-function objectMerge(result, input) {
+// Merges value into object, using optional constructor arg as default, or {} if undefined
+// init will clone the default
+// step will merge input into object and return result
+// result is identity
+var objectTransformer = (_objectTransformer = {}, _objectTransformer[tInit] = function () {
+  return {};
+}, _objectTransformer[tStep] = function objectMerge(result, input) {
   if (_util.isArray(input) && input.length === 2) {
     result[input[0]] = input[1];
   } else {
@@ -335,8 +284,12 @@ function objectMerge(result, input) {
     }
   }
   return result;
+}, _objectTransformer[tResult] = _util.identity, _objectTransformer);
+
+function symIterReturnSelf() {
+  return this;
 }
-//# sourceMappingURL=_internal.js.map
+
 
 },{"6":6}],3:[function(require,module,exports){
 'use strict';
@@ -354,7 +307,7 @@ _defaults(exports, _interopExportWildcard(_core, _defaults));
 var _transducers = require(5);
 
 _defaults(exports, _interopExportWildcard(_transducers, _defaults));
-//# sourceMappingURL=base.js.map
+
 
 },{"4":4,"5":5}],4:[function(require,module,exports){
 'use strict';
@@ -394,12 +347,6 @@ exports.unreduced = _util.unreduced;
 exports.Transducer = _util.Transducer;
 exports.isIterable = _util.isIterable;
 exports.isIterator = _util.isIterator;
-exports.ArrayIterable = _internal.ArrayIterable;
-exports.FunctionIterable = _internal.FunctionIterable;
-exports.ObjectIterable = _internal.ObjectIterable;
-exports.ArrayTransformer = _internal.ArrayTransformer;
-exports.StringTransformer = _internal.StringTransformer;
-exports.ObjectTransformer = _internal.ObjectTransformer;
 
 // Transduce, reduce, into
 var reduce = _internal.reduceImpl(_reduce);
@@ -600,7 +547,7 @@ var Stepper = (function () {
 
   return Stepper;
 })();
-//# sourceMappingURL=core.js.map
+
 
 },{"2":2,"6":6}],5:[function(require,module,exports){
 'use strict';
@@ -1034,7 +981,7 @@ var Interpose = (function (_Transducer14) {
 
   return Interpose;
 })(_util.Transducer);
-//# sourceMappingURL=transducers.js.map
+
 
 },{"4":4,"6":6}],6:[function(require,module,exports){
 'use strict';
@@ -1187,7 +1134,7 @@ var Transducer = (function () {
 })();
 
 exports.Transducer = Transducer;
-//# sourceMappingURL=util.js.map
+
 
 },{}]},{},[1])(1)
 });

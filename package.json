@@ -1,6 +1,6 @@
 {
   "name": "transduce",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "description": "JavaScript transducers and iterators",
   "main": "index.js",
   "scripts": {
@@ -22,15 +22,15 @@
   },
   "homepage": "http://github.com/transduce/transduce",
   "devDependencies": {
-    "browserify": "~9.0.3",
-    "bundle-collapser": "~1.1.4",
-    "gulp": "^3.8.11",
+    "browserify": "^13.0.0",
+    "bundle-collapser": "^1.0.0",
+    "gulp": "^3.0.0",
     "gulp-babel": "^5.0.0",
-    "gulp-sourcemaps": "^1.5.1",
-    "iterdone": "~0.1.0",
-    "jshint": "~2.6.0",
+    "gulp-sourcemaps": "^1.0.0",
+    "iterdone": "^0.1.0",
+    "jshint": "^2.0.0",
     "tap-bail": "0.0.0",
-    "tape": "~3.5.0",
-    "uglify-js": "~2.4.16"
+    "tape": "^4.0.0",
+    "uglify-js": "^2.0.0"
   }
 }
