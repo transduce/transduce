@@ -240,5 +240,5 @@ const objectTransformer = {
 }
 
 function symIterReturnSelf() {
-  return this;
+  return this
 }
