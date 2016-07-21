@@ -127,7 +127,8 @@ export class ArrayIterable {
           return {done: true}
         }
         return {done: false, value: this.arr[idx++]}
-      }
+      },
+      [symIter]: symIterReturnSelf
     }
   }
 }
@@ -137,7 +138,7 @@ export class FunctionIterable {
     this.fn = fn
   }
   [symIter](){
-    return {next: this.fn}
+    return { next: this.fn, [symIter]: symIterReturnSelf }
   }
 }
 
@@ -155,7 +156,8 @@ export class ObjectIterable {
         }
         var key = this.keys[idx++]
         return {done: false, value: [key, this.obj[key]]}
-      }
+      },
+      [symIter]: symIterReturnSelf
     }
   }
 }
@@ -235,4 +237,8 @@ const objectTransformer = {
     return result
   },
   [tResult]: identity
+}
+
+function symIterReturnSelf() {
+  return this
 }

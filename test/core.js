@@ -305,6 +305,7 @@ test('iterate array', function(t){
   idx = 0
   arr = [1,2,3]
   iterator = tr.iterable(arr)[symbol]()
+  t.equals(iterator, iterator[symbol](), 'iterator === iterator[symbol]()')
   t.deepEquals({value: arr[idx++], done: false}, iterator.next())
   t.deepEquals({value: arr[idx++], done: false}, iterator.next())
   t.deepEquals({value: arr[idx++], done: false}, iterator.next())
@@ -333,6 +334,7 @@ test('iterate string', function(t){
   idx = 0
   arr = ['1','2','3']
   iterator = tr.iterable('123')[symbol]()
+  t.equals(iterator, iterator[symbol](), 'iterator === iterator[symbol]()')
   t.deepEquals({value: arr[idx++], done: false}, iterator.next())
   t.deepEquals({value: arr[idx++], done: false}, iterator.next())
   t.deepEquals({value: arr[idx++], done: false}, iterator.next())
@@ -355,11 +357,14 @@ test('iterate string', function(t){
 })
 
 test('iterate object', function(t){
-  var obj, arr
+  var obj, objIterator, arr, symbol = tr.protocols.iterator
   var toArray = iterdone.toArray
 
   obj = {a:1, b:2, c:3}
   arr = [['a', 1],['b', 2],['c', 3]]
+
+  objIterator = tr.iterator(obj)
+  t.equals(objIterator, objIterator[symbol](), 'objIterator === objIterator[symbol]()')
 
   t.deepEqual(tr.into([], tr.iterable(obj)), arr)
   t.deepEqual(toArray(obj).sort(), arr)
@@ -380,6 +385,7 @@ test('iterate fn', function(t){
 
   start = 0
   iterator = tr.iterable(count(start))[symbol]()
+  t.equals(iterator, iterator[symbol](), 'iterator === iterator[symbol]()')
   t.deepEquals({value: start++, done: false}, iterator.next())
   t.deepEquals({value: start++, done: false}, iterator.next())
   t.deepEquals({value: start++, done: false}, iterator.next())
