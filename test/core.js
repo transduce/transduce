@@ -4,7 +4,8 @@ var tr = require('../'),
     iterdone = require('iterdone'),
     test = require('tape'),
     compose = tr.compose,
-    stringReduce = tr.transformer('')
+    stringReduce = tr.transformer(''),
+    symIter = tr.protocols.iterator
 
 function isOdd(x){return x % 2 === 1}
 function not(p){
@@ -142,18 +143,25 @@ test('eduction', function(t){
   var xf,
       eduction = tr.eduction,
       iterToArray = iterdone.toArray,
-      into = tr.into
+      into = tr.into,
+      hasIterSym,
+      iterator
 
   var divisibleBy2 = eduction(
         tr.map(function(val){return [val, val % 2 === 0]}),
         [1,2,3])
+
+  iterator = divisibleBy2[symIter]();
+  t.ok(typeof iterator[symIter] === 'function' && iterator === iterator[symIter](),
+      'iterator[symIter]() === iterator')
+
   t.deepEqual(into([], divisibleBy2), [[1,false], [2,true], [3,false]])
   t.deepEqual(into({}, divisibleBy2), {1:false, 2:true, 3:false})
 
   xf = tr.map(add(1))
   t.deepEqual(into([], eduction(xf, [1,2,3])), [2,3,4])
   t.deepEqual(iterToArray(eduction(xf, [1,2,3])), [2,3,4])
-
+  
   xf = tr.map(add(2))
   t.deepEqual(into([], eduction(xf, [1,2,3])), [3,4,5])
   t.deepEqual(iterToArray(eduction(xf, [1,2,3])), [3,4,5])
@@ -300,12 +308,12 @@ test('transform function', function(t){
 })
 
 test('iterate array', function(t){
-  var arr, iterator, idx, symbol = tr.protocols.iterator
+  var arr, iterator, idx
 
   idx = 0
   arr = [1,2,3]
-  iterator = tr.iterable(arr)[symbol]()
-  t.equals(iterator, iterator[symbol](), 'iterator === iterator[symbol]()')
+  iterator = tr.iterable(arr)[symIter]()
+  t.equals(iterator, iterator[symIter](), 'iterator === iterator[symIter]()')
   t.deepEquals({value: arr[idx++], done: false}, iterator.next())
   t.deepEquals({value: arr[idx++], done: false}, iterator.next())
   t.deepEquals({value: arr[idx++], done: false}, iterator.next())
@@ -314,14 +322,14 @@ test('iterate array', function(t){
 
   idx = 0
   arr = [2]
-  iterator = tr.iterable(arr)[symbol]()
+  iterator = tr.iterable(arr)[symIter]()
   t.deepEquals({value: arr[idx++], done: false}, iterator.next())
   t.ok(iterator.next().done)
   t.ok(iterator.next().done)
 
   idx = 0
   arr = []
-  iterator = tr.iterable(arr)[symbol]()
+  iterator = tr.iterable(arr)[symIter]()
   t.ok(iterator.next().done)
   t.ok(iterator.next().done)
 
@@ -329,12 +337,12 @@ test('iterate array', function(t){
 })
 
 test('iterate string', function(t){
-  var arr, iterator, idx, symbol = tr.protocols.iterator
+  var arr, iterator, idx
 
   idx = 0
   arr = ['1','2','3']
-  iterator = tr.iterable('123')[symbol]()
-  t.equals(iterator, iterator[symbol](), 'iterator === iterator[symbol]()')
+  iterator = tr.iterable('123')[symIter]()
+  t.equals(iterator, iterator[symIter](), 'iterator === iterator[symIter]()')
   t.deepEquals({value: arr[idx++], done: false}, iterator.next())
   t.deepEquals({value: arr[idx++], done: false}, iterator.next())
   t.deepEquals({value: arr[idx++], done: false}, iterator.next())
@@ -343,13 +351,13 @@ test('iterate string', function(t){
 
   idx = 0
   arr = ['2']
-  iterator = tr.iterable('2')[symbol]()
+  iterator = tr.iterable('2')[symIter]()
   t.deepEquals({value: arr[idx++], done: false}, iterator.next())
   t.ok(iterator.next().done)
   t.ok(iterator.next().done)
 
   idx = 0
-  iterator = tr.iterable('')[symbol]()
+  iterator = tr.iterable('')[symIter]()
   t.ok(iterator.next().done)
   t.ok(iterator.next().done)
 
@@ -357,14 +365,14 @@ test('iterate string', function(t){
 })
 
 test('iterate object', function(t){
-  var obj, objIterator, arr, symbol = tr.protocols.iterator
+  var obj, objIterator, arr
   var toArray = iterdone.toArray
 
   obj = {a:1, b:2, c:3}
   arr = [['a', 1],['b', 2],['c', 3]]
 
   objIterator = tr.iterator(obj)
-  t.equals(objIterator, objIterator[symbol](), 'objIterator === objIterator[symbol]()')
+  t.equals(objIterator, objIterator[symIter](), 'objIterator === objIterator[symIter]()')
 
   t.deepEqual(tr.into([], tr.iterable(obj)), arr)
   t.deepEqual(toArray(obj).sort(), arr)
@@ -374,7 +382,7 @@ test('iterate object', function(t){
 })
 
 test('iterate fn', function(t){
-  var fn, iterator, start, symbol = tr.protocols.iterator
+  var fn, iterator, start
 
   function count(init){
     var cnt = init
@@ -384,15 +392,15 @@ test('iterate fn', function(t){
   }
 
   start = 0
-  iterator = tr.iterable(count(start))[symbol]()
-  t.equals(iterator, iterator[symbol](), 'iterator === iterator[symbol]()')
+  iterator = tr.iterable(count(start))[symIter]()
+  t.equals(iterator, iterator[symIter](), 'iterator === iterator[symIter]()')
   t.deepEquals({value: start++, done: false}, iterator.next())
   t.deepEquals({value: start++, done: false}, iterator.next())
   t.deepEquals({value: start++, done: false}, iterator.next())
   t.deepEquals({value: start++, done: false}, iterator.next())
 
   start = 10
-  iterator = tr.iterable(count(start))[symbol]()
+  iterator = tr.iterable(count(start))[symIter]()
   t.deepEquals({value: start++, done: false}, iterator.next())
   t.deepEquals({value: start++, done: false}, iterator.next())
   t.deepEquals({value: start++, done: false}, iterator.next())
@@ -402,7 +410,7 @@ test('iterate fn', function(t){
 })
 
 test('iterate next fn', function(t){
-  var fn, iterator, start, symbol = tr.protocols.iterator
+  var fn, iterator, start
 
   function count(init){
     var cnt = init
@@ -414,14 +422,14 @@ test('iterate next fn', function(t){
   }
 
   start = 0
-  iterator = tr.iterable(count(start))[symbol]()
+  iterator = tr.iterable(count(start))[symIter]()
   t.deepEquals({value: start++, done: false}, iterator.next())
   t.deepEquals({value: start++, done: false}, iterator.next())
   t.deepEquals({value: start++, done: false}, iterator.next())
   t.deepEquals({value: start++, done: false}, iterator.next())
 
   start = 10
-  iterator = tr.iterable(count(start))[symbol]()
+  iterator = tr.iterable(count(start))[symIter]()
   t.deepEquals({value: start++, done: false}, iterator.next())
   t.deepEquals({value: start++, done: false}, iterator.next())
   t.deepEquals({value: start++, done: false}, iterator.next())
@@ -435,9 +443,14 @@ test('sequence array', function(t){
   var xf,
       toArray = iterdone.toArray,
       sequence = tr.sequence,
-      transducer = tr.transducer
+      transducer = tr.transducer, iterator
 
   xf = tr.map(add(1))
+
+  iterator = sequence(xf, [1,2,3])[symIter]()
+  t.ok(typeof iterator[symIter] === 'function' && iterator === iterator[symIter](),
+      'iterator[symIter]() === iterator')
+  
   t.deepEqual(toArray(sequence(xf, [1,2,3])), [2,3,4])
   xf = tr.map(add(2))
   t.deepEqual(toArray(sequence(xf, [1,2,3])), [3,4,5])
@@ -463,9 +476,15 @@ test('sequence array', function(t){
 test('sequence fn', function(t){
   var xf,
       toArray = iterdone.toArray,
-      sequence = tr.sequence
+      sequence = tr.sequence,
+      iterator
 
   xf = compose(tr.filter(isOdd), tr.take(3))
+
+  iterator = sequence(xf, count())[symIter]()
+  t.ok(typeof iterator[symIter] === 'function' && iterator === iterator[symIter](),
+      'iterator[symIter]() === iterator')
+
   t.deepEqual(toArray(sequence(xf, count())), [1,3,5])
 
   xf = compose(tr.filter(isOdd), tr.drop(3), tr.take(4))
