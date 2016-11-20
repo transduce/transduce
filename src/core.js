@@ -6,7 +6,7 @@ const symIter = protocols.iterator
 
 // Transformer, iterable, completing
 import {transduceImpl, reduceImpl, intoImpl,
-        transformer, iterable, iterator, completing} from './_internal'
+        transformer, iterable, iterator, completing, symIterReturnSelf} from './_internal'
 
 export {transformer, iterable, iterator, completing}
 
@@ -131,6 +131,7 @@ class LazyIterator {
     return this.values.length ? {done: false, value: this.values.shift()} : {done: true}
   }
 }
+LazyIterator.prototype[symIter] = symIterReturnSelf;
 
 const stepTransformer = {
   [tInit]: () => {},

@@ -239,6 +239,6 @@ const objectTransformer = {
   [tResult]: identity
 }
 
-function symIterReturnSelf() {
+export function symIterReturnSelf() {
   return this
 }

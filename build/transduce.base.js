@@ -14,6 +14,7 @@ exports.intoImpl = intoImpl;
 exports.iterator = iterator;
 exports.iterable = iterable;
 exports.transformer = transformer;
+exports.symIterReturnSelf = symIterReturnSelf;
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
@@ -508,6 +509,8 @@ var LazyIterator = (function () {
 
   return LazyIterator;
 })();
+
+LazyIterator.prototype[symIter] = _internal.symIterReturnSelf;
 
 var stepTransformer = (_stepTransformer = {}, _stepTransformer[tInit] = function () {}, _stepTransformer[tStep] = function (lt, input) {
   lt.values.push(input);
