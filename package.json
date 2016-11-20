@@ -1,6 +1,6 @@
 {
   "name": "transduce",
-  "version": "0.10.1",
+  "version": "0.10.2",
   "description": "JavaScript transducers and iterators",
   "main": "index.js",
   "scripts": {
